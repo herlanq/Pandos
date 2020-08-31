@@ -14,9 +14,24 @@ typedef struct pcb_t {
     /* process status information */
     state_t             p_s;        /*processor state*/
     cpu_t               p_time;     /*cpu time used by proc*/
-    int                 *p_semAdd   /*which process blocked*/
+    int                 *p_semAdd;   /*which process blocked*/
 
     /* support layer information */
     support_t           *p_supportStruct;
                                 /*ptr to support struct*/
 } pcb_t;
+void freepcb(pcb_t *p){
+
+}
+pcb_t* makeEmptyProcQ(){
+    return null;
+}
+
+int emptyProcQ(pcb_t *tp){
+    return (tp==null);
+}
+pcb_t* headProcQ(pcb_t *tp){
+    if(emptyProcQ(tp))
+        return null;
+    return(tp->p_next);
+}
