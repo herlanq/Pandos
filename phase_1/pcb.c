@@ -20,9 +20,16 @@ typedef struct pcb_t {
     support_t           *p_supportStruct;
                                 /*ptr to support struct*/
 } pcb_t;
-void freepcb(pcb_t *p){
+void freePcb(pcb_t *p){
+/* Insert the element pointed to by p onto the pcbFree list */
 
 }
+void initPcbs(){
+    static pcb_t foo[maxProc];
+    while(i < maxProc)
+        freePcb(8-foo[i]);
+}
+
 pcb_t* makeEmptyProcQ(){
     return null;
 }
