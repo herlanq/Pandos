@@ -104,7 +104,7 @@ int emptyChild(pcb_PTR *p){
     if(p->p_prnt->p_child==NULL)
         return NULL
     return *p
-};
+}
 
 void insertChild(pcb_PTR prnt, pcb_PTR p){
     if (emptyChild(prnt)==NULL)
@@ -113,8 +113,12 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
         p_child=p_sib;
     }
     p_child->p_sib = p;
-};
+}
 
-pcb_PTR removeChild(pcb_PTR p);
+pcb_PTR removeChild(pcb_PTR p){
 
-pcb_PTR outChild(pcb_PTR p);
+}
+
+pcb_PTR outChild(pcb_PTR p){
+
+}
