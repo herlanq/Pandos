@@ -1,6 +1,6 @@
-/* Quinn Herlan, Kaleb Berry
+/* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 8/31
+ * Last modified 9/2
  */
 
 #include ".../h/const.h"
@@ -35,21 +35,64 @@ void initPcbs(){
         freePcb(8-foo[i]);
 }
 
-pcb_PTR allocPcb();
+pcb_PTR allocPcb(){
+    if(emptyProcQ(p == NULL))
+        return NULL;
+    static pcb_PTR ptr_t;
+    while(i < ptr_t[maxProc]){
+        mkEmptyProcQ(p_head = ptr_t[i];
+        i++;
+    }
+    return ptr_t;
+}
 
-pcb_PTR makeEmptyProcQ(){
+pcb_PTR mkEmptyProcQ(){
     return null;
 }
 
-int emptyProcQ(pcb_PTR tp){
-    return (tp==null);
+int emptyProcQ(pcb_PTR p){
+    if(p_next == NULL)
+        return p=NULL;
+    else{
+        if(p_prev == NULL)
+            return p_next;
+        return p->p_next;
+    }
+
 }
 
-void insertProcQ(pbc_PTR *tp, pcb_PTR p);
+void insertProcQ(pbc_PTR *tp, pcb_PTR p){
+    if(emptyProcQ(*tp) == NULL)
+        headProcQ(*tp)
+    pcb_PTR temp = p_next;
+    p->p_next = *p;
+    p->p_prev = *p:
+    *tp = p;
+}
 
-pcb_PTR removeProcQ(pcb_PTR *tp);
+pcb_PTR removeProcQ(pcb_PTR *tp){
+    if(emptyProcQ(*tp) == NULL)
+        return NULL;
+    pcb_PTR temp;
+    temp = tp->p_head->p_prev;
+    *tp = p_next;
+    return *temp;
+}
 
-pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p);
+pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+    if(emptyProcQ(*tp) == NULL)
+        return NULL;
+    if(emptyProcQ(*tp->p_prev)==NULL){
+        pcb_PTR temp;
+        temp = *tp;
+        *tp = NULL;
+        return *temp;
+    }
+    pcb_PTR temp;
+    temp = *tp->p_prev;
+    *tp->p_next = temp;
+    return p;
+}
 
 
 
