@@ -94,17 +94,26 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     return p;
 }
 
-
-
 pcb_t* headProcQ(pcb_PTR tp){
     if(emptyProcQ(tp))
         return null;
     return(tp->p_next);
 }
 
-int emptyChild(pcb_PTR p);
+int emptyChild(pcb_PTR *p){
+    if(p->p_prnt->p_child==NULL)
+        return NULL
+    return *p
+};
 
-void insertChild(pcb_PTR prnt, pcb_PTR p);
+void insertChild(pcb_PTR prnt, pcb_PTR p){
+    if (emptyChild(prnt)==NULL)
+        prnt->p_child = p;
+    while(prnt->p_child->p_sib != NULL){
+        p_child=p_sib;
+    }
+    p_child->p_sib = p;
+};
 
 pcb_PTR removeChild(pcb_PTR p);
 
