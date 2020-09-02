@@ -116,6 +116,10 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
 }
 
 pcb_PTR removeChild(pcb_PTR p){
+    if(emptyChild(p)==NULL)
+        return NULL;
+    p->p_child
+    return *p
 
 }
 
