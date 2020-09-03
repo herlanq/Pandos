@@ -54,13 +54,12 @@ pcb_PTR mkEmptyProcQ(){
     return null;
 }
 
-//checks to make sure that the queue is empty, if it is not it returns a location in memory.
-int emptyProcQ(pcb_PTR tp){
-    if(tp == NULL){
-        return NULL;
-    }
-    return tp;
+/* Return TRUE if the queue whose tail is pointed to by tp is empty.
+Return FALSE otherwise. */
+int emptyProcQ(pcb_PTR tp) {
+    return (tp == NULL);
 }
+
 //inserts a new process on to the queue, and then adjusts each pointer accordingly.
 void insertProcQ(pbc_PTR *tp, pcb_PTR p){
     /* case 1: empty */
@@ -69,17 +68,17 @@ void insertProcQ(pbc_PTR *tp, pcb_PTR p){
         p-p_prev = p;
     }else if(*tp->p_next == *tp){ /* case 2: only one node*/
         /* new node is assigned to the tail pointer and prev pointer
-         * new previous of the tail pointer and the next is the new node */
+         * new previous and next is the new node */
         p->p_next = *tp;
         p->p_prev = *tp;
-        *tp-p_prev = p;
+        *tp->p_prev = p;
         *tp->p_next = p;
 
     }else{ /* case 3: n nodes where n > 1 */
         /* new node is the head node
-         * then next pointer of the new node is the head
+         * next pointer of the new node is the head
          * previous pointer of the head is the new node
-         * p_prev of the new node points to the tail of the old node*/
+         * p_prev of the new node points to the tail of the initial node*/
         pcb_PTR temp = *tp->p_next; //temp head node
         *tp->p_next = p;
         p->p_next = temp;
@@ -99,10 +98,6 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
         *tp = mkEmptyProcQ();
         return temp;
     }else{ // queue has n nodes where n > 1
-        /* temp points to head node
-         * tail pointer points to head's next
-         * point temp->p_next->p_prev and set as tail pointer
-         * return the head of queue (which is removed) */
         pcb_PTR temp = *tp->p_next;
         *tp->p_next = temp->p_next;
         temp->p_next->p_prev = *tp;
