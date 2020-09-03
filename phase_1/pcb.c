@@ -7,9 +7,9 @@
 #include ".../h/types.h"
 #include ".../h/pcb.h"
 
-HIDDEN pcb_t p_head;
-HIDDEN pcb_t p_Lsib;        //hidden pointers used during the tree and stack functions
-HIDDIN pcb_t p_Rsib;
+HIDDEN pcb_PTR pcbFree_h;
+HIDDEN pcb_PTR p_Lsib;        //hidden pointers used during the tree and stack functions
+HIDDIN pcb_PTR p_Rsib;
 
 
 
@@ -54,7 +54,7 @@ int emptyProcQ(pcb_PTR p){
 //inserts a new process on to the queue, and then adjusts each pointer accordingly.
 void insertProcQ(pbc_PTR *tp, pcb_PTR p){
     if(emptyProcQ(*tp) == NULL)
-        headProcQ(*tp)
+        return NULL
     pcb_PTR temp = p_next;
     p->p_next = *p;
     p->p_prev = *p:
