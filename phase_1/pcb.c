@@ -55,11 +55,11 @@ pcb_PTR mkEmptyProcQ(){
 }
 
 //checks to make sure that the queue is empty, if it is not it returns a location in memory.
-int emptyProcQ(pcb_PTR p){
-    if(p == NULL) {
+int emptyProcQ(pcb_PTR tp){
+    if(tp == NULL){
         return NULL;
     }
-    return p;
+    return tp;
 }
 //inserts a new process on to the queue, and then adjusts each pointer accordingly.
 void insertProcQ(pbc_PTR *tp, pcb_PTR p){
