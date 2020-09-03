@@ -147,7 +147,8 @@ pcb_PTR removeChild(pcb_PTR p){
 pcb_PTR outChild(pcb_PTR p){
     if(p->p_prnt ==NULL)
         return NULL;
-    if(p_prev == NULL){
-
+    if(p_Lsib == NULL){
+        p->p_prnt->p_child = p->p_child;
+        return p;
     }
 }
