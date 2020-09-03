@@ -26,16 +26,17 @@ void initPcbs(){
         freePcb(8-foo[i]);
 }
 
-//allocating PCB space within this function by iterating over the maxproc size again.
+//allocating PCB space within this function
 pcb_PTR allocPcb(){
     if(emptyProcQ(p == NULL))
         return NULL;
     static pcb_PTR ptr_t;
-    while(i < ptr_t[maxProc]){
-        mkEmptyProcQ(p_head = ptr_t[i];
-        i++;
-    }
-    return ptr_t;
+    *tp = NULL;
+    p = NULL;
+    p_next = NULL;
+    p_prev = NULL;
+    removeProcQ(p);
+    return p;
 }
 
 // clears out the queue by returning null
@@ -45,13 +46,9 @@ pcb_PTR mkEmptyProcQ(){
 
 //checks to make sure that the queue is empty, if it is not it returns a location in memory.
 int emptyProcQ(pcb_PTR p){
-    if(p_next == NULL)
-        return p=NULL;
-    else{
-        if(p_prev == NULL)
-            return p_next;
-        return p->p_next;
-    }
+    if(p == NULL)
+        return NULL;
+    return p;
 
 }
 //inserts a new process on to the queue, and then adjusts each pointer accordingly.
@@ -106,8 +103,8 @@ int emptyChild(pcb_PTR *p){
 //inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
 void insertChild(pcb_PTR prnt, pcb_PTR p){
     if (emptyChild(prnt)==NULL)
-        prnt->p_child = p;
-    while(prnt->p_child->p_sib != NULL){
+        p_prnt->p_child = p;
+    while(p_prnt->p_child->p_sib != NULL){
         p_child=p_sib;
     }
     p_child->p_sib = p;
@@ -118,8 +115,8 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
 pcb_PTR removeChild(pcb_PTR p){
     if(emptyChild(p)==NULL)
         return NULL;
-    p->p_child
-    return *p
+    p->p_prnt->p_child = p->p_child;
+    return p;
 
 }
 // removes a specified child that may or may not be the first one, or could be the top parent.
