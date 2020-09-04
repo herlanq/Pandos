@@ -29,7 +29,7 @@ typedef struct pcb_t {
     struct pcb_t        *p_next,     /*pointer to next entry*/
                         *p_prev,     /*pointer to prev entry*/
     /* process tree fields */
-                        *p_print,    /*pointer to parent*/
+                        *p_prnt,    /*pointer to parent*/
                         *p_child,    /*pointer to child*/
                         *p_sib,      /*pointer to sibling*/
 			            *p_prevsib;  /*pointer to previous sib*/
