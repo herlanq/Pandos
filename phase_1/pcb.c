@@ -62,25 +62,25 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
     /* case 1: empty */
     if(emptyProcQ((*tp)) == NULL){
         p->p_next = p;
-        p-p_prev = p;
+        p->p_prev = p;
     }else if(*tp->p_next == *tp){ /* case 2: only one node*/
         /* new node is assigned to the tail pointer and prev pointer
          * new previous and next is the new node */
         p->p_next = *tp;
         p->p_prev = *tp;
-        *tp->p_prev = p;
-        *tp->p_next = p;
+        (*tp)->p_prev = p;
+        (*tp)->p_next = p;
 
     }else{ /* case 3: n nodes where n > 1 */
         /* new node is the head node
          * next pointer of the new node is the head
          * previous pointer of the head is the new node
          * p_prev of the new node points to the tail of the initial node*/
-        pcb_PTR temp = *tp->p_next; /* temp head node */
-        *tp->p_next = p;
+        pcb_PTR temp = (*tp)->p_next; /* temp head node */
+        (*tp)->p_next = p;
         p->p_next = temp;
         p->p_prev = *tp;
-        *tp = p;
+        (*tp) = p;
     }
 
     *tp = p;
@@ -88,7 +88,7 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
 
 /*takes the next process off of the queue and adjusts pointers accordingly. */
 pcb_PTR removeProcQ(pcb_PTR *tp) {
-    if (emptyProcQ((*tp) == NULL){ /* if queue is empty, return  */
+    if (emptyProcQ((*tp) == NULL)){ /* if queue is empty, return  */
         return NULL;
     }else if ((*tp)->p_next == (*tp)){ /* if there is only one node */
         pcb_PTR *temp = *tp;
@@ -101,6 +101,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
         return temp;
     }
 }
+
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     if(emptyProcQ((*tp)) == NULL){
@@ -109,12 +110,12 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
         if((*tp)->p_next == *tp){
             (*tp) = mkEmptyProcQ();
         }
-        (*tp)->p_prev
+        (*tp)->p_prev;
         p->p_prev = NULL;
         p->p_next = NULL;
         return p;
-    }else if(*tp == p){
-        *tp = P->p_prev;
+    }else if((*tp) == p){
+        (*tp) = p->p_prev;
         pcb_PTR temp;
         temp = p;
         temp->p_next->p_prev = temp->p_prev;
@@ -146,11 +147,11 @@ int emptyChild(pcb_PTR p){
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
 void insertChild(pcb_PTR prnt, pcb_PTR p){
-    if (emptyChild(prnt)){ /* case 1: no children */
+    if (emptyChild(p_prnt)){ /* case 1: no children */
         p_prnt->p_child = p;
         p->p_prnt = p_prnt;
         p->p_prevsib = NULL;
-        p->p_Rsib = NULL;
+        p->p_sib = NULL;
     } /* case 2: n children n >= 1 */
     p->p_prnt = p_prnt;
     p_prnt->p_child->p_prevsib = p;
@@ -192,13 +193,13 @@ pcb_PTR outChild(pcb_PTR p){
     }
 
     /* one child */
-    if(p_prevsib == NULL && p->p_sib == NULL && p== p->p_prnt->p_child){
+    if(p->p_prevsib == NULL && p->p_sib == NULL && p == p->p_prnt->p_child){
         p->p_prnt->p_child = NULL;
         p->p_prnt = NULL;
         return p;
     }
     /* head child */
-    if(p == p->p_prnt-p_child){
+    if(p == p->p_prnt->p_child){
         /* removeChild(p); ??*/
         p->p_prnt->p_child = p->p_sib;
         p->p_sib->p_prevsib = NULL;
