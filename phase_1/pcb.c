@@ -13,8 +13,13 @@ HIDDEN pcb_PTR pcbFree_h;
 
 /*set new node's next pointer to current head, make head the newly inserted node*/
 void freePcb(pcb_PTR p){
-    p->p_next = pcbFree_h;
-    pcbFree_h = p;
+    if(pcbFree_h == NULL){
+        pcbFree_h = p;
+    }else{
+        pcb_PTR temp = pcbFree_h;
+        pcbFree_h = p;
+        p->p_next = temp;
+    }
 }
 
 /*function to initialize the pcb stack with maxproc size of 20.*/
@@ -24,6 +29,7 @@ void initPcbs(){
     int i = 0;
     while(i < MAXPROC){
         freePcb(&pcbInit[i]);
+        i++;
     }
 }
 
