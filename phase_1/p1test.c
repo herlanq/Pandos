@@ -131,16 +131,12 @@ void main() {
 
 	/* Check allocProc */
 	for (i = 0; i < MAXPROC; i++) {
-	    addokbuf("loop");
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
-    addokbuf("out of loop");
 	if (allocPcb() != NULL) {
-        addokbuf("in if");
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
-    addokbuf("passed allocpcb!=null");
 	addokbuf("allocPcb ok   \n");
 
 	/* return the last 10 entries back to free list */
