@@ -32,7 +32,7 @@ initASL(){
  * and proceed as above.
  * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
  * return TRUE. In all other cases return FALSE. */
-int insertBlocked(int *semAdd, pcb t *p){
+int insertBlocked(int *semAdd, pcb_t *p){
 
 }
 
@@ -49,6 +49,6 @@ pcb_t *removeBlocked(int *semAdd){
  * semaphore (p→ p semAdd) on the ASL.
  * If pcb pointed to by p does not appear in the process queue associated with p’s semaphore,
  * which is an error condition, return NULL; otherwise, re- turn p. */
-pcb_t *outBlocked(pcb t *p){
+pcb_t *outBlocked(pcb_t *p){
 
 }
