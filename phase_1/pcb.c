@@ -150,17 +150,17 @@ int emptyChild(pcb_PTR p){
 /* Make the pcb pointed to by p a child of the pcb pointed to by prnt.
 */
 void insertChild(pcb_PTR prnt, pcb_PTR p){
-    // Lsib = prev, Rsib = next
+    // p_sib = next, p_prevsib = prev
     if (emptyChild(prnt)){ // case 1: no children
         p_prnt->p_child = p;
         p->p_prnt = p_prnt;
-        p->p_Lsib = NULL;
-        p->p_Rsib = NULL;
+        p->p_prevsib = NULL;
+        p->p_sib = NULL;
     } // case 2: n children n >= 1
     p->p_prnt = p_prnt;
-    p_prnt->p_child->p_Lsib = p;
-    p->p_Rsib = p_prnt->p_child;
-    p->p_Lsib = NULL;
+    p_prnt->p_child->p_prevsib = p;
+    p->p_sib = p_prnt->p_child;
+    p->p_prevsib = NULL;
     p_prnt->p_child =p;
 }
 
@@ -171,7 +171,7 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
 pcb_PTR removeChild(pcb_PTR p){
     if(emptyChild(p)==NULL){ // no children
         return NULL;
-    }else if(p->p_child->p_Rsib == NULL) { // one child
+    }else if(p->p_child->p_sib == NULL) { // one child
 
 
     }else { // children n > 1
@@ -190,7 +190,7 @@ pcb_PTR outChild(pcb_PTR p){
         return NULL;
     }
     // one child
-    if(p_Lsib == NULL && p->Rsib == NULL && p== p->prnt->p_child){
+    if(p_prevsib == NULL && p->p_sib == NULL && p== p->prnt->p_child){
         p->p_prnt->p_child = NULL;
         p->p_prnt = NULL;
         return p;
