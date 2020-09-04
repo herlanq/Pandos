@@ -103,17 +103,25 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 }
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-    if(emptyProcQ(*tp) == NULL) {
+    if(headProcQ(*p) == NULL) {
+        removeProcQ(*tp, p);
         return NULL;
-    } else if(emptyProcQ(*tp->p_prev)==NULL){
+    }else if(*tp->p_prev=p_next){
+        p->p_prev = NULL;
+        p->p_next = NULL;
+        return p;
+    }else if(*tp = p;){
+        *tp = P->p_prev;
         pcb_PTR temp;
-        temp = *tp;
-        *tp = NULL;
-        return *temp;
+        temp = p;
+        temp->p_next->p_prev = temp->p_prev;
+        temp->p_prev->p_next = temp->p_next;
+        return p;
     }
     pcb_PTR temp;
-    temp = *tp->p_prev;
-    *tp->p_next = temp;
+    temp = p;
+    temp->p_next->p_prev = temp->p_prev;
+    temp->p_prev->p_next = temp->p_next;
     return p;
 }
 
@@ -138,13 +146,13 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
     if (emptyChild(prnt)){ /* case 1: no children */
         p_prnt->p_child = p;
         p->p_prnt = p_prnt;
-        p->p_Lsib = NULL;
+        p->p_prevsib = NULL;
         p->p_Rsib = NULL;
     } /* case 2: n children n >= 1 */
     p->p_prnt = p_prnt;
-    p_prnt->p_child->p_Lsib = p;
-    p->p_Rsib = p_prnt->p_child;
-    p->p_Lsib = NULL;
+    p_prnt->p_child->p_prevsib = p;
+    p->p_sib = p_prnt->p_child;
+    p->p_prevsib = NULL;
     p_prnt->p_child =p;
 }
 
