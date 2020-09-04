@@ -3,9 +3,9 @@
  * Last modified 9/4
  */
 
-#include ".../h/const.h"
-#include ".../h/types.h"
-#include ".../h/pcb.h"
+#include "../h/const.h"
+#include "../h/types.h"
+#include "../h/pcb.h"
 
 HIDDEN pcb_PTR pcbFree_h;
 

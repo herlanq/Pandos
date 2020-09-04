@@ -3,9 +3,12 @@
  * Last modified 9/4
  */
 
-#include ".../h/const.h"
-#include ".../h/types.h"
-#include ".../h/pcb.h"
+#include "../h/const.h"
+#include "../h/types.h"
+#include "../h/pcb.h"
+
+semd_t *semd_h;     /* defines active list*/
+semd_t *semddFree_h; /* defines free semaphore list */
 
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
