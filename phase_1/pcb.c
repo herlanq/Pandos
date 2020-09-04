@@ -159,40 +159,64 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
 
 /*removes the first child pointed to by p, and adjusts siblings accordingly if any. */
 pcb_PTR removeChild(pcb_PTR p){
-    if(emptyChild(p)==NULL){
+    if(emptyChild(p)==NULL){ /* no child */
         return NULL;
-    }else if(p->p_child->p_Rsib == NULL) {
-
-
-    }else { /* children n > 1 */
-
+    }else if(p->p_child->p_sib == NULL){ /* children = 1 */
+        temp = p->p_child;
+        temp->p_prnt = NULL;
+        temp->p_sib = NULL;
+        temp->p_prevsib = NULL;
+        p->p_child = NULL;
+        return temp;
+    }else{ /* children n > 1 */
+        temp = p->p_child;
+        temp->p_sib->p_prevsib = NULL;
+        p->p_child = temp->p_sib;
+        temp->p_prevsib = NULL;
+        p->p_prnt = NULL;
+        return temp;
     }
-
 }
 /* removes a specified child that may or may not be the first one, or could be the top parent. */
 pcb_PTR outChild(pcb_PTR p){
-    if(p == NULL){
+    /* if empty*/
+    if(p == NULL){ /* if p is empty*/
         return NULL;
     }
-    if(p->p_prnt == NULL){
+    if(p->p_prnt == NULL){ /* if parent of p is empty, thus p is not a child*/
         return NULL;
     }
+
     /* one child */
-    if(p_Lsib == NULL && p->Rsib == NULL && p== p->prnt->p_child){
+    if(p_prevsib == NULL && p->p_sib == NULL && p== p->p_prnt->p_child){
         p->p_prnt->p_child = NULL;
         p->p_prnt = NULL;
         return p;
     }
-    /* first child */
-    if(){
-
+    /* head child */
+    if(p == p->p_prnt-p_child){
+        /* removeChild(p); ??*/
+        p->p_prnt->p_child = p->p_sib;
+        p->p_sib->p_prevsib = NULL;
+        p->p_sib = NULL;
+        p->p_prnt = NULL;
+        return p;
     }
     /* last child */
-    if(){
-
+    if(p->p_sib == NULL){
+        p->p_prevsib->p_sib = NULL;
+        p->p_prevsib = NULL;
+        p->p_prnt = NULL;
+        return p;
     }
-    /* middle */
-    if(){
-
+    /* some other child */
+    if(p->p_prevsib != NULL && p->sib != NULL){
+        p->p_prevsib->p_sib = p->p_sib;
+        p->p_sib->p_prevsib = p->p_prevsib;
+        p->sib = NULL;
+        p->p_prevsib = NULL;
+        p->p_prnt = NULL;
+        return p;
     }
+    return NULL;
 }
