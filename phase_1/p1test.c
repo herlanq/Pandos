@@ -137,6 +137,7 @@ void main() {
 	}
     addokbuf("out of loop");
 	if (allocPcb() != NULL) {
+        addokbuf("in if");
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
     addokbuf("passed allocpcb!=null");
