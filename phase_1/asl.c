@@ -5,7 +5,7 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "../h/pcb.h"
+#include "../h/asl.h"
 
 semd_t *semd_h;     /* defines active list*/
 semd_t *semddFree_h; /* defines free semaphore list */
