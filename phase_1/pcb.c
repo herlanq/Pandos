@@ -148,7 +148,7 @@ int emptyChild(pcb_PTR p){
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
 void insertChild(pcb_PTR prnt, pcb_PTR p){
     if (emptyChild(prnt)){ /* case 1: no children */
-        p_prnt->p_child = p;
+        prnt->p_child = p;
         p->p_prnt = p_prnt;
         p->p_prevsib = NULL;
         p->p_sib = NULL;
