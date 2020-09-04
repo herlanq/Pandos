@@ -19,10 +19,10 @@ void freePcb(pcb_PTR p){
 
 /*function to initialize the pcb stack with maxproc size of 20.*/
 void initPcbs(){
-    static pcb_t pcbInit[maxProc];
+    static pcb_t pcbInit[MAXPROC];
     pcbFree_h = NULL;
     int i = 0;
-    while(i < maxProc){
+    while(i < MAXPROC){
         freePcb(&pcbInit[i]);
     }
 }
@@ -63,7 +63,7 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
     if(emptyProcQ((*tp)) == NULL){
         p->p_next = p;
         p->p_prev = p;
-    }else if(*tp->p_next == *tp){ /* case 2: only one node*/
+    }else if((*tp)->p_next == (*tp)){ /* case 2: only one node*/
         /* new node is assigned to the tail pointer and prev pointer
          * new previous and next is the new node */
         p->p_next = *tp;
@@ -147,7 +147,7 @@ int emptyChild(pcb_PTR p){
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
 void insertChild(pcb_PTR prnt, pcb_PTR p){
-    if (emptyChild(p_prnt)){ /* case 1: no children */
+    if (emptyChild(prnt)){ /* case 1: no children */
         p_prnt->p_child = p;
         p->p_prnt = p_prnt;
         p->p_prevsib = NULL;
