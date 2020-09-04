@@ -139,6 +139,7 @@ void main() {
 	if (allocPcb() != NULL) {
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
+    addokbuf("passed allocpcb!=null");
 	addokbuf("allocPcb ok   \n");
 
 	/* return the last 10 entries back to free list */
