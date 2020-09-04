@@ -44,11 +44,11 @@ typedef struct pcb_t {
 } pcb_t, *pcb_PTR;
 
 /* semaphore descriptor type */
-typedef struct semd t {
+typedef struct semd_t {
     struct semd_t *s next;  /* next element on the ASL */
     int *s semAdd;          /* pointer to the semaphore */
     pcb_t *s procQ;         /* tail pointer to a process queue */
-} semd t;
+} semd_t;
 
 #define t_recv_status		d_status
 #define t_recv_command		d_command

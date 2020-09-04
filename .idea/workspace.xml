@@ -28,7 +28,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/phase_1/asl.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/h/types.h" beforeDir="false" afterPath="$PROJECT_DIR$/h/types.h" afterDir="false" />
     </list>
