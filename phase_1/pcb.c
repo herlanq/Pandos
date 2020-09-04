@@ -153,11 +153,11 @@ void insertChild(pcb_PTR prnt, pcb_PTR p){
         p->p_prevsib = NULL;
         p->p_sib = NULL;
     } /* case 2: n children n >= 1 */
-    p->p_prnt = p_prnt;
-    p_prnt->p_child->p_prevsib = p;
-    p->p_sib = p_prnt->p_child;
+    p->p_prnt = prnt;
+    prnt->p_child->p_prevsib = p;
+    p->p_sib = prnt->p_child;
     p->p_prevsib = NULL;
-    p_prnt->p_child =p;
+    prnt->p_child =p;
 }
 
 
