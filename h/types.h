@@ -45,9 +45,9 @@ typedef struct pcb_t {
 
 /* semaphore descriptor type */
 typedef struct semd_t {
-    struct semd_t *s next;  /* next element on the ASL */
-    int *s semAdd;          /* pointer to the semaphore */
-    pcb_t *s procQ;         /* tail pointer to a process queue */
+    struct semd_t *s_next;  /* next element on the ASL */
+    int *s_semAdd;          /* pointer to the semaphore */
+    pcb_t *s_procQ;         /* tail pointer to a process queue */
 } semd_t;
 
 #define t_recv_status		d_status
