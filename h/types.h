@@ -32,6 +32,7 @@ typedef struct pcb_t {
                         *p_print,    /*pointer to parent*/
                         *p_child,    /*pointer to child*/
                         *p_sib;      /*pointer to sibling*/
+			*p_prevsib;  /*pointer to previous sib*/
     /* process status information */
     state_t             p_s;        /*processor state*/
     cpu_t               p_time;     /*cpu time used by proc*/
@@ -40,7 +41,7 @@ typedef struct pcb_t {
     /* support layer information */
     support_t           *p_supportStruct;
                                 /*ptr to support struct*/
-} pcb_t;
+} pcb_t, *pcb_PTR;
 
 #define t_recv_status		d_status
 #define t_recv_command		d_command
