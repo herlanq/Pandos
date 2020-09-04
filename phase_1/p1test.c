@@ -131,7 +131,7 @@ void main() {
 
 	/* Check allocProc */
 	for (i = 0; i < MAXPROC; i++) {
-	    addokbuf("inside loop");
+	    addokbuf("loop");
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
