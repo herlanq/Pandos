@@ -41,7 +41,7 @@ typedef struct pcb_t {
     /* support layer information */
     support_t           *p_supportStruct;
                                 /*ptr to support struct*/
-} pcb_t;
+} pcb_t, *pcb_PTR;
 
 #define t_recv_status		d_status
 #define t_recv_command		d_command
