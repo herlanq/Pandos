@@ -149,7 +149,7 @@ int emptyChild(pcb_PTR p){
 void insertChild(pcb_PTR prnt, pcb_PTR p){
     if (emptyChild(prnt)){ /* case 1: no children */
         prnt->p_child = p;
-        p->p_prnt = p_prnt;
+        p->p_prnt = prnt;
         p->p_prevsib = NULL;
         p->p_sib = NULL;
     } /* case 2: n children n >= 1 */
