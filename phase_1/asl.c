@@ -5,6 +5,8 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
+#include "../h/pbc.h"
+#include "../phase_1//pbc.c"
 #include "../h/asl.h"
 
 semd_t *semdFree_h; /* defines free semaphore list */
@@ -14,7 +16,9 @@ semd_t *semd_h /* defines active semaphore list */
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
-
+    semd_t *temp;
+    temp = getParent(semAdd); /* gets the parent node */
+    return headProcQ(temp->s_next->s_procQ);
 }
 
 /* Initialize the semdFree list to contain all the elements of the array
