@@ -178,11 +178,16 @@ void main() {
 		adderrbuf("outProcQ failed on first entry   ");
     adderrbuf("here1");
 	freePcb(q);
+<<<<<<< HEAD
     adderrbuf("here2");
+=======
+	addokbuf("this means I got out of the first freePCB \n");
+>>>>>>> 26390cab2b65c2a813e8e1b527babc8387f8ce81
 	q = outProcQ(&qa, midproc);
 	if (q == NULL || q != midproc)
 		adderrbuf("outProcQ failed on middle entry   ");
 	freePcb(q);
+	addokbuf("this means I got out of the second freePCB \n");
 	if (outProcQ(&qa, procp[0]) != NULL)
 		adderrbuf("outProcQ failed on nonexistent entry   ");
 	addokbuf("outProcQ ok   \n");
