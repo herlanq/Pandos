@@ -28,7 +28,7 @@ void initASL(){
     semdFree_h = NULL;
     int i;
     for(i=2; i<MAXPROC+2; i++) {
-        deallocASL(&ASLInit[i]);
+        /*deallocASL(&ASLInit[i]);*/
     }
     /* setting the first and second nodes as dummy nodes */
     semd_t *first;

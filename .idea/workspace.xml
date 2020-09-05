@@ -29,6 +29,9 @@
   <component name="ChangeListManager">
     <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="asl commit">
       <change beforePath="$PROJECT_DIR$/phase_1/asl.c" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/asl.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase_1/asl.o" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/asl.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase_1/kernel" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase_1/pcb.o" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/pcb.o" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +69,7 @@
       <workItem from="1599243640165" duration="841000" />
       <workItem from="1599261252780" duration="4242000" />
       <workItem from="1599326044759" duration="2693000" />
-      <workItem from="1599329869915" duration="458000" />
+      <workItem from="1599329869915" duration="528000" />
     </task>
     <task id="LOCAL-00001" summary="asl commit">
       <created>1599329953131</created>
@@ -82,7 +85,14 @@
       <option name="project" value="LOCAL" />
       <updated>1599330174852</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="asl commit">
+      <created>1599330342850</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1599330342850</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -105,10 +115,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="asl commit" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="249" y="165" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1599330243557">
-      <screen x="72" y="27" width="1368" height="873" />
+    <state x="214" y="149" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1599330348986">
+      <screen x="72" y="27" width="1095" height="772" />
     </state>
-    <state x="214" y="149" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1095.772@72.27.1095.772" timestamp="1599329995334" />
+    <state x="214" y="149" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1095.772@72.27.1095.772" timestamp="1599330348986" />
     <state x="249" y="165" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1368.873@72.27.1368.873" timestamp="1599330243557" />
   </component>
 </project>
