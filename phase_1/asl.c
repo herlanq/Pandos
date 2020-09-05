@@ -26,7 +26,8 @@ This method will be only called once during data structure initialization. */
 void initASL(){
     static semd_t ASLInit[MAXPROC+2]; /* includes two dummy nodes*/
     semdFree_h = NULL;
-    for(int i=2; i<MAXPROC+2; i++) {
+    int i;
+    for(i=2; i<MAXPROC+2; i++) {
         deallocASL(&ASLInit[i]);
     }
     /* setting the first and second nodes as dummy nodes */
