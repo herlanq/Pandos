@@ -5,7 +5,7 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "../h/pbc.h"
+#include "../h/pcb.h"
 #include "../h/asl.h"
 
 semd_t *semdFree_h; /* defines free semaphore list */
@@ -114,6 +114,6 @@ semd_t *getParent(int *semAdd){
         temp = temp->s_next;
     }
     return temp;
-} 
+}
 
 
