@@ -114,20 +114,25 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     if(emptyProcQ((*tp)) == TRUE){
         return NULL;
     }else if((*tp) == p){
-        if((*tp)->p_next == *tp){
+        if((*tp)->p_next == (*tp)){
             (*tp) = mkEmptyProcQ();
+        }else{
+            (*tp)->p_prev->p_next = (*tp)->p_next;
+            (*tp) ->p_next ->p_prev = (*tp)->p_prev;
+            *tp = (*tp)->p_prev;
         }
-        (*tp)->p_prev;
-        p->p_prev = NULL;
-        p->p_next = NULL;
         return p;
-    }else if((*tp) == p){
-        (*tp) = p->p_prev;
+    }else{
         pcb_PTR temp;
-        temp = p;
-        temp->p_next->p_prev = temp->p_prev;
-        temp->p_prev->p_next = temp->p_next;
-        return p;
+        temp = headProcQ(*tp);
+        while(temp != (*tp) && temp != p){
+            temp = temp->p_next;
+        }
+        if(temp == (*tp)){
+            return NULL;
+        }
+        p->p_prev->p_next = p->p_next;
+        p->p_next->p_prev = p->p_prev;
     }
     pcb_PTR temp;
     temp = p;
