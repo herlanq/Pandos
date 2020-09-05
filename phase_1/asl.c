@@ -32,9 +32,17 @@ void initASL(){
     /* setting the first and second dummy nodes */
     semd_t *first;
     first = &ASLInit[0];
-    semd_t
+    semd_t *last;
+    last = &ASLInit[1];
 
+    first->s_semAdd = NULL;
+    last->s_semAdd = (int*) MAXINT;
+    first->s_next = last;
+    last->s_next = NULL;
+    first->s_procQ = NULL;
+    last->s_procQ = NULL;
 
+    semd_h = first;
 }
 
 /* Insert the pcb pointed to by p at the tail of the process queue associated with the semaphore
