@@ -41,13 +41,13 @@ pcb_PTR allocPcb(){
     pcb_PTR temp;
     temp = pcbFree_h;
     pcbFree_h = pcbFree_h->p_next;
-    /* initializing new pcb 
-    temp->p_next = NULL;
-    temp->p_prev = NULL;
-    temp->p_prnt = NULL;
+    /* initializing new pcb
     temp->p_child = NULL;
+    temp->p_sib = NULL;
     temp->p_prevsib = NULL;
-    temp->p_sib = NULL; */
+    temp->p_prnt = NULL;
+    temp->p_next = NULL;
+    temp->p_prev = NULL;*/
 
     return temp;
 }
