@@ -27,6 +27,21 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="">
+<<<<<<< HEAD
+<<<<<<< HEAD
+      <change afterPath="$PROJECT_DIR$/phase_1/term0.umpsSuccessfulOut.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase_1/term0.umps.txt" beforeDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/h/asl.h" beforeDir="false" afterPath="$PROJECT_DIR$/h/asl.h" afterDir="false" />
+=======
+>>>>>>> ce8537789aabf6408fb72de6482d6c224a57b8d9
+      <change beforePath="$PROJECT_DIR$/phase_1/asl.c" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/asl.c" afterDir="false" />
+>>>>>>> c80f5c070bb2360db1dbd9b3f0697571e33c821b
+=======
     <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="pcb commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase_1/kernel" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/kernel" afterDir="false" />
@@ -35,6 +50,7 @@
       <change beforePath="$PROJECT_DIR$/phase_1/p1test.c" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/p1test.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase_1/pcb.o" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/pcb.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase_1/term0.umps" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/term0.umps" afterDir="false" />
+>>>>>>> 20b51da96bfbf5a9a2863150022c8807c15346ec
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,9 +86,21 @@
       <workItem from="1598899195219" duration="2465000" />
       <workItem from="1599167432863" duration="5105000" />
       <workItem from="1599243640165" duration="841000" />
+<<<<<<< HEAD
+      <workItem from="1599261252780" duration="4614000" />
+=======
       <workItem from="1599261252780" duration="4242000" />
+<<<<<<< HEAD
+<<<<<<< HEAD
+      <workItem from="1599326044759" duration="1078000" />
+>>>>>>> c80f5c070bb2360db1dbd9b3f0697571e33c821b
+=======
+      <workItem from="1599326044759" duration="2185000" />
+>>>>>>> ce8537789aabf6408fb72de6482d6c224a57b8d9
+=======
       <workItem from="1599326044759" duration="2693000" />
       <workItem from="1599329869915" duration="1451000" />
+>>>>>>> 20b51da96bfbf5a9a2863150022c8807c15346ec
     </task>
     <task id="LOCAL-00001" summary="asl commit">
       <created>1599329953131</created>
