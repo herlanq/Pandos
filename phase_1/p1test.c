@@ -134,7 +134,7 @@ void main() {
 		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL   ");
 	}
-	if (allocPcb() != NULL) {
+	if (allocPcb() == NULL) {
 		adderrbuf("allocPcb: allocated more than MAXPROC entries   ");
 	}
 	addokbuf("allocPcb ok   \n");
@@ -164,6 +164,7 @@ void main() {
 		default:
 			break;
 		}
+		addokbuf("running thru loop   \n");
 		insertProcQ(&qa, q);
 	}
 	addokbuf("inserted 10 elements   \n");
