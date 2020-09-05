@@ -26,10 +26,13 @@ void initASL(){
     int i;
     i =2;
     while(i < MAXPROC+2){
-        deallocASL()
-
+        deallocASL(&ASLInit[i]);
         i++;
     }
+    /* setting the first and second dummy nodes */
+    semd_t *first;
+    first = &ASLInit[0];
+    semd_t
 
 
 }
