@@ -6,7 +6,6 @@
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/pbc.h"
-#include "../phase_1/pbc.c"
 #include "../h/asl.h"
 
 semd_t *semdFree_h; /* defines free semaphore list */
@@ -30,7 +29,7 @@ void initASL(){
     if(int i=2; i<MAXPROC+2; i++){
         deallocASL(&ASLInit[i]);
     }
-    /* setting the first and second dummy nodes */
+    /* setting the first and second nodes as dummy nodes */
     semd_t *first;
     first = &ASLInit[0];
     semd_t *last;
@@ -111,7 +110,6 @@ semd_t *getParent(int *semAdd){
     if(semdAdd == NULL){
         semAdd = (int*) MAXINT;
     }
-
     while (semAdd > (temp->s_next->s_semAdd)){
         temp = temp->s_next;
     }
