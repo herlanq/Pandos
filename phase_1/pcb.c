@@ -70,7 +70,7 @@ int emptyProcQ(pcb_PTR tp) {
 /*inserts a new process on to the queue, and then adjusts each pointer accordingly.*/
 void insertProcQ(pcb_PTR *tp, pcb_PTR p){
     /* case 1: empty */
-    if(emptyProcQ((*tp)) == NULL){
+    if(emptyProcQ((*tp)) == TRUE){
         p->p_next = p;
         p->p_prev = p;
     }else if((*tp)->p_next == (*tp)){ /* case 2: only one node*/
@@ -98,7 +98,7 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
 
 /*takes the next process off of the queue and adjusts pointers accordingly. */
 pcb_PTR removeProcQ(pcb_PTR *tp) {
-    if (emptyProcQ((*tp) == NULL)){ /* if queue is empty, return  */
+    if (emptyProcQ((*tp) == TRUE)){ /* if queue is empty, return  */
         return NULL;
     }else if ((*tp)->p_next == (*tp)){ /* if there is only one node */
         pcb_PTR *temp = *tp;
@@ -114,7 +114,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-    if(emptyProcQ((*tp)) == NULL){
+    if(emptyProcQ((*tp)) == TRUE){
         return NULL;
     }else if((*tp) == p){
         if((*tp)->p_next == *tp){

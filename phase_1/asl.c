@@ -6,17 +6,20 @@
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/pcb.h"
+<<<<<<< HEAD
 #include "../h/asl.h"
+=======
+>>>>>>> 0358c5cddcedf066b3c42e4694cba99f6449f452
 
 semd_t *semdFree_h; /* defines free semaphore list */
-semd_t *semd_h /* defines active semaphore list */
+semd_t *semd_h; /* defines active semaphore list */
 
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    temp = getParent(semAdd); /* gets the parent node */
+    /* temp = getParent(semAdd);  gets the parent node */
     return headProcQ(temp->s_next->s_procQ);
 }
 
@@ -26,8 +29,16 @@ This method will be only called once during data structure initialization. */
 void initASL(){
     static semd_t ASLInit[MAXPROC+2]; /* includes two dummy nodes*/
     semdFree_h = NULL;
+<<<<<<< HEAD
     if(int i=2; i<MAXPROC+2; i++){
         deallocASL(&ASLInit[i]);
+=======
+    int i;
+    i =2;
+    while(i < MAXPROC+2){
+        /*deallocASL(&ASLInit[i]); */
+        i++;
+>>>>>>> 0358c5cddcedf066b3c42e4694cba99f6449f452
     }
     /* setting the first and second nodes as dummy nodes */
     semd_t *first;
@@ -97,18 +108,20 @@ semd_t *allocASL(){
 
 /* Similar to pcb, like allocASL function above
  * Function used to deallocate values in ASL
- * adds nodes to semdFree list */
-semd_t deallocASL(semd_t *semd){
+ * adds nodes to semdFree list 
+semd_t *deallocASL(semd_t *semd){
     semd->s_next = semdFree_h;
     semdFree_h = semd;
+    return NULL;
 }
 
 /* returns semAdd parent if semAdd != NULL
- * if semdAdd = NULL, return a dummy parent node */
-semd_t *getParent(int *semAdd){
-    semd_t *temp = (semd_t*) semd_h;
-    if(semdAdd == NULL){
-        semAdd = (int*) MAXINT;
+ * if semdAdd = NULL, return a dummy parent node 
+semd_t getParent(int *semAdd){
+    semd_t *temp = semd_h;
+    if(semAdd == NULL){
+        semAdd = MAXINT;
+        return semAdd;
     }
     while (semAdd > (temp->s_next->s_semAdd)){
         temp = temp->s_next;
@@ -117,3 +130,4 @@ semd_t *getParent(int *semAdd){
 }
 
 
+*/
