@@ -7,8 +7,8 @@
 #include "../h/types.h"
 #include "../h/asl.h"
 
-semd_t *semd_h;     /* defines active list*/
-semd_t *semddFree_h; /* defines free semaphore list */
+semd_t *semdFree_h; /* defines free semaphore list */
+semd_t *semd_h /* defines active semaphore list */
 
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
@@ -19,8 +19,18 @@ pcb_t *headBlocked(int *semAdd){
 
 /* Initialize the semdFree list to contain all the elements of the array
 static semd t semdTable[MAXPROC]
-This method will be only called once during data structure initializa- tion. */
-initASL(){
+This method will be only called once during data structure initialization. */
+void initASL(){
+    static semd_t ASLInit[MAXPROC+2]; /* includes two dummy nodes*/
+    semdFree_h = NULL;
+    int i;
+    i =2;
+    while(i < MAXPROC+2){
+        deallocASL()
+
+        i++;
+    }
+
 
 }
 
@@ -52,3 +62,48 @@ pcb_t *removeBlocked(int *semAdd){
 pcb_t *outBlocked(pcb_t *p){
 
 }
+
+/*                          Additional Functions                     */
+/* Functions used for code writing efficiency and to make the code easier to follow */
+
+/* Similar to pcb
+ * Function used to allocate values in ASL
+ * sets node pointer values to semd_t
+ */
+semd_t *allocASL(){
+    semd_t *temp;
+
+    if(semdFree_h == NULL){
+        return NULL;
+    }
+    temp = semdFree_h;
+    semdFree_h = semdFree_h->s_next;
+    temp->s_next = NULL;
+    temp->s_semAdd = NULL;
+    temp->s_procQ = NULL;
+    return temp;
+}
+
+/* Similar to pcb, like allocASL function above
+ * Function used to deallocate values in ASL
+ * adds nodes to semdFree list */
+semd_t deallocASL(semd_t *semd){
+    semd->s_next = semdFree_h;
+    semdFree_h = semd;
+}
+
+/* returns semAdd parent if semAdd != NULL
+ * if semdAdd = NULL, return a dummy parent node */
+semd_t *getParent(int *semAdd){
+    semd_t *temp = (semd_t*) semd_h;
+    if(semdAdd == NULL){
+        semAdd = (int*) MAXINT;
+    }
+
+    while (semAdd > (temp->s_next->s_semAdd)){
+        temp = temp->s_next;
+    }
+    return temp;
+}
+
+

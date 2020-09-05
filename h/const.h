@@ -28,6 +28,7 @@
 
 #define NULL 			    ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
+#define MAXINT            0xFFFFFFFF
 
 /* device interrupts */
 #define DISKINT			  3
