@@ -5,19 +5,17 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "../h/pbc.h"
-#include "../phase_1//pbc.c"
-#include "../h/asl.h"
+#include "../h/pcb.h"
 
 semd_t *semdFree_h; /* defines free semaphore list */
-semd_t *semd_h /* defines active semaphore list */
+semd_t *semd_h; /* defines active semaphore list */
 
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    temp = getParent(semAdd); /* gets the parent node */
+    /* temp = getParent(semAdd);  gets the parent node */
     return headProcQ(temp->s_next->s_procQ);
 }
 
@@ -30,7 +28,7 @@ void initASL(){
     int i;
     i =2;
     while(i < MAXPROC+2){
-        deallocASL(&ASLInit[i]);
+        /*deallocASL(&ASLInit[i]); */
         i++;
     }
     /* setting the first and second dummy nodes */
@@ -101,18 +99,20 @@ semd_t *allocASL(){
 
 /* Similar to pcb, like allocASL function above
  * Function used to deallocate values in ASL
- * adds nodes to semdFree list */
-semd_t deallocASL(semd_t *semd){
+ * adds nodes to semdFree list 
+semd_t *deallocASL(semd_t *semd){
     semd->s_next = semdFree_h;
     semdFree_h = semd;
+    return NULL;
 }
 
 /* returns semAdd parent if semAdd != NULL
- * if semdAdd = NULL, return a dummy parent node */
-semd_t *getParent(int *semAdd){
-    semd_t *temp = (semd_t*) semd_h;
-    if(semdAdd == NULL){
-        semAdd = (int*) MAXINT;
+ * if semdAdd = NULL, return a dummy parent node 
+semd_t getParent(int *semAdd){
+    semd_t *temp = semd_h;
+    if(semAdd == NULL){
+        semAdd = MAXINT;
+        return semAdd;
     }
 
     while (semAdd > (temp->s_next->s_semAdd)){
@@ -122,3 +122,4 @@ semd_t *getParent(int *semAdd){
 }
 
 
+*/
