@@ -61,10 +61,7 @@ pcb_PTR mkEmptyProcQ(){
 /* Return TRUE if the queue whose tail is pointed to by tp is empty.
 Return FALSE otherwise. */
 int emptyProcQ(pcb_PTR tp) {
-    if(tp == NULL){
-        return NULL;
-
-    }
+    return (tp == NULL);
 }
 
 /*inserts a new process on to the queue, and then adjusts each pointer accordingly.*/
