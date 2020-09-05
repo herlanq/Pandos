@@ -29,12 +29,15 @@
   <component name="ChangeListManager">
     <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="">
 <<<<<<< HEAD
+<<<<<<< HEAD
       <change afterPath="$PROJECT_DIR$/phase_1/term0.umpsSuccessfulOut.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase_1/term0.umps.txt" beforeDir="false" />
 =======
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/h/asl.h" beforeDir="false" afterPath="$PROJECT_DIR$/h/asl.h" afterDir="false" />
+=======
+>>>>>>> ce8537789aabf6408fb72de6482d6c224a57b8d9
       <change beforePath="$PROJECT_DIR$/phase_1/asl.c" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/asl.c" afterDir="false" />
 >>>>>>> c80f5c070bb2360db1dbd9b3f0697571e33c821b
     </list>
@@ -75,8 +78,12 @@
       <workItem from="1599261252780" duration="4614000" />
 =======
       <workItem from="1599261252780" duration="4242000" />
+<<<<<<< HEAD
       <workItem from="1599326044759" duration="1078000" />
 >>>>>>> c80f5c070bb2360db1dbd9b3f0697571e33c821b
+=======
+      <workItem from="1599326044759" duration="2185000" />
+>>>>>>> ce8537789aabf6408fb72de6482d6c224a57b8d9
     </task>
     <servers />
   </component>
