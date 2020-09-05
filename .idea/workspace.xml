@@ -27,8 +27,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="036ba365-20fb-4191-a5fd-c3e2cc48c47e" name="Default Changelist" comment="asl commit">
       <change beforePath="$PROJECT_DIR$/phase_1/asl.c" beforeDir="false" afterPath="$PROJECT_DIR$/phase_1/asl.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,8 +66,16 @@
       <workItem from="1599243640165" duration="841000" />
       <workItem from="1599261252780" duration="4242000" />
       <workItem from="1599326044759" duration="2693000" />
-      <workItem from="1599329869915" duration="58000" />
+      <workItem from="1599329869915" duration="286000" />
     </task>
+    <task id="LOCAL-00001" summary="asl commit">
+      <created>1599329953131</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1599329953131</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -85,5 +92,15 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="asl commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="asl commit" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="214" y="149" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1599329995334">
+      <screen x="72" y="27" width="1095" height="772" />
+    </state>
+    <state x="214" y="149" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1095.772@72.27.1095.772" timestamp="1599329995334" />
   </component>
 </project>
