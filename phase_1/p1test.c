@@ -164,7 +164,6 @@ void main() {
 		default:
 			break;
 		}
-		addokbuf("running thru loop   \n");
 		insertProcQ(&qa, q);
 	}
 	addokbuf("inserted 10 elements   \n");
