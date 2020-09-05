@@ -2,14 +2,8 @@ Initialized process control blocks
 allocPcb ok   
 freed 10 entries   
 Inserting...   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
-running thru loop   
 inserted 10 elements   
+I made it this far baby 
+This far? 
+this means I got out of the first freePCB 
+this means I got out of the second freePCB 

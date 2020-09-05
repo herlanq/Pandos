@@ -117,7 +117,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
         if((*tp)->p_next == *tp){
             (*tp) = mkEmptyProcQ();
         }
-        (*tp)->p_prev;
+        (*tp)->p_prev = (*tp);
         p->p_prev = NULL;
         p->p_next = NULL;
         return p;
