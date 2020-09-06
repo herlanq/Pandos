@@ -16,7 +16,7 @@ semd_t *semd_h; /* defines active semaphore list */
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    /* temp = getParent(semAdd);  gets the parent node */
+    temp = search(semAdd);  gets the parent node */
     return headProcQ(temp->s_next->s_procQ);
 }
 
@@ -28,7 +28,7 @@ void initASL(){
     semdFree_h = NULL;
     int i;
     for(i=2; i<MAXPROC+2; i++) {
-        /*deallocASL(&ASLInit[i]);*/
+        deallocASL(&(ASLInit[i]));
     }
     /* setting the first and second nodes as dummy nodes */
     semd_t *first;
@@ -104,10 +104,14 @@ void *deallocASL(semd_t *semd){
     semdFree_h = semd;
 }
 
-semd_t search(int *semAdd){
-    semd_t *temp = semd_h;
+/* goes through asl to determine if next node has semdAdd == parameter semAdd
+ * compares whether next semAdd > semaphore address.
+ * if semAdd == NULL, sets it to = MAXINT = 0xFFFFFFF
+ */
+semd_t *search(int *semAdd){
+    semd_t *temp = (semd_t*) semd_h;
     if(semAdd == NULL){
-        semAdd = MAXINT;
+        semAdd = (int*) MAXINT;
         return semAdd;
     }
     while (semAdd > (temp->s_next->s_semAdd)){

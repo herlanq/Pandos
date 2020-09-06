@@ -18,7 +18,7 @@ extern pcb_PTR headBlocked (int *semAdd);
 extern void initASL ();
 
 /*adding helper functions */
-extern semd_t *getParent(int *semAdd);
+extern semd_t *search(int *semAdd);
 extern semd_t deallocASL(semd_t *semd);
 extern semd_t *allocASL();
 
