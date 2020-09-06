@@ -121,12 +121,9 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
             (*tp) ->p_next ->p_prev = (*tp)->p_prev;
             *tp = (*tp)->p_prev;
         }
-<<<<<<< HEAD
-=======
         (*tp)->p_prev = (*tp);
         p->p_prev = NULL;
         p->p_next = NULL;
->>>>>>> 26390cab2b65c2a813e8e1b527babc8387f8ce81
         return p;
     }else{
         pcb_PTR temp;

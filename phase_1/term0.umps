@@ -3,11 +3,4 @@ allocPcb ok
 freed 10 entries   
 Inserting...   
 inserted 10 elements   
-<<<<<<< HEAD
 here1
-=======
-I made it this far baby 
-This far? 
-this means I got out of the first freePCB 
-this means I got out of the second freePCB 
->>>>>>> 26390cab2b65c2a813e8e1b527babc8387f8ce81
