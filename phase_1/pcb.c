@@ -13,13 +13,11 @@ HIDDEN pcb_PTR pcbFree_h;
 
 /*set new node's next pointer to current head, make head the newly inserted node*/
 void freePcb(pcb_PTR p){
-    if(pcbFree_h == NULL){
+    if(pcbFree_h == NULL) {
         pcbFree_h = p;
-    }else{
-        pcb_PTR temp = pcbFree_h;
-        pcbFree_h = p;
-        p->p_next = temp;
     }
+    p->p_next = pcbFree_h;
+    pcbFree_h = p;
 }
 
 /*function to initialize the pcb stack with maxproc size of 20.*/
@@ -89,7 +87,6 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
         p->p_prev = *tp;
         (*tp) = p;
     }
-
     *tp = p;
 }
 
@@ -98,13 +95,14 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
     if (emptyProcQ((*tp) == TRUE)){ /* if queue is empty, return  */
         return NULL;
     }else if ((*tp)->p_next == (*tp)){ /* if there is only one node */
-        pcb_PTR *temp = *tp;
+        pcb_PTR temp = *tp;
         *tp = mkEmptyProcQ();
         return temp;
-    }else{ /* queue has n nodes where n > 1 */
+    }else{                             /* queue has n nodes where n > 1 */
         pcb_PTR temp = (*tp)->p_next;
         (*tp)->p_next = temp->p_next;
-        temp->p_next->p_prev = *tp;
+        temp->p_next->p_prev = (*tp);
+        temp->p_prev = temp->p_next = NULL;
         return temp;
     }
 }
