@@ -3,4 +3,4 @@ allocPcb ok
 freed 10 entries   
 Inserting...   
 inserted 10 elements   
-here1
+here1this means I got out of the first freePCB 

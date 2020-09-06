@@ -176,9 +176,7 @@ void main() {
 	q = outProcQ(&qa, firstproc);
 	if (q == NULL || q != firstproc)
 		adderrbuf("outProcQ failed on first entry   ");
-    adderrbuf("here1");
 	freePcb(q);
-    adderrbuf("here2");
 	addokbuf("this means I got out of the first freePCB \n");
 	q = outProcQ(&qa, midproc);
 	if (q == NULL || q != midproc)

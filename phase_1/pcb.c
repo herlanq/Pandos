@@ -15,9 +15,11 @@ HIDDEN pcb_PTR pcbFree_h;
 void freePcb(pcb_PTR p){
     if(pcbFree_h == NULL) {
         pcbFree_h = p;
+        return;
+    }else{
+        p->p_next = pcbFree_h;
+        pcbFree_h = p;
     }
-    p->p_next = pcbFree_h;
-    pcbFree_h = p;
 }
 
 /*function to initialize the pcb stack with maxproc size of 20.*/
@@ -116,7 +118,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
             (*tp) = mkEmptyProcQ();
         }else{
             (*tp)->p_prev->p_next = (*tp)->p_next;
-            (*tp) ->p_next ->p_prev = (*tp)->p_prev;
+            (*tp)->p_next->p_prev = (*tp)->p_prev;
             *tp = (*tp)->p_prev;
         }
         (*tp)->p_prev = (*tp);
