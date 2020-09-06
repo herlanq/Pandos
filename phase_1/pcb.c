@@ -120,7 +120,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     pcb_PTR temp;
     temp = (*tp)->p_next;
     while (temp != (*tp)) {
-        if (temp == p) {
+        if (temp == p){
             p->p_next->p_prev = p->p_prev;
             p->p_prev->p_next = p->p_next;
             p->p_next = NULL;
@@ -163,7 +163,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     temp->p_prev->p_next = temp->p_next;
     return temp;
     */
-}
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */
 pcb_t* headProcQ(pcb_PTR tp){

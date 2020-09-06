@@ -83,11 +83,10 @@ pcb_t *outBlocked(pcb_t *p){
  * sets node pointer values to semd_t
  */
 semd_t *allocASL(){
-    semd_t *temp;
-
     if(semdFree_h == NULL){ /* if already free */
         return NULL;
     }
+    semd_t *temp;
     temp = semdFree_h;
     semdFree_h = semdFree_h->s_next;
     temp->s_next = NULL;
@@ -98,16 +97,14 @@ semd_t *allocASL(){
 
 /* Similar to pcb, like allocASL function above
  * Function used to deallocate values in ASL
- * adds nodes to semdFree list 
-semd_t *deallocASL(semd_t *semd){
+ * adds nodes to semdFree list
+ */
+void *deallocASL(semd_t *semd){
     semd->s_next = semdFree_h;
     semdFree_h = semd;
-    return NULL;
 }
 
-/* returns semAdd parent if semAdd != NULL
- * if semdAdd = NULL, return a dummy parent node 
-semd_t getParent(int *semAdd){
+semd_t search(int *semAdd){
     semd_t *temp = semd_h;
     if(semAdd == NULL){
         semAdd = MAXINT;
@@ -118,6 +115,3 @@ semd_t getParent(int *semAdd){
     }
     return temp;
 }
-
-
-*/
