@@ -41,14 +41,14 @@ pcb_PTR allocPcb(){
     pcb_PTR temp;
     temp = pcbFree_h;
     pcbFree_h = pcbFree_h->p_next;
-    /* initializing new pcb
+    /*initializing new pcb
     temp->p_child = NULL;
     temp->p_sib = NULL;
     temp->p_prevsib = NULL;
     temp->p_prnt = NULL;
     temp->p_next = NULL;
     temp->p_prev = NULL;
-     */
+    */
 
     return temp;
 }
@@ -111,55 +111,36 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-    if(emptyProcQ((*tp)) == TRUE)
+    if(emptyProcQ((*tp)))
         return NULL;
-    if((*tp) = p){
+    if((*tp)->p_next = p){
         removeProcQ((*tp));
     }
     pcb_PTR temp;
+    if((*tp) = p){
+        temp = (*tp);
+        temp->p_next->p_prev = temp->p_prev;
+        temp->p_prev->p_next = temp->p_next;
+        temp->p_next = NULL;
+        temp->p_prev = NULL;
+        (*tp) = (*tp)->p_prev;
+        return temp;
+    }
     temp = (*tp)->p_next;
     while(temp != (*tp)){
         if(temp = p){
-            p->p_next->p_prev = p->p_prev;
-            p->p_prev->p_next = p->p_next;
-            p->p_next = NULL;
-            p->p_prev = NULL;
-            return p;
+            temp = p;
+            temp->p_next->p_prev = temp->p_prev;
+            temp->p_prev->p_next = temp->p_next;
+            temp->p_next = NULL;
+            temp->p_prev = NULL;
+            return temp;
         }
         if(temp = (*tp))
             return NULL;
+        temp = temp->p_prev;
     }
-/*
-    else if((*tp) == p){
-        if((*tp)->p_next == (*tp)){
-            (*tp) = mkEmptyProcQ();
-        }else{
-            (*tp)->p_prev->p_next = (*tp)->p_next;
-            (*tp)->p_next->p_prev = (*tp)->p_prev;
-            *tp = (*tp)->p_prev;
-        }
-        (*tp)->p_prev = (*tp);
-        p->p_prev = NULL;
-        p->p_next = NULL;
-        return p;
-    }else{
-        pcb_PTR temp;
-        temp = headProcQ(*tp);
-        while(temp != (*tp) && temp != p){
-            temp = temp->p_next;
-        }
-        if(temp == (*tp)){
-            return NULL;
-        }
-        p->p_prev->p_next = p->p_next;
-        p->p_next->p_prev = p->p_prev;
-    }
-    pcb_PTR temp;
-    temp = p;
-    temp->p_next->p_prev = temp->p_prev;
-    temp->p_prev->p_next = temp->p_next;
-    return temp;
-    */
+    
 }
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */
