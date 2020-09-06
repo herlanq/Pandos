@@ -1,6 +1,0 @@
-Initialized process control blocks   
-allocPcb ok   
-freed 10 entries   
-Inserting...   
-inserted 10 elements   
-here1this means I got out of the first freePCB 

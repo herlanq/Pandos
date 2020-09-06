@@ -111,9 +111,26 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-    if(emptyProcQ((*tp)) == TRUE){
+    if(emptyProcQ((*tp)) == TRUE)
         return NULL;
-    }else if((*tp) == p){
+    if((*tp) = p){
+        removeProcQ((*tp));
+    }
+    pcb_PTR temp;
+    temp = (*tp)->p_next;
+    while(temp != (*tp)){
+        if(temp = p){
+            p->p_next->p_prev = p->p_prev;
+            p->p_prev->p_next = p->p_next;
+            p->p_next = NULL;
+            p->p_prev = NULL;
+            return p;
+        }
+        if(temp = (*tp))
+            return NULL;
+    }
+/*
+    else if((*tp) == p){
         if((*tp)->p_next == (*tp)){
             (*tp) = mkEmptyProcQ();
         }else{
@@ -142,6 +159,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
     temp->p_next->p_prev = temp->p_prev;
     temp->p_prev->p_next = temp->p_next;
     return temp;
+    */
 }
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */
