@@ -59,7 +59,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
     semd_t *temp;
     temp = (semd_t*) search(semAdd);
     if(temp->s_next->s_semAdd == semAdd){
-        p->p_semAdd = semdAdd;
+        p->p_semAdd = semAdd;
         insertProcQ(&(temp->s_next->s_procQ), p);
         return FALSE;
     }else{ /* if semaphore is not active, allocate new descriptor from semdFree list */
