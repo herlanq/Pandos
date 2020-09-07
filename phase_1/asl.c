@@ -85,7 +85,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
  * empty (emptyProcQ(s procq) is TRUE), remove the semaphore descriptor from the
  * ASL and return it to the semdFree list. */
 pcb_t *removeBlocked(int *semAdd){
-    semd_t* node;
+    semd_t *node;
     node = (semd_t*) search(semAdd);
     pcb_t* returnVal;
     if(node->s_next->s_semAdd == semAdd){
@@ -110,6 +110,27 @@ pcb_t *removeBlocked(int *semAdd){
  * If pcb pointed to by p does not appear in the process queue associated with p’s semaphore,
  * which is an error condition, return NULL; otherwise, re- turn p. */
 pcb_t *outBlocked(pcb_t *p){
+    semd_t *node;
+    node = search(p->p_semAdd);
+    pcb_t* returnVal;
+    if(node == NULL){
+        return NULL;
+
+    }
+    if(node->s_next->s_semAdd == p->p_semAdd){
+        returnVal = outProcQ(&(node->s_next->s_procQ), p);
+        if(emptyProcQ(node->s_next->s_procQ)){
+            semd_t *removed;
+            removed = node->s_next;
+            node->s_next = node->s_next->s_next;
+            deallocASL(removed);
+            removed->s_semAdd = NULL;
+        }
+        returnVal->p_semAdd = NULL;
+        return returnVal;
+    }else{
+        return NULL;
+    }
 
 }
 
