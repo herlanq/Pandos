@@ -109,25 +109,9 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
         return temp;
     }
 }
-
-/*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
-
-/*
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
-    if (emptyProcQ((*tp)) == TRUE) {
+    if(emptyProcQ(*tp)) {
         return NULL;
-<<<<<<< HEAD
-    }
-    if ((*tp) == p) {
-        removeProcQ((tp));
-=======
-    if((*tp)->p_next == p){
-        pcb_PTR temp = (*tp)->p_next;
-        (*tp)->p_next = temp->p_next;
-        temp->p_next->p_prev = (*tp);
-        temp->p_prev = temp->p_next = NULL;
-        return temp;
->>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
     }
     pcb_PTR temp;
     if((*tp) == p){
@@ -139,59 +123,29 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
         (*tp) = (*tp)->p_prev;
         return temp;
     }
+    if((*tp)->p_next == p){
+        temp = (*tp)->p_next;
+        (*tp)->p_next = temp->p_next;
+        temp->p_next->p_prev = (*tp);
+        temp->p_prev = temp->p_next = NULL;
+        return temp;
+    }
     temp = (*tp)->p_next;
-<<<<<<< HEAD
-    while(temp != (*tp) && temp != p){
-        if(temp == p){
-=======
     while(temp != (*tp)){
         if(temp == p){
-            counter = 1;
->>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
             temp = p;
             temp->p_next->p_prev = temp->p_prev;
             temp->p_prev->p_next = temp->p_next;
             temp->p_next = NULL;
             temp->p_prev = NULL;
-            temp = *tp;
+            temp = (*tp);
             return temp;
         }
-<<<<<<< HEAD
-    }
-} */
-pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
-    if(emptyProcQ(*tp)) {
-        return NULL;
-    }else if((*tp) == p){
-        if((*tp)->p_next == (*tp)){
-            (*tp) = mkEmptyProcQ();
-        }else{
-            (*tp)->p_prev->p_next = (*tp)->p_next;
-            (*tp)->p_next->p_prev = (*tp)->p_prev;
-            (*tp) = (*tp)->p_prev;
-        }
-        return p;
-    }else{
-        pcb_PTR temp;
-        temp = headProcQ(*tp);
-        while(temp != (*tp) && temp != p){
-            temp = temp->p_next;
-        }
-        if(temp == (*tp)){
-            return NULL;
-        }
-        p->p_prev->p_next = p->p_next;
-        p->p_next->p_prev = p->p_prev;
-        return temp;
-    }
-=======
-
         temp = temp->p_next;
         counter++;
     }
     return NULL;
     
->>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
 }
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */
