@@ -138,7 +138,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
             temp->p_prev->p_next = temp->p_next;
             temp->p_next = NULL;
             temp->p_prev = NULL;
-            temp = (*tp);
             return temp;
         }
         temp = temp->p_next;
