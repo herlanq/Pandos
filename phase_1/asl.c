@@ -57,7 +57,7 @@ void initASL(){
  * return TRUE. In all other cases return FALSE. */
 int insertBlocked(int *semAdd, pcb_t *p){
     semd_t *temp;
-    temp = (semd_t*) search(semdAdd);
+    temp = (semd_t*) search(semAdd);
     if(temp->s_next->s_semAdd == semAdd){
         p->p_semAdd = semdAdd;
         insertProcQ(&(temp->s_next->s_procQ), p);
@@ -158,7 +158,7 @@ semd_t *allocASL(){
  * Function used to deallocate values in ASL
  * adds nodes to semdFree list
  */
-void *deallocASL(semd_t *semd){
+void deallocASL(semd_t *semd){
     semd->s_next = semdFree_h;
     semdFree_h = semd;
 }
