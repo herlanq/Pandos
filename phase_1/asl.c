@@ -16,7 +16,7 @@ semd_t *semd_h; /* defines active semaphore list */
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    /* temp = getParent(semAdd);  gets the parent node */
+    temp = search(semAdd);  /* uses search helper function to find corresponding node */
     return headProcQ(temp->s_next->s_procQ);
 }
 
@@ -28,7 +28,7 @@ void initASL(){
     semdFree_h = NULL;
     int i;
     for(i=2; i<MAXPROC+2; i++) {
-        /*deallocASL(&ASLInit[i]);*/
+        deallocASL(&(ASLInit[i]));
     }
     /* setting the first and second nodes as dummy nodes */
     semd_t *first;
@@ -48,13 +48,34 @@ void initASL(){
 
 /* Insert the pcb pointed to by p at the tail of the process queue associated with the semaphore
  * whose physical address is semAdd and set the semaphore address of p to semAdd.
- * If the semaphore is cur- rently not active (i.e. there is no descriptor for it in the ASL),
+ * If the semaphore is currently not active (i.e. there is no descriptor for it in the ASL),
  * allocate a new descriptor from the semdFree list, insert it in the ASL (at the appropriate position),
  * initialize all of the fields (i.e. set s semAdd to semAdd, and s procq to mkEmptyProcQ()),
  * and proceed as above.
+ *
  * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
  * return TRUE. In all other cases return FALSE. */
 int insertBlocked(int *semAdd, pcb_t *p){
+    semd_t *temp;
+    temp = (semd_t*) search(semAdd);
+    if(temp->s_next->s_semAdd == semAdd){
+        p->p_semAdd = semAdd;
+        insertProcQ(&(temp->s_next->s_procQ), p);
+        return FALSE;
+    }else{ /* if semaphore is not active, allocate new descriptor from semdFree list */
+        semd_t *new = (semd_t*) allocASL();
+        if(new == NULL){
+            return TRUE;
+        }else{
+            new->s_next = temp->s_next;
+            temp->s_next = new;
+            new->s_procQ = mkEmptyProcQ();
+            p->p_semAdd = semAdd;
+            new->s_semAdd = semAdd;
+            insertProcQ(&(new->s_procQ), p);
+            return FALSE;
+        }
+    }
 
 }
 
@@ -64,7 +85,24 @@ int insertBlocked(int *semAdd, pcb_t *p){
  * empty (emptyProcQ(s procq) is TRUE), remove the semaphore descriptor from the
  * ASL and return it to the semdFree list. */
 pcb_t *removeBlocked(int *semAdd){
-
+    semd_t *node;
+    node = (semd_t*) search(semAdd);
+    pcb_t* returnVal;
+    if(node->s_next->s_semAdd == semAdd){
+        returnVal = removeProcQ(&node->s_next->s_procQ);
+        if(returnVal == NULL){
+            return NULL;
+        }
+        if(emptyProcQ(node->s_next->s_procQ)){
+            semd_t *removed = node->s_next;
+            node->s_next = node->s_next->s_next;
+            deallocASL(removed);
+        }
+        returnVal->p_semAdd = NULL;
+        return returnVal;
+    }else{
+        return NULL;
+    }
 }
 
 /* Remove the pcb pointed to by p from the process queue associated with p’s
@@ -72,6 +110,27 @@ pcb_t *removeBlocked(int *semAdd){
  * If pcb pointed to by p does not appear in the process queue associated with p’s semaphore,
  * which is an error condition, return NULL; otherwise, re- turn p. */
 pcb_t *outBlocked(pcb_t *p){
+    semd_t *node;
+    node = search(p->p_semAdd);
+    pcb_t *returnVal;
+    if(node == NULL){
+        return NULL;
+
+    }
+    if(node->s_next->s_semAdd == p->p_semAdd){
+        returnVal = outProcQ(&(node->s_next->s_procQ), p);
+        if(emptyProcQ(node->s_next->s_procQ)){
+            semd_t *removed;
+            removed = node->s_next;
+            node->s_next = node->s_next->s_next;
+            deallocASL(removed);
+            removed->s_semAdd = NULL;
+        }
+        returnVal->p_semAdd = NULL;
+        return returnVal;
+    }else{
+        return NULL;
+    }
 
 }
 
@@ -83,11 +142,10 @@ pcb_t *outBlocked(pcb_t *p){
  * sets node pointer values to semd_t
  */
 semd_t *allocASL(){
-    semd_t *temp;
-
     if(semdFree_h == NULL){ /* if already free */
         return NULL;
     }
+    semd_t *temp;
     temp = semdFree_h;
     semdFree_h = semdFree_h->s_next;
     temp->s_next = NULL;
@@ -98,19 +156,21 @@ semd_t *allocASL(){
 
 /* Similar to pcb, like allocASL function above
  * Function used to deallocate values in ASL
- * adds nodes to semdFree list 
-semd_t *deallocASL(semd_t *semd){
+ * adds nodes to semdFree list
+ */
+void deallocASL(semd_t *semd){
     semd->s_next = semdFree_h;
     semdFree_h = semd;
-    return NULL;
 }
 
-/* returns semAdd parent if semAdd != NULL
- * if semdAdd = NULL, return a dummy parent node 
-semd_t getParent(int *semAdd){
-    semd_t *temp = semd_h;
+/* goes through asl to determine if next node has semdAdd == parameter semAdd
+ * compares whether next semAdd > semaphore address.
+ * if semAdd == NULL, sets it to = MAXINT = 0xFFFFFFF
+ */
+semd_t *search(int *semAdd){
+    semd_t *temp = (semd_t*) semd_h;
     if(semAdd == NULL){
-        semAdd = MAXINT;
+        semAdd = (int*) MAXINT;
         return semAdd;
     }
     while (semAdd > (temp->s_next->s_semAdd)){
@@ -118,6 +178,3 @@ semd_t getParent(int *semAdd){
     }
     return temp;
 }
-
-
-*/
