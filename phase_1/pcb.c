@@ -117,7 +117,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
         removeProcQ((tp));
     }
     pcb_PTR temp;
-    if((*tp) = p){
+    if((*tp) == p){
         temp = (*tp);
         temp->p_next->p_prev = temp->p_prev;
         temp->p_prev->p_next = temp->p_next;
@@ -128,27 +128,13 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     }
     temp = (*tp)->p_next;
     while(temp != (*tp)){
-        if(temp = p){
+        if(temp == p){
             temp = p;
             temp->p_next->p_prev = temp->p_prev;
             temp->p_prev->p_next = temp->p_next;
             temp->p_next = NULL;
             temp->p_prev = NULL;
             return temp;
-    while (temp != (*tp)) {
-        if (temp == p){
-            p->p_next->p_prev = p->p_prev;
-            p->p_prev->p_next = p->p_next;
-            p->p_next = NULL;
-            p->p_prev = NULL;
-            return p;
-        }
-        if (temp == (*tp)) {
-            return NULL;
-        temp = temp->p_prev;
-    }
-    
-}
         }
     }
 }
