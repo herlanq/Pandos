@@ -158,25 +158,48 @@ pcb_t* headProcQ(pcb_PTR tp){
 /*checks to see if there is a child on the tree, and returns NULL if there is not.
  return true if empty
  return false if not */
-int emptyChild(pcb_PTR p){
-    if(p->p_child == NULL)
+int emptyChild(pcb_PTR prnt){
+    if(prnt->p_child == NULL)
         return TRUE;
 }
 
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
 void insertChild(pcb_PTR prnt, pcb_PTR p){
-    if (emptyChild(prnt)){ /* case 1: no children */
+    if(emptyChild(prnt))
+    {
         prnt->p_child = p;
         p->p_prnt = prnt;
         p->p_prevsib = NULL;
         p->p_sib = NULL;
-    } /* case 2: n children n >= 1 */
-    p->p_prnt = prnt;
-    prnt->p_child->p_prevsib = p;
-    p->p_sib = prnt->p_child;
-    p->p_prevsib = NULL;
-    prnt->p_child =p;
+    }
+    else
+    {
+        p->p_prnt = prnt;
+        prnt->p_child->p_sib = prnt->p_child;
+        prnt->p_child->p_sib->p_prevsib = p;
+        prnt->p_child = p;
+        p->p_prevsib = NULL;
+    }
+
+
+
+
+
+    /*if (emptyChild(prnt)){ /* case 1: no children 
+        prnt->p_child = p;
+        p->p_prnt = prnt;
+        p->p_prevsib = NULL;
+        p->p_sib = NULL;
+    }
+    else{ /* case 2: n children n >= 1 
+        p->p_prnt = prnt;
+        prnt->p_child->p_prevsib = p;
+        p->p_sib = prnt->p_child;
+        p->p_prevsib = NULL;
+        prnt->p_child =p;
+    }
+    */
 }
 
 
