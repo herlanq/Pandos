@@ -114,20 +114,12 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 }
 
 /*takes a specific pointer and removes said process from queue, and adjusts pointers accodingly. */
-<<<<<<< HEAD
-pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
-    if(emptyProcQ((*tp)))
-        return NULL;
-    if((*tp)->p_next = p){
-        removeProcQ((*tp));
-=======
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     if (emptyProcQ((*tp)) == TRUE) {
         return NULL;
     }
     if ((*tp) == p) {
         removeProcQ((tp));
->>>>>>> 1004c85d8053066f3b0b4690e44da9d750c2b5bd
     }
     pcb_PTR temp;
     if((*tp) = p){
@@ -140,7 +132,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
         return temp;
     }
     temp = (*tp)->p_next;
-<<<<<<< HEAD
     while(temp != (*tp)){
         if(temp = p){
             temp = p;
@@ -149,7 +140,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
             temp->p_next = NULL;
             temp->p_prev = NULL;
             return temp;
-=======
     while (temp != (*tp)) {
         if (temp == p){
             p->p_next->p_prev = p->p_prev;
@@ -157,20 +147,22 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
             p->p_next = NULL;
             p->p_prev = NULL;
             return p;
->>>>>>> 1004c85d8053066f3b0b4690e44da9d750c2b5bd
         }
         if (temp == (*tp)) {
             return NULL;
-<<<<<<< HEAD
         temp = temp->p_prev;
     }
     
 }
-=======
         }
     }
 }
 /*
+ * pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p){
+    if(emptyProcQ((*tp)))
+        return NULL;
+    if((*tp)->p_next = p){
+        removeProcQ((*tp));
     else if((*tp) == p){
         if((*tp)->p_next == (*tp)){
             (*tp) = mkEmptyProcQ();
@@ -201,7 +193,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     temp->p_prev->p_next = temp->p_next;
     return temp;
     */
->>>>>>> 1004c85d8053066f3b0b4690e44da9d750c2b5bd
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */
 pcb_t* headProcQ(pcb_PTR tp){
