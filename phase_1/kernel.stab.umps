@@ -32,8 +32,8 @@ setENTRYHI                       :FUN:0x200037D0:0x0000001C:GLB
 semdFree_h                       :OBJ:0x20005D6C:0x00000004:GLB
 removeBlocked                    :FUN:0x2000265C:0x00000128:GLB
 allocASL                         :FUN:0x200028D4:0x00000090:GLB
-emptyChild                       :FUN:0x20003208:0x00000040:GLB
-removeChild                      :FUN:0x20003324:0x00000120:GLB
+emptyChild                       :FUN:0x20003208:0x00000048:GLB
+removeChild                      :FUN:0x2000332C:0x00000120:GLB
 WAIT                             :FUN:0x20003888:0x00000014:GLB
 __start                          :FUN:0x200010B0:0x0000003C:GLB
 LDST                             :FUN:0x200039B4:0x00000018:GLB
@@ -59,7 +59,7 @@ getCAUSE                         :FUN:0x20003740:0x00000014:GLB
 outBlocked                       :FUN:0x20002784:0x00000150:GLB
 setENTRYLO                       :FUN:0x20003798:0x0000001C:GLB
 getBADVADDR                      :FUN:0x200036F0:0x00000014:GLB
-insertChild                      :FUN:0x20003248:0x000000DC:GLB
+insertChild                      :FUN:0x20003250:0x000000DC:GLB
 getRANDOM                        :FUN:0x200036C8:0x00000014:GLB
 TLBP                             :FUN:0x2000384C:0x00000014:GLB
 mkEmptyProcQ                     :FUN:0x20002BC0:0x00000024:GLB
@@ -67,7 +67,7 @@ allocPcb                         :FUN:0x20002B54:0x0000006C:GLB
 outProcQ                         :FUN:0x20002EF0:0x000002B8:GLB
 termprint                        :FUN:0x20001128:0x000001AC:GLB
 errbuf                           :OBJ:0x20005CE4:0x00000080:GLB
-outChild                         :FUN:0x20003444:0x00000254:GLB
+outChild                         :FUN:0x2000344C:0x00000254:GLB
 setINDEX                         :FUN:0x2000377C:0x0000001C:GLB
 getPRID                          :FUN:0x20003768:0x00000014:GLB
 qa                               :OBJ:0x20005D64:0x00000004:GLB

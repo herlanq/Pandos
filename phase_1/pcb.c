@@ -159,7 +159,8 @@ pcb_t* headProcQ(pcb_PTR tp){
  return true if empty
  return false if not */
 int emptyChild(pcb_PTR p){
-    return (p->p_child==NULL);
+    if(p->p_child == NULL)
+        return TRUE;
 }
 
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
