@@ -16,7 +16,7 @@ semd_t *semd_h; /* defines active semaphore list */
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    temp = search(semAdd);  gets the parent node */
+    temp = search(semAdd);  /* uses search helper function to find corresponding node */
     return headProcQ(temp->s_next->s_procQ);
 }
 
@@ -112,7 +112,7 @@ pcb_t *removeBlocked(int *semAdd){
 pcb_t *outBlocked(pcb_t *p){
     semd_t *node;
     node = search(p->p_semAdd);
-    pcb_t* returnVal;
+    pcb_t *returnVal;
     if(node == NULL){
         return NULL;
 
