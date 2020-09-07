@@ -8,6 +8,8 @@
 #include "../h/pcb.h"
 
 HIDDEN pcb_PTR pcbFree_h;
+int counter = 0;
+
 
 
 
@@ -66,7 +68,7 @@ int emptyProcQ(pcb_PTR tp) {
 /*inserts a new process on to the queue, and then adjusts each pointer accordingly.*/
 void insertProcQ(pcb_PTR *tp, pcb_PTR p){
     /* case 1: empty */
-    if(emptyProcQ((*tp)) == TRUE){
+    if(emptyProcQ((*tp))){
         p->p_next = p;
         p->p_prev = p;
     }else if((*tp)->p_next == (*tp)){ /* case 2: only one node*/
@@ -93,7 +95,7 @@ void insertProcQ(pcb_PTR *tp, pcb_PTR p){
 
 /*takes the next process off of the queue and adjusts pointers accordingly. */
 pcb_PTR removeProcQ(pcb_PTR *tp) {
-    if (emptyProcQ((*tp) == TRUE)){ /* if queue is empty, return  */
+    if (emptyProcQ((*tp))){ /* if queue is empty, return  */
         return NULL;
     }else if ((*tp)->p_next == (*tp)){ /* if there is only one node */
         pcb_PTR temp = (*tp);
@@ -114,9 +116,18 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     if (emptyProcQ((*tp)) == TRUE) {
         return NULL;
+<<<<<<< HEAD
     }
     if ((*tp) == p) {
         removeProcQ((tp));
+=======
+    if((*tp)->p_next == p){
+        pcb_PTR temp = (*tp)->p_next;
+        (*tp)->p_next = temp->p_next;
+        temp->p_next->p_prev = (*tp);
+        temp->p_prev = temp->p_next = NULL;
+        return temp;
+>>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
     }
     pcb_PTR temp;
     if((*tp) == p){
@@ -129,8 +140,14 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
         return temp;
     }
     temp = (*tp)->p_next;
+<<<<<<< HEAD
     while(temp != (*tp) && temp != p){
         if(temp == p){
+=======
+    while(temp != (*tp)){
+        if(temp == p){
+            counter = 1;
+>>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
             temp = p;
             temp->p_next->p_prev = temp->p_prev;
             temp->p_prev->p_next = temp->p_next;
@@ -139,6 +156,7 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
             temp = *tp;
             return temp;
         }
+<<<<<<< HEAD
     }
 } */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
@@ -166,6 +184,14 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
         p->p_next->p_prev = p->p_prev;
         return temp;
     }
+=======
+
+        temp = temp->p_next;
+        counter++;
+    }
+    return NULL;
+    
+>>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
 }
 
 /*returns null if list is empty in passed tailpointer, otherwise returns the head of the queue. */

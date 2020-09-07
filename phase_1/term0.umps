@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 Initialized process control blocks   
 allocPcb ok   
 freed 10 entries   
 Inserting...   
 inserted 10 elements   
 made it past first pcb
+=======
+>>>>>>> 82471a311c388deb86d64cbb8f8487b0579994b6
