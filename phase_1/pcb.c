@@ -48,12 +48,9 @@ pcb_PTR allocPcb(){
     temp->p_prnt = NULL;
     temp->p_next = NULL;
     temp->p_prev = NULL;
-<<<<<<< HEAD
     */
 
-=======
      */
->>>>>>> 1004c85d8053066f3b0b4690e44da9d750c2b5bd
     return temp;
 }
 
