@@ -165,13 +165,13 @@ void deallocASL(semd_t *semd){
 
 /* goes through asl to determine if next node has semdAdd == parameter semAdd
  * compares whether next semAdd > semaphore address.
- * if semAdd == NULL, sets it to = MAXINT = 0xFFFFFFF
+ * if semAdd == NULL, sets it to = MAXINT = 0xFFFFFFF as a dummy node
+ * if semAdd is found returns address of semAdd
  */
 semd_t *search(int *semAdd){
     semd_t *temp = (semd_t*) semd_h;
     if(semAdd == NULL){
         semAdd = (int*) MAXINT;
-        return semAdd;
     }
     while (semAdd > (temp->s_next->s_semAdd)){
         temp = temp->s_next;
