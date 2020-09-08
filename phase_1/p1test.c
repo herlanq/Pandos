@@ -212,6 +212,7 @@ void main() {
 	addokbuf("Inserting...   \n");
 	for (i = 1; i < 10; i++) {
 		insertChild(procp[0], procp[i]);
+		addokbuf("Inserted ... \n");
 	}
 	addokbuf("Inserted 9 children   \n");
 
