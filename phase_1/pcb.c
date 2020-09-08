@@ -168,6 +168,7 @@ int emptyChild(pcb_t *p) {
 
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
+
 /*void insertChild(pcb_PTR prnt, pcb_PTR p){
     if(emptyProcQ(*tp)){
         p->p_sib = p;
