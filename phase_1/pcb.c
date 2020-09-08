@@ -30,9 +30,14 @@ void initPcbs(){
     pcbFree_h = NULL;
     int i = 0;
     while(i < MAXPROC){
+        insertProcQ(&pcbFree_h, &pcbInit[i]);
+        i++;
+    }
+    /*while(i < MAXPROC){
         freePcb(&pcbInit[i]);
         i++;
     }
+     */
 }
 
 /*allocating PCB space within this function*/
@@ -43,14 +48,14 @@ pcb_PTR allocPcb(){
     pcb_PTR temp;
     temp = pcbFree_h;
     pcbFree_h = pcbFree_h->p_next;
-    /*initializing new pcb
+    /*initializing new pcb*/
     temp->p_child = NULL;
     temp->p_sib = NULL;
     temp->p_prevsib = NULL;
     temp->p_prnt = NULL;
     temp->p_next = NULL;
     temp->p_prev = NULL;
-    */
+
     return temp;
 }
 

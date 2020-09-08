@@ -8,8 +8,8 @@
 #include "../h/pcb.h"
 #include "../h/asl.h"
 
-semd_t *semdFree_h; /* defines free semaphore list */
-semd_t *semd_h; /* defines active semaphore list */
+semd_t *semdFree_h; /* pointer to head of free semaphore list */
+semd_t *semd_h; /* pointer to head of active semaphore list */
 
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
@@ -17,32 +17,33 @@ semd_t *semd_h; /* defines active semaphore list */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
     temp = search(semAdd);  /* uses search helper function to find corresponding node */
-    return headProcQ(temp->s_next->s_procQ);
+    if(temp == NULL || temp->s_procQ == NULL){
+        return NULL;
+    }else{
+        return headProcQ(temp->s_procQ);
+    }
 }
 
 /* Initialize the semdFree list to contain all the elements of the array
-static semd t semdTable[MAXPROC]
-This method will be only called once during data structure initialization. */
+static semd t semdTable[MAXPROC] */
 void initASL(){
     static semd_t ASLInit[MAXPROC+2]; /* includes two dummy nodes*/
     semdFree_h = NULL;
-    int i;
-    for(i=2; i<MAXPROC+2; i++) {
-        deallocASL(&(ASLInit[i]));
+    int i =0;
+    while((i+1) < (MAXPROC+1)){
+        freeASL(&(ASLInit[i]));
+        i++;
     }
-    /* setting the first and second nodes as dummy nodes */
+    /* setting the first and last nodes as dummy nodes */
     semd_t *first;
-    first = &ASLInit[0];
     semd_t *last;
-    last = &ASLInit[1];
-
+    first = &ASLInit[0];
+    last = &ASLInit[MAXINT];
     first->s_semAdd = NULL;
-    last->s_semAdd = (int*) MAXINT;
-    first->s_next = last;
-    last->s_next = NULL;
     first->s_procQ = NULL;
+    last->s_semAdd = NULL;
+    last->s_next = NULL;
     last->s_procQ = NULL;
-
     semd_h = first;
 }
 
@@ -96,7 +97,7 @@ pcb_t *removeBlocked(int *semAdd){
         if(emptyProcQ(node->s_next->s_procQ)){
             semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
-            deallocASL(removed);
+            freeASL(removed);
         }
         returnVal->p_semAdd = NULL;
         return returnVal;
@@ -123,7 +124,7 @@ pcb_t *outBlocked(pcb_t *p){
             semd_t *removed;
             removed = node->s_next;
             node->s_next = node->s_next->s_next;
-            deallocASL(removed);
+            freeASL(removed);
             removed->s_semAdd = NULL;
         }
         returnVal->p_semAdd = NULL;
@@ -134,7 +135,8 @@ pcb_t *outBlocked(pcb_t *p){
 
 }
 
-/*                          Additional Functions                     */
+/*                                   Additional Functions                                           */
+
 /* Functions used for code writing efficiency and to make the code easier to follow */
 
 /* Similar to pcb
@@ -158,23 +160,22 @@ semd_t *allocASL(){
  * Function used to deallocate values in ASL
  * adds nodes to semdFree list
  */
-void deallocASL(semd_t *semd){
-    semd->s_next = semdFree_h;
-    semdFree_h = semd;
+void freeASL(semd_t *semd){
+    if(semdFree_h == NULL){
+        semdFree_h = semd;
+        return;
+    }else{
+        semd->s_next = semdFree_h;
+        semdFree_h = semd;
+    }
 }
 
 /* goes through asl to determine if next node has semdAdd == parameter semAdd
- * compares whether next semAdd > semaphore address.
- * if semAdd == NULL, sets it to = MAXINT = 0xFFFFFFF as a dummy node
  * if semAdd is found returns address of semAdd
  */
-
 semd_t *search(int *semAdd){
-    semd_t *temp = (semd_t*) semd_h;
-    if(semAdd == NULL){
-        semAdd = (int*) MAXINT;
-    }
-    while (semAdd > (temp->s_next->s_semAdd)){
+    semd_t *temp = semd_h->s_next;
+    while (semAdd != (temp->s_semAdd)){
         temp = temp->s_next;
     }
     return temp;

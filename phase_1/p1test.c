@@ -148,7 +148,6 @@ void main() {
 	/* create a 10-element process queue */
 	qa = NULL;
 	if (!emptyProcQ(qa)) adderrbuf("emptyProcQ: unexpected FALSE   ");
-	addokbuf("Inserting...   \n");
 	for (i = 0; i < 10; i++) {
 		if ((q = allocPcb()) == NULL)
 			adderrbuf("allocPcb: unexpected NULL while insert   ");
@@ -213,7 +212,6 @@ void main() {
 	addokbuf("Inserting...   \n");
 	for (i = 1; i < 10; i++) {
 		insertChild(procp[0], procp[i]);
-		addokbuf("Inserted ... \n");
 	}
 	addokbuf("Inserted 9 children   \n");
 
