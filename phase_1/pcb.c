@@ -155,13 +155,15 @@ pcb_t* headProcQ(pcb_PTR tp){
     return tp->p_next;
 }
 
+
+/*                                   Process Tree Management                         */
+
+
 /*checks to see if there is a child on the tree, and returns NULL if there is not.
  return true if empty
  return false if not */
-int emptyChild(pcb_PTR p) {
-    if (p->p_child == NULL) {
-        return TRUE;
-    }
+int emptyChild(pcb_t *p) {
+    return (p->p_child == NULL);
 }
 
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
