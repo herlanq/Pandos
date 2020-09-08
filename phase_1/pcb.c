@@ -33,11 +33,6 @@ void initPcbs(){
         insertProcQ(&pcbFree_h, &pcbInit[i]);
         i++;
     }
-    /*while(i < MAXPROC){
-        freePcb(&pcbInit[i]);
-        i++;
-    }
-     */
 }
 
 /*allocating PCB space within this function*/
