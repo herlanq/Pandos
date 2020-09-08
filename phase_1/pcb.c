@@ -233,7 +233,7 @@ void insertChild(pcb_PTR prnt, pcb_PTR p) {
 /*removes the first child pointed to by p, and adjusts siblings accordingly if any. */
 pcb_PTR removeChild(pcb_PTR p){
     pcb_t *temp;
-    if(emptyChild(p->p_child)==NULL){ /* no child */
+    if(emptyChild(p)){ /* no child */
         return NULL;
     }else if(p->p_child->p_sib == NULL){ /* children = 1 */
         temp = p->p_child;
