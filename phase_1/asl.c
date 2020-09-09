@@ -31,7 +31,7 @@ void initASL(){
     semdFree_h = NULL;
     int i =0;
     while((i+1) < (MAXPROC+1)){
-        freeASL(&(ASLInit[i]));
+        freeSemd(&(ASLInit[i]));
         i++;
     }
     /* setting the first and last nodes as dummy nodes */
@@ -63,16 +63,16 @@ int insertBlocked(int *semAdd, pcb_t *p) {
         insertProcQ(&(temp->s_next->s_procQ), p);
         return FALSE;
     } else {
-        semd_t *new = allocASL();
-        if (new == NULL) {
-            return TRUE;
-        } else {
-            new->s_next = temp->s_next;
-            temp->s_next = new;
+        semd_t *new = allocSemd();
+        if  (temp == NULL && semdFree_h == NULL) {
+            new->s_next = temp;
             new->s_procQ = mkEmptyProcQ();
+            temp->s_next = NULL;
             p->p_semAdd = semAdd;
             new->s_semAdd = semAdd;
             insertProcQ(&(new->s_procQ), p);
+            return TRUE;
+        }else{
             return FALSE;
         }
     }
@@ -85,8 +85,8 @@ int insertBlocked(int *semAdd, pcb_t *p) {
  * ASL and return it to the semdFree list. */
 pcb_t *removeBlocked(int *semAdd){
     semd_t *node;
-    node = (semd_t*) search(semAdd);
     pcb_t* returnVal;
+    node = search(semAdd);
     if(node->s_next->s_semAdd == semAdd){
         returnVal = removeProcQ(&node->s_next->s_procQ);
         if(returnVal == NULL){
@@ -95,7 +95,7 @@ pcb_t *removeBlocked(int *semAdd){
         if(emptyProcQ(node->s_next->s_procQ)){
             semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
-            freeASL(removed);
+            freeSemd(removed);
         }
         returnVal->p_semAdd = NULL;
         return returnVal;
@@ -122,7 +122,7 @@ pcb_t *outBlocked(pcb_t *p){
             semd_t *removed;
             removed = node->s_next;
             node->s_next = node->s_next->s_next;
-            freeASL(removed);
+            freeSemd(removed);
             removed->s_semAdd = NULL;
         }
         returnVal->p_semAdd = NULL;
@@ -141,7 +141,7 @@ pcb_t *outBlocked(pcb_t *p){
  * Function used to allocate values in ASL
  * sets node pointer values to semd_t
  */
-semd_t *allocASL(){
+semd_t *allocSemd(){
     if(semdFree_h == NULL){ /* if already free */
         return NULL;
     }
@@ -150,7 +150,7 @@ semd_t *allocASL(){
     semdFree_h = semdFree_h->s_next;
     temp->s_next = NULL;
     temp->s_semAdd = NULL;
-    temp->s_procQ = NULL;
+    temp->s_procQ = mkEmptyProcQ();
     return temp;
 }
 
@@ -158,7 +158,7 @@ semd_t *allocASL(){
  * Function used to deallocate values in ASL
  * adds nodes to semdFree list
  */
-void freeASL(semd_t *semd){
+void freeSemd(semd_t *semd){
     if(semdFree_h == NULL){
         semdFree_h = semd;
         return;
@@ -173,7 +173,7 @@ void freeASL(semd_t *semd){
  */
 semd_t *search(int *semAdd){
     semd_t *temp = semd_h;
-    while (semAdd > temp->s_next->s_semAdd){
+    while (semAdd >= temp->s_next->s_semAdd){
         temp = temp->s_next;
     }
     return temp;
