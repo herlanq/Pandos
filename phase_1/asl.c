@@ -37,14 +37,14 @@ void initASL(){
     }
     /* setting the first and last nodes as dummy nodes */
     semd_t *first;
-    semd_t *last;
-    /* init first dummy node */
     first = &(semdTable[0]);
+    semd_t *last;
+    last = &(semdTable[1]);
+    /* init first dummy node */
     first->s_semAdd = NULL;         /* set first node's semAdd = NULL*/
     first->s_procQ = NULL;
     first->s_next = last;
     /* init last dummy node */
-    last = &(semdTable[1]);
     last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint*/
     last->s_procQ = NULL;
     last->s_next = NULL;
@@ -70,12 +70,13 @@ int insertBlocked(int *semAdd, pcb_t *p) {
         return FALSE;
     } else {
         semd_t *new = allocSemd();
-        if  (temp == NULL && semdFree_h == NULL) {
-            new->s_next = temp;
+        if  (new == NULL) {
+            /*new->s_next = temp;
             new->s_procQ = mkEmptyProcQ();
             temp->s_next = NULL;
             p->p_semAdd = semAdd;
             new->s_semAdd = semAdd;
+             */
             insertProcQ(&(new->s_procQ), p);
             return TRUE;
         }else{
@@ -148,14 +149,15 @@ pcb_t *outBlocked(pcb_t *p){
 semd_t *allocSemd(){
     if(semdFree_h == NULL){ /* if already free */
         return NULL;
+    }else{
+        semd_t *temp;
+        temp = semdFree_h;
+        semdFree_h = semdFree_h->s_next;
+        temp->s_next = NULL;
+        temp->s_semAdd = NULL;
+        temp->s_procQ = mkEmptyProcQ();
+        return temp;
     }
-    semd_t *temp;
-    temp = semdFree_h;
-    semdFree_h = semdFree_h->s_next;
-    temp->s_next = NULL;
-    temp->s_semAdd = NULL;
-    temp->s_procQ = mkEmptyProcQ();
-    return temp;
 }
 
 /* Similar to freePcb, like allocASL function above
