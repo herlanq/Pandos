@@ -93,18 +93,17 @@ pcb_t *removeBlocked(int *semAdd){
     semd_t *node;
     pcb_t* returnVal;
     node = search(semAdd);
-    if(node->s_next->s_semAdd == semAdd){
-        returnVal = removeProcQ(&node->s_next->s_procQ);
-        if(returnVal == NULL){
-            return NULL;
-        }
-        if(emptyProcQ(node->s_next->s_procQ)){
+    if(node->s_next->s_semAdd == semAdd) {
+        returnVal = removeProcQ(&node->s_next->s_procQ); /* return value is equal to a pointer to the head pcb */
+        if (emptyProcQ(node->s_next->s_procQ)) {
             semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
             freeSemd(removed);
+            return returnVal;
+        } else {
+            returnVal->p_semAdd = NULL;
+            return returnVal;
         }
-        returnVal->p_semAdd = NULL;
-        return returnVal;
     }else{
         return NULL;
     }
@@ -120,7 +119,6 @@ pcb_t *outBlocked(pcb_t *p){
     pcb_t *returnVal;
     if(node == NULL){
         return NULL;
-
     }
     if(node->s_next->s_semAdd == p->p_semAdd){
         returnVal = outProcQ(&(node->s_next->s_procQ), p);
@@ -143,7 +141,7 @@ pcb_t *outBlocked(pcb_t *p){
 
 /* Functions used for code writing efficiency and to make the code easier to follow */
 
-/* Similar to pcb
+/* Similar to allocPcb
  * Function used to allocate values in ASL
  * sets node pointer values to semd_t
  */
@@ -160,7 +158,7 @@ semd_t *allocSemd(){
     return temp;
 }
 
-/* Similar to pcb, like allocASL function above
+/* Similar to freePcb, like allocASL function above
  * Function used to deallocate values in ASL
  * adds nodes to semdFree list
  */
