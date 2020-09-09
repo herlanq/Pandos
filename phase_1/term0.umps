@@ -15,24 +15,4 @@ insertChild, removeChild and emptyChild ok
 process tree module ok      
 Initialized active semaphore list   
 insertBlocked test #1 started  
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
 insertBlocked test #2 started  
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 
-inserted .. 

@@ -109,6 +109,7 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
         return temp;
     }
 }
+
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     if(emptyProcQ(*tp)) {
         return NULL;
@@ -169,26 +170,6 @@ int emptyChild(pcb_t *p) {
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
 
-/*void insertChild(pcb_PTR prnt, pcb_PTR p){
-    if(emptyProcQ(*tp)){
-        p->p_sib = p;
-        p->p_prevsib = p;
-    }else if((*tp)->p_sib == (*tp)){
-        p->p_sib = (*tp);
-        p->p_prevsib = (*tp);
-        (*tp)->p_prevsib = p;
-        (*tp)->p_sib = p;
-    }else{
-        pcb_PTR temp = (*tp)->p_sib;
-        (*tp)->p_sib = p;
-        p->p_sib = temp;
-        temp->p_prevsib = p;
-        p->p_prevsib = (*tp);
-        (*tp) = p;
-    }
-}
-   */
-
 void insertChild(pcb_PTR prnt, pcb_PTR p) {
     if (emptyChild(prnt)) {
         prnt->p_child = p;
@@ -203,32 +184,6 @@ void insertChild(pcb_PTR prnt, pcb_PTR p) {
         prnt->p_child = p;
     }
 }
-/*p->p_prnt = prnt;
-        prnt->p_child->p_sib = prnt->p_child;
-        prnt->p_child->p_sib->p_prevsib = p;
-        prnt->p_child = p;
-        p->p_prevsib = NULL;
-         */
-
-
-
-
-
-    /*if (emptyChild(prnt)){ case 1: no children
-        prnt->p_child = p;
-        p->p_prnt = prnt;
-        p->p_prevsib = NULL;
-        p->p_sib = NULL;
-    }
-    else{ case 2: n children n >= 1
-        p->p_prnt = prnt;
-        prnt->p_child->p_prevsib = p;
-        p->p_sib = prnt->p_child;
-        p->p_prevsib = NULL;
-        prnt->p_child =p;
-    }
-    */
-
 
 /*removes the first child pointed to by p, and adjusts siblings accordingly if any. */
 pcb_PTR removeChild(pcb_PTR p){
