@@ -74,6 +74,29 @@ void initASL(){
 int insertBlocked(int *semAdd, pcb_t *p) {
     semd_t *temp;
     temp = search(semAdd);
+    if(temp->s_next->s_semAdd != semAdd)
+    {
+        semd_t *alloc_sem = allocSemd();
+        if(alloc_sem == NULL)
+            return TRUE;
+        semd_t *semdprev = search(alloc_sem->s_semAdd);
+        semd_t *semdnext = semdprev->s_next;
+        semdprev->s_next = alloc_sem;
+        alloc_sem->s_next = semdnext;
+        insertProcQ(&(alloc_sem->s_procQ), p);
+        return FALSE;
+    }
+    insertProcQ(&(temp->s_next->s_procQ), p);
+    return FALSE;
+}
+
+
+
+
+
+
+
+  /*  
     p->p_semAdd = semAdd;
     if (temp->s_next->s_semAdd == semAdd){
         insertProcQ(&(temp->s_next->s_procQ), p);
@@ -92,7 +115,7 @@ int insertBlocked(int *semAdd, pcb_t *p) {
         return FALSE;
     }
     
-}
+}*/
 
 /* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
  * otherwise, remove the first (i.e. head) pcb from the process queue of the found semaphore
@@ -101,10 +124,31 @@ int insertBlocked(int *semAdd, pcb_t *p) {
  * ASL and return it to the semdFree list. */
 pcb_t *removeBlocked(int *semAdd){
     semd_t *node;
+    node = search(semAdd);
+    if(node->s_next->s_semAdd != semAdd)
+        return NULL;
+    pcb_PTR r_pcb = removeProcQ(&node->s_next->s_procQ);
+    if(emptyProcQ(&node->s_next->s_procQ)){
+        semd_t *temp = node->s_next;
+        node->s_next = temp->s_next;
+        temp->s_next = NULL;
+    }
+    return r_pcb;
+
+}
+
+
+
+
+
+
+
+/*
+    semd_t *node;
     pcb_t* returnVal;
     node = search(semAdd);
     if(node->s_next->s_semAdd == semAdd){
-        returnVal = removeProcQ(&node->s_next->s_procQ); /* return value is equal to a pointer to the head pcb */
+        returnVal = removeProcQ(&node->s_next->s_procQ);  return value is equal to a pointer to the head pcb 
         return returnVal;
     }
     else if (emptyProcQ(node->s_next->s_procQ)) {
@@ -118,7 +162,7 @@ pcb_t *removeBlocked(int *semAdd){
     else{
         return NULL;
     }
-}
+}*/
 
 /* Remove the pcb pointed to by p from the process queue associated with p’s
  * semaphore (p→ p semAdd) on the ASL.
