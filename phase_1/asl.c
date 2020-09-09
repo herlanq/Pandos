@@ -37,11 +37,9 @@ void initASL(){
     /* setting the first and last nodes as dummy nodes */
     semd_t *first;
     semd_t *last;
-    first = &ASLInit[0];
-    last = &ASLInit[MAXINT];
-    first->s_semAdd = NULL;
+    first = &(ASLInit[0]);      /* first->s_semAdd ??*/
+    last = &(ASLInit[MAXINT]); /* last->s_semAdd ??*/
     first->s_procQ = NULL;
-    last->s_semAdd = NULL;
     last->s_next = NULL;
     last->s_procQ = NULL;
     semd_h = first;
@@ -61,6 +59,7 @@ int insertBlocked(int *semAdd, pcb_t *p) {
     temp = search(semAdd);
     if (temp->s_next->s_semAdd == semAdd){
         insertProcQ(&(temp->s_next->s_procQ), p);
+        p->p_semAdd = semAdd;
         return FALSE;
     } else {
         semd_t *new = allocSemd();
