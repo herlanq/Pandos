@@ -28,28 +28,38 @@ pcb_t *headBlocked(int *semAdd){
 static semd t semdTable[MAXPROC] */
 void initASL(){
     static semd_t semdTable[MAXPROC+2]; /* includes two dummy nodes*/
-    semd_h = NULL;
-    semdFree_h = NULL;
-    int i = 2;
+    semd_h = &semdTable[0];
+    semd_h->s_next = &semdTable[1];
+    semd_h ->s_semAdd =0;
+    semd_h -> s_next ->s_semAdd = MAXINT;
+    semd_h-> s_procQ = mkEmptyProcQ();
+    semd_h ->s_next->s_procQ =mkEmptyProcQ();
+    semd_h->s_next->s_next=NULL;
+
+    semdFree_h = &semdTable[2];
+    int i = 3;
     while(i < (MAXPROC+2)){
         freeSemd(&(semdTable[i]));
         i++;
     }
-    /* setting the first and last nodes as dummy nodes */
+    return;
+    /* setting the first and last nodes as dummy nodes 
     semd_t *first;
     semd_t *last;
-    /* init first dummy node */
-    first = &(semdTable[0]);
-    first->s_semAdd = NULL;         /* set first node's semAdd = NULL*/
-    first->s_procQ = NULL;
-    first->s_next = last;
-    /* init last dummy node */
+    
+    /* init last dummy node 
     last = &(semdTable[1]);
-    last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint*/
+    last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint
     last->s_procQ = NULL;
     last->s_next = NULL;
+    /* init first dummy node 
+    first = &(semdTable[0]);
+    first->s_semAdd = NULL;         /* set first node's semAdd = NULL
+    first->s_procQ = NULL;
+    first->s_next = last;
+    
 
-    semd_h = first;
+    semd_h = first; */
 }
 
 /* Insert the pcb pointed to by p at the tail of the process queue associated with the semaphore
@@ -64,24 +74,24 @@ void initASL(){
 int insertBlocked(int *semAdd, pcb_t *p) {
     semd_t *temp;
     temp = search(semAdd);
+    p->p_semAdd = semAdd;
     if (temp->s_next->s_semAdd == semAdd){
         insertProcQ(&(temp->s_next->s_procQ), p);
-        p->p_semAdd = semAdd;
         return FALSE;
-    } else {
-        semd_t *new = allocSemd();
-        if  (temp == NULL && semdFree_h == NULL) {
-            new->s_next = temp;
-            new->s_procQ = mkEmptyProcQ();
-            temp->s_next = NULL;
-            p->p_semAdd = semAdd;
-            new->s_semAdd = semAdd;
-            insertProcQ(&(new->s_procQ), p);
-            return TRUE;
-        }else{
-            return FALSE;
-        }
     }
+    else if(semdFree_h == NULL){
+        return TRUE;
+    }    
+    else {
+        semd_t *new = allocSemd();
+        semd_t *semdprev = search(new->s_semAdd);
+        semd_t *semdnext = semdprev->s_next;
+        semdprev->s_next = new;
+        new->s_next = semdnext;
+        insertProcQ(&(new->s_procQ), p);
+        return FALSE;
+    }
+    
 }
 
 /* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
@@ -93,18 +103,19 @@ pcb_t *removeBlocked(int *semAdd){
     semd_t *node;
     pcb_t* returnVal;
     node = search(semAdd);
-    if(node->s_next->s_semAdd == semAdd) {
+    if(node->s_next->s_semAdd == semAdd){
         returnVal = removeProcQ(&node->s_next->s_procQ); /* return value is equal to a pointer to the head pcb */
-        if (emptyProcQ(node->s_next->s_procQ)) {
+        return returnVal;
+    }
+    else if (emptyProcQ(node->s_next->s_procQ)) {
             semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
             freeSemd(removed);
-            return returnVal;
-        } else {
-            returnVal->p_semAdd = NULL;
-            return returnVal;
-        }
-    }else{
+            removed->s_semAdd = NULL;
+            removed->s_procQ = NULL;
+            return NULL;
+        } 
+    else{
         return NULL;
     }
 }

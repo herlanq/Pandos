@@ -19,8 +19,8 @@ extern void initASL ();
 
 /*adding helper functions */
 extern semd_t *search(int *semAdd);
-extern void deallocASL(semd_t *semd);
-extern semd_t *allocASL();
+extern void freeSemd(semd_t *semd);
+extern semd_t *allocSemd();
 
 /***************************************************************/
 
