@@ -27,21 +27,28 @@ pcb_t *headBlocked(int *semAdd){
 /* Initialize the semdFree list to contain all the elements of the array
 static semd t semdTable[MAXPROC] */
 void initASL(){
-    static semd_t ASLInit[MAXPROC+2]; /* includes two dummy nodes*/
+    static semd_t semdTable[MAXPROC+2]; /* includes two dummy nodes*/
+    semd_h = NULL;
     semdFree_h = NULL;
-    int i =0;
-    while((i+1) < (MAXPROC+1)){
-        freeSemd(&(ASLInit[i]));
+    int i = 2;
+    while(i < (MAXPROC+2)){
+        freeSemd(&(semdTable[i]));
         i++;
     }
     /* setting the first and last nodes as dummy nodes */
     semd_t *first;
     semd_t *last;
-    first = &(ASLInit[0]);      /* first->s_semAdd ??*/
-    last = &(ASLInit[MAXINT]); /* last->s_semAdd ??*/
+    /* init first dummy node */
+    first = &(semdTable[0]);
+    first->s_semAdd = NULL;         /* set first node's semAdd = NULL*/
     first->s_procQ = NULL;
-    last->s_next = NULL;
+    first->s_next = last;
+    /* init last dummy node */
+    last = &(semdTable[1]);
+    last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint*/
     last->s_procQ = NULL;
+    last->s_next = NULL;
+
     semd_h = first;
 }
 
@@ -168,11 +175,12 @@ void freeSemd(semd_t *semd){
 }
 
 /* goes through asl to determine if next node has semdAdd == parameter semAdd
- * if semAdd is found returns address of semAdd
+ * if semAdd is found returns address of semAdd,compares whether the semAdd is greater than
+ * next semAdd in order to keep the list sorted
  */
 semd_t *search(int *semAdd){
     semd_t *temp = semd_h;
-    while (semAdd >= temp->s_next->s_semAdd){
+    while (semAdd > temp->s_next->s_semAdd){
         temp = temp->s_next;
     }
     return temp;
