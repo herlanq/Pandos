@@ -56,18 +56,17 @@ void initASL(){
  *
  * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
  * return TRUE. In all other cases return FALSE. */
-int insertBlocked(int *semAdd, pcb_t *p){
+int insertBlocked(int *semAdd, pcb_t *p) {
     semd_t *temp;
-    temp = (semd_t*) search(semAdd);
-    if(temp->s_next->s_semAdd == semAdd){
-        p->p_semAdd = semAdd;
+    temp = search(semAdd);
+    if (temp->s_next->s_semAdd == semAdd){
         insertProcQ(&(temp->s_next->s_procQ), p);
         return FALSE;
-    }else{ /* if semaphore is not active, allocate new descriptor from semdFree list */
-        semd_t *new = (semd_t*) allocASL();
-        if(new == NULL){
+    } else {
+        semd_t *new = allocASL();
+        if (new == NULL) {
             return TRUE;
-        }else{
+        } else {
             new->s_next = temp->s_next;
             temp->s_next = new;
             new->s_procQ = mkEmptyProcQ();
@@ -77,7 +76,6 @@ int insertBlocked(int *semAdd, pcb_t *p){
             return FALSE;
         }
     }
-
 }
 
 /* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
@@ -174,8 +172,8 @@ void freeASL(semd_t *semd){
  * if semAdd is found returns address of semAdd
  */
 semd_t *search(int *semAdd){
-    semd_t *temp = semd_h->s_next;
-    while (semAdd != (temp->s_semAdd)){
+    semd_t *temp = semd_h;
+    while (semAdd > temp->s_next->s_semAdd){
         temp = temp->s_next;
     }
     return temp;
