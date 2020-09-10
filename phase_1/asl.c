@@ -39,7 +39,7 @@ void initASL(){
     semd_t *first;
     first = &(semdTable[0]);
     semd_t *last;
-    last = &(semdTable[1]);
+    last = &(semdTable[2]);
     /* init first dummy node */
     first->s_semAdd = NULL;         /* set first node's semAdd = NULL*/
     first->s_procQ = NULL;
@@ -127,6 +127,7 @@ pcb_t *removeBlocked(int *semAdd){
             semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
             freeSemd(removed);
+            returnVal->p_semAdd = NULL;
             return returnVal;
         } else {
             returnVal->p_semAdd = NULL;
@@ -193,7 +194,9 @@ semd_t *allocSemd(){
  */
 void freeSemd(semd_t *semd) {
     if (semdFree_h == NULL) {
+        semd->s_next = NULL;
         semdFree_h = semd;
+        
     } else {
         semd->s_next = semdFree_h;
         semdFree_h = semd;
