@@ -11,13 +11,14 @@
 semd_t *semdFree_h; /* pointer to head of free semaphore list */
 semd_t *semd_h; /* pointer to head of active semaphore list */
 int isNull;
+int semadd_value;
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
     temp = search(semAdd);  /* uses search helper function to find corresponding node */
-    if(temp == NULL || temp->s_next->s_procQ == NULL){
+    if(temp == NULL || emptyProcQ(temp->s_next->s_procQ)){
         return NULL;
     }else{
         return headProcQ(temp->s_next->s_procQ);
@@ -39,7 +40,7 @@ void initASL(){
     semd_t *first;
     first = &(semdTable[0]);
     semd_t *last;
-    last = &(semdTable[2]);
+    last = &(semdTable[1]);
     /* init first dummy node */
     first->s_semAdd = 0;         /* set first node's semAdd = NULL*/
     first->s_procQ = NULL;
@@ -95,31 +96,6 @@ int insertBlocked(int *semAdd, pcb_t *p) {
 }
 
 
-/*
-int insertBlocked(int *semAdd, pcb_t *p){
-    semd_t *temp;
-    temp = (semd_t*) search(semAdd);
-    if(temp->s_next->s_semAdd == semAdd){
-        p->p_semAdd = semAdd;
-        insertProcQ(&(temp->s_next->s_procQ), p);
-        return FALSE;
-    }else{
-        semd_t *new = (semd_t*) allocPcb();
-        if(new == NULL){
-            return TRUE;
-        }else{
-            new->s_next = temp->s_next;
-            temp->s_next = new;
-            new->s_procQ = mkEmptyProcQ();
-
-            p->p_semAdd = semAdd;
-            new->s_semAdd = semAdd;
-            insertProcQ(&(new->s_procQ), p);
-            return FALSE;
-        }
-    }
-}
- */
 
 /* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
  * otherwise, remove the first (i.e. head) pcb from the process queue of the found semaphore
@@ -143,7 +119,6 @@ pcb_t *removeBlocked(int *semAdd){
             return returnVal;
         }
     }else{
-        isNull = 1;
         return NULL;
     }
 }
@@ -154,26 +129,22 @@ pcb_t *removeBlocked(int *semAdd){
  * which is an error condition, return NULL; otherwise, re- turn p. */
 pcb_t *outBlocked(pcb_t *p){
     semd_t *node;
+    pcb_t* returnVal;
     node = search(p->p_semAdd);
-    pcb_t *returnVal;
-    if(node == NULL){
-        return NULL;
-    }
-    if(node->s_next->s_semAdd == p->p_semAdd){
-        returnVal = outProcQ(&(node->s_next->s_procQ), p);
-        if(emptyProcQ(node->s_next->s_procQ)){
-            semd_t *removed;
-            removed = node->s_next;
+    if(node->s_next->s_semAdd == p->p_semAdd) {
+        returnVal = outProcQ(&node->s_next->s_procQ, p); /* return value is equal to a pointer to the head pcb */
+        if (emptyProcQ(node->s_next->s_procQ)) {
+            semd_t *removed = node->s_next;
             node->s_next = node->s_next->s_next;
             freeSemd(removed);
-            removed->s_semAdd = NULL;
+            return returnVal;
+        } else {
+            returnVal->p_semAdd = NULL;
+            return returnVal;
         }
-        returnVal->p_semAdd = NULL;
-        return returnVal;
     }else{
         return NULL;
     }
-
 }
 
 /*                                   Additional Functions                                           */
@@ -218,14 +189,7 @@ void freeSemd(semd_t *semd) {
  * next semAdd in order to keep the list sorted
  */
 semd_t *search(int *semAdd){
-    semd_t *search(int *semAdd){
-    semd_t *temp = (semd_t*) semd_h; /* added reference to semd_t*/
-    while (semAdd > temp->s_next->s_semAdd){
-        temp = temp->s_next;
-    }
-    return temp;
-}
-    /*semd_t *temp = semd_h->s_next;  added reference to semd_t
+    semd_t *temp = semd_h->s_next;  /*added reference to semd_t*/
     semd_t *lagtemp = semd_h;
     if(temp->s_semAdd == 2147483647){
             return semd_h;
@@ -238,5 +202,5 @@ semd_t *search(int *semAdd){
         lagtemp = temp;
         temp = temp->s_next;
     }
-    return lagtemp;*/
+    return lagtemp;
 }
