@@ -256,12 +256,14 @@ void main() {
 	addokbuf("insertBlocked test #1 started  \n");
 	for (i = 10; i < MAXPROC; i++) {
 		procp[i] = allocPcb();
+        addokbuf("inserted\n");
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked(1): unexpected TRUE   ");
 	}
 	addokbuf("insertBlocked test #2 started  \n");
 	for (i = 0; i < 10; i++) {
 		procp[i] = allocPcb();
+        addokbuf("inserted\n");
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked(2): unexpected TRUE   ");
 	}
