@@ -61,6 +61,31 @@ void initASL(){
  * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
  * return TRUE. In all other cases return FALSE. */
 
+int insertBlocked(int *semAdd, pcb_t *p) {
+    semd_t *temp;
+    temp = (semd_t*) search(semAdd);
+    if (temp->s_next->s_semAdd != semAdd) {
+        semd_t *new = (semd_t*) allocPcb();
+        if (new == NULL) {
+            return TRUE;
+        } else {
+            new->s_next = temp->s_next;
+            temp->s_next = new;
+            new->s_procQ = mkEmptyProcQ();
+
+            p->p_semAdd = semAdd;
+            new->s_semAdd = semAdd;
+            insertProcQ(&(new->s_procQ), p);
+            return FALSE;
+        }
+    } else {
+        p->p_semAdd = semAdd;
+        insertProcQ(&(temp->s_next->s_procQ), p);
+        return FALSE;
+    }
+}
+
+/*
 int insertBlocked(int *semAdd, pcb_t *p){
     semd_t *temp;
     temp = (semd_t*) search(semAdd);
@@ -84,54 +109,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
         }
     }
 }
-
-/*
-int insertBlocked(int *semAdd, pcb_t *p) {
-    semd_t *temp;
-    temp = search(semAdd);
-    if (temp->s_next->s_semAdd == semAdd){
-        p->p_semAdd = semAdd;
-        insertProcQ(&(temp->s_next->s_procQ), p);
-        return FALSE;
-    }else{
-        semd_t *new = allocSemd();
-        if  (new == NULL) {
-            return TRUE;
-        }else{
-            new->s_next = temp->s_next;
-            new->s_semAdd = semAdd;
-            new->s_procQ = mkEmptyProcQ();
-            temp->s_next = new;
-            p->p_semAdd = semAdd;
-            insertProcQ(&(new->s_procQ), p);
-            return FALSE;
-        }
-    }
-}*/
-
-/*int insertBlocked(int *semAdd, pcb_t *p) {
-    semd_t *temp;
-    temp = search(semAdd);
-    if (temp->s_next->s_semAdd == semAdd){
-        insertProcQ(&(temp->s_next->s_procQ), p);
-        p->p_semAdd = semAdd;
-        return FALSE;
-    } else {
-        semd_t *new = allocSemd();
-        if  (new == NULL) {
-            new->s_next = temp;
-            new->s_procQ = mkEmptyProcQ();
-            temp->s_next = NULL;
-            p->p_semAdd = semAdd;
-            new->s_semAdd = semAdd;
-            insertProcQ(&(new->s_procQ), p);
-            return TRUE;
-        }else{
-            return FALSE;
-        }
-    }
-}*/
-
+ */
 
 /* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
  * otherwise, remove the first (i.e. head) pcb from the process queue of the found semaphore
@@ -213,13 +191,12 @@ semd_t *allocSemd(){
  * adds nodes to semdFree list
  */
 void freeSemd(semd_t *semd) {
-    /*if(semdFree_h == NULL){
+    if(semdFree_h == NULL){
         semdFree_h = semd;
-        return;
     }else{
-     */
-    semd->s_next = semdFree_h;
-    semdFree_h = semd;
+        semd->s_next = semdFree_h;
+        semdFree_h = semd;
+    }
 }
 
 /* goes through asl to determine if next node has semdAdd == parameter semAdd
