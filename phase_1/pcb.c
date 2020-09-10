@@ -1,6 +1,6 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 9/8
+ * Last modified 9/10
  */
 
 #include "../h/const.h"
@@ -8,8 +8,6 @@
 #include "../h/pcb.h"
 
 HIDDEN pcb_PTR pcbFree_h;
-int counter = 0;
-
 
 /*set new node's next pointer to current head, make head the newly inserted node*/
 void freePcb(pcb_PTR p){
@@ -144,7 +142,6 @@ pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
             return temp;
         }
         temp = temp->p_next;
-        counter++;
     }
     return NULL;
     

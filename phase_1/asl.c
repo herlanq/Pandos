@@ -1,6 +1,6 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 9/4
+ * Last modified 9/10
  */
 
 #include "../h/const.h"
@@ -10,14 +10,13 @@
 
 semd_t *semdFree_h; /* pointer to head of free semaphore list */
 semd_t *semd_h; /* pointer to head of active semaphore list */
-int isNull;
-int semadd_value;
-/* Return a pointer to the pcb that is at the head of the process queue associated with
+
+/* Returns a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
 pcb_t *headBlocked(int *semAdd){
     semd_t *temp;
-    temp = search(semAdd);  /* uses search helper function to find corresponding node */
+    temp = search(semAdd);  /* uses search helper function to find node corresponding with semAdd*/
     if(temp == NULL || emptyProcQ(temp->s_next->s_procQ)){
         return NULL;
     }else{
@@ -26,8 +25,7 @@ pcb_t *headBlocked(int *semAdd){
 }
 
 /* Initialize the semdFree list to contain all the elements of the array
-static semd t semdTable[MAXPROC] */
-
+as static semd t semdTable[MAXPROC+2], the first and last nodes are used as dummy nodes */
 void initASL(){
     static semd_t semdTable[MAXPROC+2]; /* includes two dummy nodes*/
     semd_h = NULL;
@@ -36,7 +34,7 @@ void initASL(){
     for(i=2; i < (MAXPROC+2); i++){
         freeSemd(&(semdTable[i]));
     }
-    /* setting the first and last nodes as dummy nodes */
+    /* initializing the first and last nodes as dummy nodes */
     semd_t *first;
     first = &(semdTable[0]);
     semd_t *last;
@@ -46,23 +44,18 @@ void initASL(){
     first->s_procQ = NULL;
     first->s_next = last;
     /* init last dummy node */
-    last->s_semAdd = 2147483647; /* set last node's semAdd = maxint*/
+    last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint*/
     last->s_procQ = NULL;
     last->s_next = NULL;
 
     semd_h = first;
 }
 
-/* Insert the pcb pointed to by p at the tail of the process queue associated with the semaphore
- * whose physical address is semAdd and set the semaphore address of p to semAdd.
- * If the semaphore is currently not active (i.e. there is no descriptor for it in the ASL),
- * allocate a new descriptor from the semdFree list, insert it in the ASL (at the appropriate position),
- * initialize all of the fields (i.e. set s semAdd to semAdd, and s procq to mkEmptyProcQ()),
- * and proceed as above.
- *
- * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
- * return TRUE. In all other cases return FALSE. */
-semd_t* semAlloc() {
+/*          Additional function         */
+/* Similar to allocPcb,
+ * Function used to allocate space in ASL
+ */
+semd_t* semAlloc(){
     if(semdFree_h == NULL){
         return NULL;
     }
@@ -71,6 +64,12 @@ semd_t* semAlloc() {
     return temp;
 }
 
+/* Inserts the pcb pointed to by p at the tail of the process queue associated with the semaphore whose physical address
+ * is semAdd and sets the semaphore address of p to semAdd.
+ * If the semaphore is currently not active, a new descriptor from the semdFree list is allocated and
+ * inserted in the ASL.
+ * If a new semaphore descriptor needs to be allocated and the semdFree list is empty, return TRUE.
+ * In all other cases return FALSE. */
 int insertBlocked(int *semAdd, pcb_t *p) {
     semd_t *temp;
     temp = (semd_t*) search(semAdd);
@@ -95,13 +94,11 @@ int insertBlocked(int *semAdd, pcb_t *p) {
     }
 }
 
-
-
-/* Search the ASL for a descriptor of this semaphore. If none is found, return NULL;
- * otherwise, remove the first (i.e. head) pcb from the process queue of the found semaphore
- * descriptor and return a pointer to it. If the process queue for this semaphore becomes
- * empty (emptyProcQ(s procq) is TRUE), remove the semaphore descriptor from the
- * ASL and return it to the semdFree list. */
+/* Searches the ASL for a descriptor of this semaphore. If none is found, returns NULL;
+ * otherwise, removes the head pcb from the process queue of the found semaphore
+ * descriptor and returns a pointer to it. If the process queue for this semaphore becomes
+ * empty (emptyProcQ(s procq) is TRUE), removes the semaphore descriptor from the
+ * ASL and returns it to the semdFree list. */
 pcb_t *removeBlocked(int *semAdd){
     semd_t *node;
     pcb_t* returnVal;
@@ -126,7 +123,7 @@ pcb_t *removeBlocked(int *semAdd){
 /* Remove the pcb pointed to by p from the process queue associated with p’s
  * semaphore (p→ p semAdd) on the ASL.
  * If pcb pointed to by p does not appear in the process queue associated with p’s semaphore,
- * which is an error condition, return NULL; otherwise, re- turn p. */
+ * which is an error condition, return NULL; otherwise, return p. */
 pcb_t *outBlocked(pcb_t *p){
     semd_t *node;
     pcb_t* returnVal;
@@ -147,27 +144,9 @@ pcb_t *outBlocked(pcb_t *p){
     }
 }
 
-/*                                   Additional Functions                                           */
+/*                                   Other Additional Functions                                           */
 
 /* Functions used for code writing efficiency and to make the code easier to follow */
-
-/* Similar to allocPcb
- * Function used to allocate values in ASL
- * sets node pointer values to semd_t
- */
-semd_t *allocSemd(){
-    if(semdFree_h == NULL){ /* if already free */
-        return NULL;
-    }else{
-        semd_t *temp;
-        temp = semdFree_h;
-        semdFree_h = semdFree_h->s_next;
-        temp->s_next = NULL;
-        temp->s_semAdd = NULL;
-        temp->s_procQ = mkEmptyProcQ();
-        return temp;
-    }
-}
 
 /* Similar to freePcb, like allocASL function above
  * Function used to deallocate values in ASL
@@ -190,17 +169,17 @@ void freeSemd(semd_t *semd) {
  */
 semd_t *search(int *semAdd){
     semd_t *temp = semd_h->s_next;  /*added reference to semd_t*/
-    semd_t *lagtemp = semd_h;
-    if(temp->s_semAdd == 2147483647){
+    semd_t *lag_temp = semd_h;
+    if(temp->s_semAdd == (int*) MAXINT){
             return semd_h;
         }
     while(semAdd >= temp->s_semAdd){
         if(temp->s_semAdd == semAdd)
         {
-            return lagtemp;
+            return lag_temp;
         }
-        lagtemp = temp;
+        lag_temp = temp;
         temp = temp->s_next;
     }
-    return lagtemp;
+    return lag_temp;
 }
