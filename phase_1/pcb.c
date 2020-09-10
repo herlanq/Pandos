@@ -11,8 +11,6 @@ HIDDEN pcb_PTR pcbFree_h;
 int counter = 0;
 
 
-
-
 /*set new node's next pointer to current head, make head the newly inserted node*/
 void freePcb(pcb_PTR p){
     if(pcbFree_h == NULL) {
@@ -110,6 +108,10 @@ pcb_PTR removeProcQ(pcb_PTR *tp) {
     }
 }
 
+/* Remove the pcb pointed to by p from the process queue whose tail pointer is pointed to by tp.
+ * Update the process queue’s tail pointer if necessary. If the desired entry is not in the indicated queue
+ * (an error condition),return NULL; otherwise, return p.
+ */
 pcb_PTR outProcQ(pcb_PTR *tp, pcb_PTR p) {
     if(emptyProcQ(*tp)) {
         return NULL;
@@ -169,7 +171,6 @@ int emptyChild(pcb_t *p) {
 
 /*inserts a child on to the tree, and then connects to the siblings, if any, on the tree.
  Make the pcb pointed to by p a child of the pcb pointed to by prnt */
-
 void insertChild(pcb_PTR prnt, pcb_PTR p) {
     if (emptyChild(prnt)) {
         prnt->p_child = p;
@@ -224,7 +225,6 @@ pcb_PTR outChild(pcb_PTR p){
     }
     /* head child */
     if(p == p->p_prnt->p_child){
-        /* removeChild(p); ??*/
         p->p_prnt->p_child = p->p_sib;
         p->p_sib->p_prevsib = NULL;
         p->p_sib = NULL;
