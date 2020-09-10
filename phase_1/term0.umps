@@ -16,3 +16,4 @@ process tree module ok
 Initialized active semaphore list   
 insertBlocked test #1 started  
 insertBlocked test #2 started  
+insertBlocked(2): unexpected TRUE   

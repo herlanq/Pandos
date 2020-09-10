@@ -26,6 +26,7 @@ pcb_t *headBlocked(int *semAdd){
 
 /* Initialize the semdFree list to contain all the elements of the array
 static semd t semdTable[MAXPROC] */
+
 void initASL(){
     static semd_t semdTable[MAXPROC+2]; /* includes two dummy nodes*/
     semd_h = NULL;
@@ -191,9 +192,9 @@ semd_t *allocSemd(){
  * adds nodes to semdFree list
  */
 void freeSemd(semd_t *semd) {
-    if(semdFree_h == NULL){
+    if (semdFree_h == NULL) {
         semdFree_h = semd;
-    }else{
+    } else {
         semd->s_next = semdFree_h;
         semdFree_h = semd;
     }
