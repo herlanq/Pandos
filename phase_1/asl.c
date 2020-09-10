@@ -10,7 +10,7 @@
 
 semd_t *semdFree_h; /* pointer to head of free semaphore list */
 semd_t *semd_h; /* pointer to head of active semaphore list */
-
+int isNull;
 /* Return a pointer to the pcb that is at the head of the process queue associated with
  * the semaphore semAdd. Return NULL if semAdd is not found on the ASL
  * or if the process queue associated with semAdd is empty. */
@@ -41,11 +41,11 @@ void initASL(){
     semd_t *last;
     last = &(semdTable[2]);
     /* init first dummy node */
-    first->s_semAdd = NULL;         /* set first node's semAdd = NULL*/
+    first->s_semAdd = 0;         /* set first node's semAdd = NULL*/
     first->s_procQ = NULL;
     first->s_next = last;
     /* init last dummy node */
-    last->s_semAdd = (int*) MAXINT; /* set last node's semAdd = maxint*/
+    last->s_semAdd = 2147483647; /* set last node's semAdd = maxint*/
     last->s_procQ = NULL;
     last->s_next = NULL;
 
@@ -61,12 +61,20 @@ void initASL(){
  *
  * If a new semaphore descriptor needs to be allocated and the semdFree list is empty,
  * return TRUE. In all other cases return FALSE. */
+semd_t* semAlloc() {
+    if(semdFree_h == NULL){
+        return NULL;
+    }
+    semd_t *temp = semdFree_h;
+    semdFree_h = semdFree_h->s_next;
+    return temp;
+}
 
 int insertBlocked(int *semAdd, pcb_t *p) {
     semd_t *temp;
     temp = (semd_t*) search(semAdd);
     if (temp->s_next->s_semAdd != semAdd) {
-        semd_t *new = (semd_t*) allocPcb();
+        semd_t *new = semAlloc();
         if (new == NULL) {
             return TRUE;
         } else {
@@ -85,6 +93,7 @@ int insertBlocked(int *semAdd, pcb_t *p) {
         return FALSE;
     }
 }
+
 
 /*
 int insertBlocked(int *semAdd, pcb_t *p){
@@ -134,6 +143,7 @@ pcb_t *removeBlocked(int *semAdd){
             return returnVal;
         }
     }else{
+        isNull = 1;
         return NULL;
     }
 }
@@ -208,12 +218,25 @@ void freeSemd(semd_t *semd) {
  * next semAdd in order to keep the list sorted
  */
 semd_t *search(int *semAdd){
+    semd_t *search(int *semAdd){
     semd_t *temp = (semd_t*) semd_h; /* added reference to semd_t*/
-    if(semAdd == NULL){
-        semAdd = (int*) MAXINT;
-    }
     while (semAdd > temp->s_next->s_semAdd){
         temp = temp->s_next;
     }
     return temp;
+}
+    /*semd_t *temp = semd_h->s_next;  added reference to semd_t
+    semd_t *lagtemp = semd_h;
+    if(temp->s_semAdd == 2147483647){
+            return semd_h;
+        }
+    while(semAdd >= temp->s_semAdd){
+        if(temp->s_semAdd == semAdd)
+        {
+            return lagtemp;
+        }
+        lagtemp = temp;
+        temp = temp->s_next;
+    }
+    return lagtemp;*/
 }
