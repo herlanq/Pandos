@@ -82,6 +82,19 @@
 #define MAX(A,B)		((A) < (B) ? B : A)
 #define	ALIGNED(A)		(((unsigned)A & 0x3) == 0)
 
+/* Sem number
+ * 8 disks
+ * 8 usb
+ * 8 network
+ * 8 printer
+ * 16 terminal(one for read and one for write)
+ * +1 for sudo
+ * 49 total device semaphores */
+#define SUMNUM 49
+
+#define IOCLOCK 100000;
+#define QUANTUM 5000;
+
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
 
