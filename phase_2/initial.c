@@ -43,7 +43,7 @@ int main(){
     processCount = 0;
     softBlockCount = 0;
     currentProc = NULL;
-    readyQue = NULL;
+    readyQue = mkEmptyProcQ();
 
     /* init semaphores */
     int i;
