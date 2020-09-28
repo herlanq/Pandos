@@ -90,7 +90,7 @@
  * 16 terminal(one for read and one for write)
  * +1 for sudo
  * 49 total device semaphores */
-#define SUMNUM 49
+#define SEMNUM 49
 
 #define IOCLOCK 100000;
 #define QUANTUM 5000;

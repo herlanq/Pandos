@@ -34,7 +34,7 @@ typedef struct pcb_t {
                         *p_sib,      /*pointer to sibling*/
 			            *p_prevsib;  /*pointer to previous sib*/
     /* process status information */
-/*  state_t             p_s;   */     /*processor state*/
+    state_t             p_s;        /*processor state*/
     cpu_t               p_time;     /*cpu time used by proc*/
     int                 *p_semAdd;   /*which process blocked*/
 
