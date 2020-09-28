@@ -56,7 +56,7 @@ void scheduler(){
         if(processCount > 0){ /* if there are still processes to be executed */
             if(softBlockCount == 0){
                 PANIC();
-            } 
+            }
             /* need to wait */
             setSTATUS(ALLOFF | IEON | IECON | IMON);
             WAIT();
