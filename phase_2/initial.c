@@ -1,6 +1,6 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 9/22
+ * Last modified 9/27
  *
  * The initial.c module serves as the main for the Pandos Implementation Operating System.
  * This module initializes code from Phase 1 and also initializes variables that are maintained within the the nucleus,
@@ -13,9 +13,10 @@
 #include "../h/pcb.h"
 #include "../h/asl.h"
 
-#include "../phase_2/interrupts.c"
-#include "../phase_2/exceptions.c"
-#include "../phase_2/scheduler.c"
+#include "../h/initial.h"
+#include "../h/interrupts.h"
+#include "../h/exceptions.h"
+#include "../h/scheduler.h"
 
 
 /* Global Variables */
