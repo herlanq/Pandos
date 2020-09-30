@@ -71,6 +71,7 @@
 #define RAMSTART        0x20000000
 #define BIOSDATAPAGE    0x0FFFF000
 #define	PASSUPVECTOR	  0x0FFFF900
+#define RAMTOP          0x20001000
 
 /* Exceptions related constants */
 #define	PGFAULTEXCEPT	  0

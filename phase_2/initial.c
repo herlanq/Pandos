@@ -28,50 +28,43 @@ pcb_t *readyQue; /* pointer to the ready queue */
 
 int semD[SEMNUM]; /* 49 Semaphore in the list */
 
-/* calls test() from the p2test file */
+/* declares test() from the p2test file */
 extern void test();
 
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
  * One the main is complete, it passes over to the scheduler */
-
 int main(){
-    /* Init pcb and asl */
-    initPcbs();
-    initASL();
-
     /* init global variables */
     processCount = 0;
     softBlockCount = 0;
     currentProc = NULL;
     readyQue = mkEmptyProcQ();
-
     /* init semaphores */
     int i;
-    for(i=0; i < SUMNUM; i++){
+    for(i=0; i < SEMNUM; i++){
         semD[i] = 0;
     }
 
+    /* Init pcb and asl */
+    initPcbs();
+    initASL();
+
+    /* load time onto the sudo clock */
+    LDIT(IOCLOCK);
+
     /* alloc process to be set the current process, increment procCount */
     currentProc = allocPcb();
+    currentProc->p_semAdd = NULL;
+    currentProc->p_time = 0;
+    currentProc->p_supportStruct = NULL;
     processCount = processCount + 1;
-
-
-
-
-    /* much more to be added here but ... */
-
-
-
 
     /* insert current proc into the ready queue*/
     insertProcQ(&readyQue, currentProc);
 
     /* init current proc back to NULL */
     currentProc = NULL;
-
-    /* load time onto the sudo clock */
-    LDIT(IOCLOCK);
 
     /* Scheduler takes over the running process */
     scheduler();

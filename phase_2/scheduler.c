@@ -58,7 +58,7 @@ void scheduler(){
                 PANIC();
             }
             /* need to wait */
-            setSTATUS(ALLOFF | IEON | IECON | IMON);
+            setSTATUS();
             WAIT();
         }
     }
