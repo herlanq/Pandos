@@ -46,6 +46,13 @@ int main(){
         semD[i] = 0;
     }
 
+    pcb_t *foo;
+    foo->s_sp = (memaddr) uTLB_RefillHandler;
+    foo->exceptionHandler = (memaddr) fooBar;
+    pcb_t *top;
+    top->s_sp = (memaddr) 0x2000.1000;
+
+
     /* Init pcb and asl */
     initPcbs();
     initASL();
@@ -70,4 +77,15 @@ int main(){
     scheduler();
 
     return 0;
+}
+
+void genExceptionHandler(/*im guessing we need to pass in the cause register*/){
+    if(/*cause register is zero*/)
+        interruptHandler();
+    if(/*cause register is 1-3*/)
+        tlbHandler();
+    if(/*cause register is 4-7*/)
+        trapHandler();
+    if(/*cause register is 8*/)
+        sysHandeler();
 }
