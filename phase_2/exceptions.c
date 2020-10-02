@@ -50,22 +50,27 @@ void sysHandler(){
 			removeChild(currentProc->p_child);
 		}
 		outProcQ(&readyQue, currentProc);
-		scheduler()
+		scheduler();
 		SYSCALL(2, 0, 0, 0);
 	}
 	if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
-		WAIT(mutex){
 			mutex--;
-			if(mutex < 0)
-				WAIT();
+			if(mutex < 0){
+				insertBlocked(&mutex, currentProc)
+				scheduler();
+				LDST(currentProc->p_s);
 		}
-		SYSCALL (3, int*semaddr, 0, 0);
+		SYSCALL (3, int*currentProc->p_semadd, 0, 0);
 	}
 	if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
-		SIGNAL(mutex);
 		mutex++;
+		if(mutex <= 0){
+			int temp = removeBlocked(&mutex);
+			insertProcQ(&readyQue, temp);
+			LDST(currentProc->p_s);
+		}
 		SYSCALL (4, int*semaddr, 0, 0);
 	}
 	if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
