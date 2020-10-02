@@ -17,6 +17,8 @@
 #include "../h/exceptions.h"
 #include "../h/scheduler.h"
 
+#include "/home/schlampyy/umps3/src/support/libumps.h"
+
 /* Variables used from initial.c */
 extern int processCount;
 extern int softBlockCount;

@@ -17,6 +17,8 @@
 #include "../h/exceptions.h"
 #include "../h/scheduler.h"
 
+#include "/home/schlampyy/umps3/src/support/libumps.h"
+
 /* Global Variables from initial.c */
 extern int processCount;
 extern int softBlockCount;
@@ -35,34 +37,34 @@ void sysHandler(){
 		pcb_t newPcb->p_s = a1;
 		newPcb->p_supportStruct = a2;
 		insertProcQ(newPcb, newPcb->p_next);
-		intertChild(newPcb, newPcb->p_child);
+		insertChild(newPcb, newPcb->p_child);
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
 		scheduler();
-		int retValue = SYSCALL (1,statet*statep, supportt*supportp, 0);
+		int retValue = SYSCALL(1,statet*statep, supportt*supportp, 0);
 	}
 	if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
 		while (currentProc->p_child != NULL)
 		{
-			removechild(currentProc->p_child);
+			removeChild(currentProc->p_child);
 		}
-		outprocQ(&readyQue, currentProc);
+		outProcQ(&readyQue, currentProc);
 		scheduler()
-		SYSCALL (2, 0, 0, 0);
+		SYSCALL(2, 0, 0, 0);
 	}
 	if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
-		wait(mutex){
+		WAIT(mutex){
 			mutex--;
 			if(mutex < 0)
-				wait();
+				WAIT();
 		}
 		SYSCALL (3, int*semaddr, 0, 0);
 	}
 	if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
-		signal(mutex);
+		SIGNAL(mutex);
 		mutex++;
 		SYSCALL (4, int*semaddr, 0, 0);
 	}
