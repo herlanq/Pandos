@@ -15,7 +15,7 @@
 /* timer, timescale, TOD-LO and other bus regs */
 #define RAMBASEADDR		0x10000000
 #define RAMBASESIZE		0x10000004
-#define TODLOADDR		  0x1000001C
+#define TODLOADDR		0x1000001C
 #define INTERVALTMR		0x10000020	
 #define TIMESCALEADDR	0x10000024
 
@@ -95,6 +95,15 @@
 
 #define IOCLOCK 100000;
 #define QUANTUM 5000;
+
+/* ON/OFF bit manipulation*/
+#define ALLOFF  0x00000000
+#define UMOFF   0x00000008       /* User Mode OFF (Kernel Mode ON)*/
+#define UMON    0xFFFFFFF7     /* User Mode ON (Kernel Mode OFF)*/
+#define IMOFF   0xFFFF00FF      /* Interrupt UNMasked */
+#define IMON    0x0000FF00      /* Interrupt Masked */
+#define IEON	0x00000004      /* Turn interrupts ON*/
+#define IECON	0x00000001      /* Turn interrupts current ON */
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
