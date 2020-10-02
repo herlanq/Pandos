@@ -30,8 +30,8 @@ extern pcb_t *readyQue;
 cpu_t compuTime; /* Keep track of time spent computing */
 cpu_t QuantumStart;
 
-/* Round Robin algorithm that schedules each process that it is going to be executed.
- * Under certain conditions, it PANICS or performs the appropriate function call.
+/* 'scheduler()' is a round Robin algorithm that schedules each process that it is going to be executed.
+ *
  */
 void scheduler(){
     if(currentProc != NULL){ /* if the current process is null */
@@ -57,11 +57,12 @@ void scheduler(){
         /* set the current process to be null, there are no processes to be run */
         currentProc = NULL;
         /* check for remaining processes */
-        if(processCount == 0){ /* if procCNT is equal to 0, everything finished running */
+        if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
             HALT();
         }
 
-        if(processCount > 0){ /* if there are still processes to be run */
+        /* if there are still processes to be run */
+        if(processCount > 0){
             if(softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
                 PANIC();
             }
