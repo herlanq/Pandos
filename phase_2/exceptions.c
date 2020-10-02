@@ -75,12 +75,12 @@ void sysHandler(){
 	}
 	if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
-		int ioStatus = SYSCALL (5, int intlNo,int dnum, int waitForTermRead);
+		int ioStatus = SYSCALL (8, int intlNo,int dnum, int waitForTermRead);
 	}
 	if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
 	{
+		currentProc->p_s.s_v0 = currentProc->p_time;
 		cpu_t cpuTime = SYSCALL (6, 0, 0, 0);
-		return cpuTime;
 	}
 	if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
@@ -88,6 +88,6 @@ void sysHandler(){
 	}
 	if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
-		supportt*sPtr = SYSCALL (8, 0, 0, 0);
+		support_t *sPtr = SYSCALL (8, 0, 0, 0);
 	}
 }
