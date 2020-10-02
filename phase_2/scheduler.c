@@ -39,28 +39,35 @@ void scheduler(){
         /* set current proc time to how long the process was running in cpu */
         currentProc->p_time = (currentProc->p_time) + (compuTime - QuantumStart);
     }
+
     /* set new process block pointer */
     pcb_t *proc;
+
     /* remove process from head of the ready que and set it as new process */
     proc = removeProcQ(&readyQue);
 
     if(proc != NULL){ /* if removed process is not null*/
         currentProc = proc;
         STCK(QuantumStart);
-        setTimer(QUANTUM);
-        LDST(&(currentProc->p_s));
+        setTIMER(QUANTUM);
+        LDST(&(currentProc->p_s);
     }
+
     if(proc == NULL){ /* if removed process is null */
+        /* set the current process to be null, there are no processes to be run */
         currentProc = NULL;
-        if(processCount == 0){ /* if procCNT is equal to 0, correct */
+        /* check for remaining processes */
+        if(processCount == 0){ /* if procCNT is equal to 0, everything finished running */
             HALT();
         }
-        if(processCount > 0){ /* if there are still processes to be executed */
-            if(softBlockCount == 0){
+
+        if(processCount > 0){ /* if there are still processes to be run */
+            if(softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
                 PANIC();
             }
-            /* need to wait */
-            setSTATUS();
+            /* have processes that are blocked, need to wait with interrupts and exceptions enabled
+             * "Twiddling Thumbs" */
+            setSTATUS(ALLOFF | IEON | IECON | IMON);
             WAIT();
         }
     }
