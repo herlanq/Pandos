@@ -46,11 +46,11 @@ int main(){
         semD[i] = 0;
     }
 
-    pcb_t *foo;
-    foo->s_sp = (memaddr) uTLB_RefillHandler;
-    foo->exceptionHandler = (memaddr) fooBar;
-    pcb_t *top;
-    top->s_sp = (memaddr) 0x2000.1000;
+    passupvector *foo = PASSUPVECTOR;
+    foo->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
+    foo->tlb_refill_stackPTR = (memaddr) 0x20001000;
+    foo->exceptionHandler = (memaddr) exception_handler;
+    foo->s_stackPTR = 0x20001000;
 
 
     /* Init pcb and asl */
@@ -58,7 +58,7 @@ int main(){
     initASL();
 
     /* load time onto the sudo clock */
-    LDIT(IOCLOCK);
+    LDIT(100);
 
     /* alloc process to be set the current process, increment procCount */
     currentProc = allocPcb();
