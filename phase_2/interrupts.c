@@ -2,7 +2,7 @@
  * CSCI 320-01 Operating Systems
  * Last modified 9/27
  *
- * This module 
+ * This module
  *
  */
 
@@ -17,7 +17,7 @@
 #include "../h/exceptions.h"
 #include "../h/scheduler.h"
 
-#include "/home/schlampyy/umps3/src/support/libumps.h"
+#include "../h/libumps.h"
 
 /* Global Variables from initial.c */
 extern int processCount;

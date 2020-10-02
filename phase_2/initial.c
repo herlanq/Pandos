@@ -18,6 +18,8 @@
 #include "../h/exceptions.h"
 #include "../h/scheduler.h"
 
+#include "../h/libumps.h"
+
 
 /* Global Variables */
 int processCount; /* number of processes on the ready queue */
