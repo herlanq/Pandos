@@ -2,8 +2,9 @@
  * CSCI 320-01 Operating Systems
  * Last modified 9/27
  *
- * This module
- *
+ * This module processes all types of device interrupts and converts them into V operations
+ * on the appropriate semaphores. Calls scheduler in order to ensure no starvation and
+ * keep the flow of the program going.
  */
 
 #include "../h/const.h"
@@ -25,3 +26,18 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
+
+/* copy state function from exceptions */
+extern void CtrlPlusC(state_t *oldState, state_t *newState);
+
+/* 2 helper functions
+ * 1 to compute the device number
+ * 1 to call the scheduler */
+int getDevice(int lineNum);
+void callScheduler();
+
+/* Function that determines the highest priority interrupt and gives control the to scheduler*/
+void IOTrapHandler(){
+
+}
+
