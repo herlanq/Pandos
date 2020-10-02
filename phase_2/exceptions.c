@@ -27,6 +27,9 @@ extern int semD[SEMNUM];
 extern cpu_t compuTime;
 extern cpu_t QuantumStart;
 
+
+/*Not sure what the type is of what we return on sysHandler, if anything at all*/
+
 void sysHandler(/*passed in a0 register i think*/){
 	if(/*a0 equals 1*/){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
@@ -37,22 +40,33 @@ void sysHandler(/*passed in a0 register i think*/){
 		newPcb->p_semadd = NULL;
 		int retValue = SYSCALL (1,statet*statep, supportt*supportp, 0);
 	}
-	if(/*a0 equals 2*/)
+	if(/*a0 equals 2*/) /*situation to terminate process*/
 	{
 		SYSCALL (2, 0, 0, 0);
 	}
-	if(/*a0 equals 3*/)
+	if(/*a0 equals 3*/) /*Passeren situation*/
 	{
-
 		SYSCALL (3, int*semaddr, 0, 0);
 	}
-	if(/*a0 equals 4*/)
+	if(/*a0 equals 4*/) /*Verhogen situation */
 	{
-
 		SYSCALL (4, int*semaddr, 0, 0);
 	}
-	if(/*a0 equals 5*/)
+	if(/*a0 equals 5*/) /*I/O situation*/
 	{
-		
+		int ioStatus = SYSCALL (5, int intlNo,int dnum, int waitForTermRead);
+	}
+	if(/*a0 equals 6*/) /*get CPU time situation */
+	{
+		cpu_t cpuTime = SYSCALL (6, 0, 0, 0);
+		return cpuTime;
+	}
+	if(/*a0 equals 7*/) /*wait clock situation*/
+	{
+		SYSCALL (7, 0, 0, 0);
+	}
+	if(/*a0 equals 8*/) /*support pointer situation */
+	{
+		supportt*sPtr = SYSCALL (8, 0, 0, 0);
 	}
 }
