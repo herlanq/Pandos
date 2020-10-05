@@ -56,8 +56,7 @@ void CallScheduler(){
 void CopyState(state_t *oldState, state_t *newState){
     /*Loop through all of the registers in the old state and write them into the new state*/
     int i;
-    for (i = 0; i < STATEREGNUM; i++)
-    {
+    for (i = 0; i < STATEREGNUM; i++){
         newState->s_reg[i] = oldState->s_reg[i];
     }
     /*Move all of the contents from the old state into the new*/
