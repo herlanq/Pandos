@@ -83,11 +83,11 @@ int main(){
 
 void genExceptionHandler(/*im guessing we need to pass in the cause register*/){
     if(/*cause register is zero*/)
-        interruptHandler();
+        InterruptHandler();
     if(/*cause register is 1-3*/)
-        tlbHandler();
+        TlbTrapHandler();
     if(/*cause register is 4-7*/)
-        trapHandler();
+        PrgTrapHandler();
     if(/*cause register is 8*/)
-        sysHandeler();
+        sysHandler();
 }

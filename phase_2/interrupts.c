@@ -27,8 +27,6 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 
-/* copy state function from exceptions */
-extern void CtrlPlusC(state_t *oldState, state_t *newState);
 
 /* 2 helper functions
  * 1 to compute the device number
@@ -37,7 +35,7 @@ int getDevice(int lineNum);
 void callScheduler();
 
 /* Function that determines the highest priority interrupt and gives control the to scheduler*/
-void IOTrapHandler(){
+void InterruptHandler(){
 
 }
 
