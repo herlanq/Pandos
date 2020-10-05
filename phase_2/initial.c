@@ -82,12 +82,15 @@ int main(){
 }
 
 void genExceptionHandler(/*im guessing we need to pass in the cause register*/){
-    if(/*cause register is zero*/)
+currentProc->p_s.s_cause && 0x000000FC;
+currentProc->p_s.s_cause << 2;          /*turning off the bits we don't need, and then shifting them over to make a comparison */
+int handle = currentProc->p_s.s_cause; 
+    if(handle == 0)
         InterruptHandler();
-    if(/*cause register is 1-3*/)
+    if(handle == 1 || handle == 2 || handle == 3)
         TlbTrapHandler();
-    if(/*cause register is 4-7*/)
+    if(handle == 4 || handle == 5 || handle == 6 || handle == 7)
         PrgTrapHandler();
-    if(/*cause register is 8*/)
+    if(handle == 8)
         sysHandler();
 }
