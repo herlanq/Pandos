@@ -94,10 +94,10 @@ void sysHandler(){
 		trapHandler();
 }
 
-void tlbHandler(){
+void TlbTrapHandler(){
 	/*yet to be coded, i believe most of this is in phase 3*/
 }
 
-void trapHandler(){
+void PrgTrapHandler(){
 	/*pass up or die scenario, yet to be coded.*/
 }
