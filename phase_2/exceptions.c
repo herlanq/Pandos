@@ -41,7 +41,7 @@ void sysHandler(){
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
 		scheduler();
-		int retValue = SYSCALL(1,statet*statep, supportt*supportp, 0);
+		int retValue = SYSCALL(1,state_t *state_p, support_t *support_p, 0);
 	}
 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
@@ -91,7 +91,7 @@ void sysHandler(){
 		support_t *sPtr = SYSCALL (8, 0, 0, 0);
 	}
 	else
-		trapHandler();
+		PrgTrapHandler();
 }
 
 void TlbTrapHandler(){
