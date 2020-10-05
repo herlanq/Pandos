@@ -91,6 +91,9 @@ int handle = currentProc->p_s.s_cause;
         TlbTrapHandler();
     if(handle == 4 || handle == 5 || handle == 6 || handle == 7)
         PrgTrapHandler();
-    if(handle == 8)
+    if(handle == 8){
+        /* should check cause register and syscall before going into syshandler
+        because if not we should hit the PrgTrapHandler() */
         sysHandler();
+    }
 }

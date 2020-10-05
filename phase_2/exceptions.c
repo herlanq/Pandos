@@ -76,20 +76,20 @@ void sysHandler(){
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
-		int ioStatus = SYSCALL (8, int intlNo,int dnum, int waitForTermRead);
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
 	{
 		currentProc->p_s.s_v0 = currentProc->p_time;
-		cpu_t cpuTime = SYSCALL (6, 0, 0, 0);
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
-		SYSCALL (7, 0, 0, 0);
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
-		support_t *sPtr = SYSCALL (8, 0, 0, 0);
+		currentProc->p_s.s_pc += 4;
 	}
 	else
 		currentProc->p_s.s_pc += 4;
