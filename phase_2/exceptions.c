@@ -40,8 +40,8 @@ void sysHandler(){
 		insertChild(newPcb, newPcb->p_child);
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
-		scheduler();
-		int retValue = SYSCALL(1,state_t *state_p, support_t *support_p, 0);
+		currentProc->p_s.s_pc += 4;
+		LDST(currentProc->p_s);
 	}
 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
@@ -50,8 +50,9 @@ void sysHandler(){
 			removeChild(currentProc->p_child);
 		}
 		outProcQ(&readyQue, currentProc);
+		freePCB(currentProc);
+		currentProc->p_s.s_pc += 4;
 		scheduler();
-		SYSCALL(2, 0, 0, 0);
 	}
 	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
@@ -61,7 +62,7 @@ void sysHandler(){
 				scheduler();
 				LDST(currentProc->p_s);
 		}
-		SYSCALL (3, int*currentProc->p_semadd, 0, 0);
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
@@ -71,7 +72,7 @@ void sysHandler(){
 			insertProcQ(&readyQue, temp);
 			LDST(currentProc->p_s);
 		}
-		SYSCALL (4, int*semaddr, 0, 0);
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
@@ -91,6 +92,7 @@ void sysHandler(){
 		support_t *sPtr = SYSCALL (8, 0, 0, 0);
 	}
 	else
+		currentProc->p_s.s_pc += 4;
 		PrgTrapHandler();
 }
 
