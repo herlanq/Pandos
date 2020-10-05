@@ -48,7 +48,7 @@ int main(){
         semD[i] = 0;
     }
 
-    passupvector *foo = PASSUPVECTOR;
+    passupvector foo = PASSUPVECTOR;
     foo->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
     foo->tlb_refill_stackPTR = (memaddr) 0x20001000;
     foo->exceptionHandler = (memaddr) exception_handler;
