@@ -36,7 +36,83 @@ void CallScheduler();
 
 /* Function that determines the highest priority interrupt and gives control the to scheduler*/
 void InterruptHandler(){
+    unsigned int causeLine;
+    /* Variables for determining dev address and dev sema4 */
+    int tempLineNum;
+    int LineNum;
+    int DevSema4;
+    int DevNum;
 
+    /* V operation sema4 variables */
+    int* sema4;
+    int* sema4Add;
+
+    /* store device status in v0*/
+    int DevStatus;
+
+    pcb_t *blockProc;
+    state_PTR caller;
+
+    /* get state of interrupt */
+    caller = (state_t*) interrupt_state;
+
+    causeLine = caller->s_cause >> 8;
+    /* if multicore is on */
+    if((causeLine & MULTICORE) != 0){
+        PANIC();
+    }else if((causeLine & CLOCK1) != 0){
+        CallScheduler(); /* process quantum is up, move to new process */
+    }else if((causeLine & CLOCK2) != 0){
+        /* access pseudo clock*/
+        sema4Add = (int*) &(semD[SEMNUM-1]);
+        /* free all currently blocked processes and insert them onto the ready queue */
+        while(headBlocked(sema4Add) != NULL){
+            /* remove blocked process */
+            blockProc = removeBlocked(sema4Add);
+            /* Put onto the ready queue */
+            if(blockProc != NULL){
+                insertProcQ(&readyQue, blockProc);
+                /* decrement softblock count*/
+                softBlockCount--;
+            }
+        }
+        /* Set sema4 back to 0 */
+        *sema4Add = 0;
+        /* load pseudo clock, call scheduler for next process */
+        LDIT(PSUEDOCLOCKTIME);
+        CallScheduler();
+    }else if((causeLine & DISKDEVICE) != 0){
+        /* disk dev is on */
+        causeLine = DI;
+    }else if((causeLine & FLASHDEVICE) != 0){
+        /* flash dev is on */
+        causeLine = FI;
+    }else if((causeLine & NETWORKDEVICE) != 0){
+        /* network dev is on */
+        causeLine = NETWORKI;
+    }else if((causeLine & PRINTERDEVICE) != 0) {
+        /* printer dev is on */
+        causeLine = PRINTERI;
+    }else if((causeLine & TERMINALDEVICE) != 0) {
+        /* terminal dev is on */
+        causeLine = TERMINALI;
+    }else{
+        PANIC();
+    }
+    /* call helper function to get line number */
+    DevNum = getDevice(LineNum);
+    /* 8 devices per line num */
+    DevSema4 = tempLineNum * DEVPERINT;
+    /* find device */
+    DevSema4 = DevSema4 + DevNum;
+    device_t *devReg;
+
+
+}
+
+/* Take in the line number of the interrupt.
+ * Bit shift until we find the first device causing the interrupt */
+void getDevice(int linenum){
 
 }
 /* In charge of putting the process back on the ready queue and calling scheduler */
@@ -60,6 +136,7 @@ void CopyState(state_t *oldState, state_t *newState){
         newState->s_reg[i] = oldState->s_reg[i];
     }
     /*Move all of the contents from the old state into the new*/
+    newState->s_entryHI = oldState->s_entryHI;
     newState->s_status = oldState->s_status;
     newState->s_pc = oldState->s_pc;
     newState->s_cause = oldState->s_cause;

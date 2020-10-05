@@ -59,8 +59,8 @@ int main(){
     initPcbs();
     initASL();
 
-    /* load time onto the sudo clock */
-    LDIT(100);
+    /* load 100ms onto the pseudo clock */
+    LDIT(IOCLOCK);
 
     /* alloc process to be set the current process, increment procCount */
     currentProc = allocPcb();

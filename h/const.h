@@ -29,7 +29,15 @@
 #define NULL 			    ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
 #define MAXINT            0xFFFFFFFF
-
+/* Sem number
+ * 8 disks
+ * 8 usb
+ * 8 network
+ * 8 printer
+ * 16 terminal(one for read and one for write)
+ * +1 for sudo
+ * 49 total device semaphores */
+#define SEMNUM           49
 /* device interrupts */
 #define DISKINT			  3
 #define FLASHINT 		  4
@@ -41,6 +49,42 @@
 #define DEVPERINT		  8		  /* devices per interrupt line */
 #define DEVREGLEN		  4		  /* device register field length in bytes, and regs per dev */	
 #define DEVREGSIZE	  16 		/* device register size in bytes */
+
+/* Define Interrupts  */
+#define MULTICORE 0x00000001
+#define CLOCK1 0x00000002
+#define CLOCK2 0x00000004
+#define DISKDEVICE 0x00000008
+#define FLASHDEVICE 0x00000010
+#define NETWORKDEVICE 0x00000020
+#define PRINTERDEVICE 0x00000040
+#define TERMINALDEVICE 0x00000080
+
+#define C1I 1
+#define C2I 2
+#define DI 3
+#define FI 4
+#define NETWORKI 5
+#define PRINTERI 6
+#define TERMINALI 7
+
+#define FIRSTBIT 0x00000001
+#define DEVPHYS 0x10000000
+#define PSUEDOCLOCKTIME 100
+#define TOTALDEVICES 8
+
+/*Acknowledge a interrupt*/
+#define ACK 1
+
+/* NEW Processor State Areas */
+
+/* SYSCALL BREAK*/
+#define interrupt_newstate 0x200003D4
+#define interrupt_state 0X20000348
+
+/* INTERRUPTS */
+#define INTERRUPTNEWAREA 0x2000008C
+#define INTERRUPTOLDAREA 0x20000000
 
 /* device register field number for non-terminal devices */
 #define STATUS			  0
@@ -83,20 +127,11 @@
 #define MAX(A,B)		((A) < (B) ? B : A)
 #define	ALIGNED(A)		(((unsigned)A & 0x3) == 0)
 
-/* Sem number
- * 8 disks
- * 8 usb
- * 8 network
- * 8 printer
- * 16 terminal(one for read and one for write)
- * +1 for sudo
- * 49 total device semaphores */
-#define SEMNUM 49
+#define IOCLOCK 100;
+#define QUANTUM 5;
 
-#define IOCLOCK 100000;
-#define QUANTUM 5000;
 
-/* ON/OFF bit manipulation*/
+/* ON/OFF bit manipulation */
 #define ALLOFF  0x00000000
 #define UMOFF   0x00000008       /* User Mode OFF (Kernel Mode ON)*/
 #define UMON    0xFFFFFFF7     /* User Mode ON (Kernel Mode OFF)*/
