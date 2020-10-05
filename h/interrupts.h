@@ -4,5 +4,7 @@
 #define INTERRUPTS
 
 extern void InterruptHandler();
+extern void CopyState();
+extern void CallScheduler();
 
 #endif
