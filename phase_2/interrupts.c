@@ -41,7 +41,7 @@ void InterruptHandler(){
     int tempLineNum;
     int LineNum;
     int DevSema4;
-    int DevNum;
+    int devNum;
 
     /* V operation sema4 variables */
     int* sema4;
@@ -54,15 +54,13 @@ void InterruptHandler(){
     state_PTR caller;
 
     /* get state of interrupt */
-    caller = (state_t*) interrupt_state;
+    caller = (state_t*) INTERRUPT_OLD;
 
     causeLine = caller->s_cause >> 8;
     /* if multicore is on */
-    if((causeLine & MULTICORE) != 0){
-        PANIC();
-    }else if((causeLine & CLOCK1) != 0){
+    if((causeLine & CLOCK1) != 0){ /* PLT */
         CallScheduler(); /* process quantum is up, move to new process */
-    }else if((causeLine & CLOCK2) != 0){
+    }else if((causeLine & CLOCK2) != 0){ /* Pseudo clock */
         /* access pseudo clock*/
         sema4Add = (int*) &(semD[SEMNUM-1]);
         /* free all currently blocked processes and insert them onto the ready queue */
@@ -77,7 +75,7 @@ void InterruptHandler(){
             }
         }
         /* Set sema4 back to 0 */
-        *sema4Add = 0;
+        sema4Add = 0;
         /* load pseudo clock, call scheduler for next process */
         LDIT(PSUEDOCLOCKTIME);
         CallScheduler();
@@ -100,29 +98,74 @@ void InterruptHandler(){
         PANIC();
     }
     /* call helper function to get line number */
-    DevNum = getDevice(LineNum);
+    devNum = getDevice(LineNum);
     /* 8 devices per line num */
     DevSema4 = tempLineNum * DEVPERINT;
+    tempLineNum = causeLine;
     /* find device */
     DevSema4 = DevSema4 + DevNum;
     device_t *devReg;
-
-
+    /* finding specific device register */
+    devReg = (device_t*)(0x10000000) + (tempLineNum * 0x80) + (devNum * 0x10);
+    /* terminal, differentiate between read/write */
+    if(LineNum == TERMINT){
+        if((devReg->d_status & 0xF) =! READY){
+            /* set dev status */
+            DevStatus = devReg->d_status;
+            /*ACK*/
+            devReg->d_command = ACK;
+        }else{
+            DevSema4 = DevSema4 + DEVPERINT;
+            DevStatus = devReg->d_status;
+            devReg->d_command = ACK;
+        }
+    }else{ /* not a terminal */
+        /* set status and ACK interrupt */
+        DevStatus = devReg->d_status;
+        devReg->d_command = ACK;
+    }
+    /* get sema4 for dev causing interrupt */
+    sema4Add = (&(semD[DevSema4]));
+    (*sema4Add) = (*sema4Add) + 1;
+    if((*sema4Add) <= 0){
+        /* Removed from blocked list */
+        blockProc = removeBlocked(sema4Add);
+        if(blockProc != NULL){
+            /* set status in v0 register and decrement softblockcount
+             * and insert into ready queue */
+            blockProc->p_s.s_v0 = DevStatus;
+            softBlockCount = softBlockCount - 1;
+            insertProcQ(&readyQue, blockProc);
+        }
+    }
+    CallScheduler();
 }
+
+/*                                              HELPER FUNCTIONS                                                    */
 
 /* Take in the line number of the interrupt.
  * Bit shift until we find the first device causing the interrupt */
 void getDevice(int linenum){
+    int x;
+    /* area that is causing the interrupt */
+    devregarea_t *interrupt_device;
+    int DevLineNum;
+    unsigned int bitMapLine;
+    unsigned int bipMapActive;
+
+    int interrupt_deviceNum;
+    DevLineNum = linenum;
+
 
 }
 /* In charge of putting the process back on the ready queue and calling scheduler */
 void CallScheduler(){
-    state_t *end_state;
-    end_state = (state_t*) interrupt_state;
+    state_t *temp;
+    temp = (state_t) INTERRUPT_OLD;
     /* if current process is not null, put back on ready queue, call scheduler */
     if(currentProc != NULL){
         /* need to copy the state of the process */
-        CopyState(end_state, &(currentProc->p_s));
+        CopyState(temp, &(currentProc->p_s));
         insertProcQ(&readyQue, currentProc);
     }
     /* since no current process, call scheduler to get next process*/
@@ -136,7 +179,6 @@ void CopyState(state_t *oldState, state_t *newState){
         newState->s_reg[i] = oldState->s_reg[i];
     }
     /*Move all of the contents from the old state into the new*/
-    newState->s_entryHI = oldState->s_entryHI;
     newState->s_status = oldState->s_status;
     newState->s_pc = oldState->s_pc;
     newState->s_cause = oldState->s_cause;

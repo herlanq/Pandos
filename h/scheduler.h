@@ -5,6 +5,10 @@
 
 extern cpu_t compuTime;
 extern cpu_t QuantumStart;
+extern int processCount;
+extern int softBlockCount;
+extern pcb_t *currentProc;
+extern pcb_t *readyQue;
 
 extern void scheduler();
 

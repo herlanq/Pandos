@@ -3,7 +3,7 @@
  * Last modified 9/27
  *
  * The Nucleus guarantees finite progress (does not allow starvation) thus, every ready process will have
- * an opportunity to execute. The Nucleus implements a simple preemptive round-robin scheduling algorithm with
+ * an opportunity to execute. This module implements a simple preemptive round-robin scheduling algorithm with
  * a time slice value of 5 milliseconds.
  */
 #include "../h/const.h"
@@ -66,10 +66,12 @@ void scheduler(){
             if(softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
                 PANIC();
             }
-            /* have processes that are blocked, need to wait with interrupts and exceptions enabled
-             * "Twiddling Thumbs" */
-            setSTATUS(ALLOFF | IEON | IECON | IMON);
-            WAIT();
+            if(softBlockCount > 0){
+                /* have processes that are blocked, need to wait with interrupts and exceptions enabled
+                 * "Twiddling Thumbs" */
+                setSTATUS(ALLOFF | IEON | IECON | IMON);
+                WAIT();
+            }
         }
     }
 }

@@ -50,7 +50,7 @@ void sysHandler(){
 			removeChild(currentProc->p_child);
 		}
 		outProcQ(&readyQue, currentProc);
-		freePCB(currentProc);
+		freePcb(currentProc);
 		currentProc->p_s.s_pc += 4;
 		scheduler();
 	}
@@ -118,7 +118,7 @@ void PassUpOrDie(state_t *caller, int trigger){
         /*0 is TLB EXCEPTIONS*/
         case TLBTRAP:
         if((currentProc-> newTLBstate) == NULL){
-            Syscall2();
+            S;
         }else{
             CopyState(caller, currentProc-> oldTLBstate);
             LDST(currentProc-> newTLBstate);

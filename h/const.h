@@ -60,21 +60,18 @@
 #define PRINTERDEVICE 0x00000040
 #define TERMINALDEVICE 0x00000080
 
-#define C1I 1
-#define C2I 2
-#define DI 3
-#define FI 4
-#define NETWORKI 5
-#define PRINTERI 6
-#define TERMINALI 7
+#define C1I 1 /* clock 1 interrupt */
+#define C2I 2 /* clock 2 interrupt */
+#define DI 3  /* disk interrupt */
+#define FI 4  /* flash interrupt */
+#define NETWORKI 5   /* network interrupt */
+#define PRINTERI 6   /* printer interrupt */
+#define TERMINALI 7  /* terminal interrupt */
 
 #define FIRSTBIT 0x00000001
 #define DEVPHYS 0x10000000
 #define PSUEDOCLOCKTIME 100
 #define TOTALDEVICES 8
-
-/*Acknowledge a interrupt*/
-#define ACK 1
 
 /* NEW Processor State Areas */
 
@@ -83,8 +80,8 @@
 #define interrupt_state 0X20000348
 
 /* INTERRUPTS */
-#define INTERRUPTNEWAREA 0x2000008C
-#define INTERRUPTOLDAREA 0x20000000
+#define INTERRUPT_NEW 0x2000008C
+#define INTERRUPT_OLD 0x20000000
 
 /* device register field number for non-terminal devices */
 #define STATUS			  0
