@@ -33,6 +33,8 @@ extern cpu_t QuantumStart;
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
+	int mutex;
+
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
 		newPcb->p_supportStruct = a2;
@@ -56,27 +58,31 @@ void sysHandler(){
 	}
 	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
-			mutex--;
-			if(mutex < 0){
-				insertBlocked(&mutex, currentProc)
-				scheduler();
-				LDST(currentProc->p_s);
-		}
 		currentProc->p_s.s_pc += 4;
+		mutex--;
+		if(mutex < 0){
+			insertBlocked(&mutex, currentProc)
+			scheduler();
+			LDST(currentProc->p_s);
+		}
+
+		
 	}
 	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
 		mutex++;
+		currentProc->p_s.s_pc += 4;
 		if(mutex <= 0){
 			int temp = removeBlocked(&mutex);
 			insertProcQ(&readyQue, temp);
 			LDST(currentProc->p_s);
 		}
-		currentProc->p_s.s_pc += 4;
+		
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
 	{
@@ -86,22 +92,26 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
+		if(p_supportStruct == NULL)
+			currentProc->p_s.s_v0 = NULL;
+		currentProc->p_s.s_v0 = p_supportStruct;
 		currentProc->p_s.s_pc += 4;
 	}
-	else
+	else if(currentProc->p_s.s_a0 >= 9)
 		currentProc->p_s.s_pc += 4;
-		PrgTrapHandler();
+		PassUpOrDie();
 }
 
 void TlbTrapHandler(){
-	/*yet to be coded, i believe most of this is in phase 3*/
+	PassUpOrDie();
 }
 
 void PrgTrapHandler(){
-	/*pass up or die scenario, yet to be coded.*/
+	PassUpOrDie();
 }
 
 /* If an exception has been encountered, it passes the error to the appropriate handler, if no exception
