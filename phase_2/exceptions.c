@@ -33,6 +33,8 @@ extern cpu_t QuantumStart;
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
+	int mutex;
+
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
 		newPcb->p_supportStruct = a2;
@@ -89,11 +91,14 @@ void sysHandler(){
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
+		if(p_supportStruct == NULL)
+			currentProc->p_s.s_v0 = NULL;
+		currentProc->p_s.s_v0 = p_supportStruct;
 		currentProc->p_s.s_pc += 4;
 	}
-	else
+	else if(currentProc->p_s.s_a0 >= 9)
 		currentProc->p_s.s_pc += 4;
-		PrgTrapHandler();
+		PassUpOrDie();
 }
 
 void TlbTrapHandler(){
