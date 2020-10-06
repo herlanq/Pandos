@@ -102,11 +102,11 @@ void sysHandler(){
 }
 
 void TlbTrapHandler(){
-	/*yet to be coded, i believe most of this is in phase 3*/
+	PassUpOrDie();
 }
 
 void PrgTrapHandler(){
-	/*pass up or die scenario, yet to be coded.*/
+	PassUpOrDie();
 }
 
 /* If an exception has been encountered, it passes the error to the appropriate handler, if no exception
