@@ -58,27 +58,31 @@ void sysHandler(){
 	}
 	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
-			mutex--;
-			if(mutex < 0){
-				insertBlocked(&mutex, currentProc)
-				scheduler();
-				LDST(currentProc->p_s);
-		}
 		currentProc->p_s.s_pc += 4;
+		mutex--;
+		if(mutex < 0){
+			insertBlocked(&mutex, currentProc)
+			scheduler();
+			LDST(currentProc->p_s);
+		}
+
+		
 	}
 	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
 		mutex++;
+		currentProc->p_s.s_pc += 4;
 		if(mutex <= 0){
 			int temp = removeBlocked(&mutex);
 			insertProcQ(&readyQue, temp);
 			LDST(currentProc->p_s);
 		}
-		currentProc->p_s.s_pc += 4;
+		
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
 	{
@@ -88,6 +92,7 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
