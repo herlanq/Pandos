@@ -103,3 +103,46 @@ void TlbTrapHandler(){
 void PrgTrapHandler(){
 	/*pass up or die scenario, yet to be coded.*/
 }
+
+/* If an exception has been encountered, it passes the error to the appropriate handler, if no exception
+ * is found, it kills the process and all of its children
+ * cases:
+ * 1 - TLB Trap Handler
+ * 2 - Program Trap Handler
+ * 3 - Syscall 9+
+ */
+void PassUpOrDie(state_t *caller, int trigger){
+    /* what exception is triggering */
+    switch (trigger){
+
+        /*0 is TLB EXCEPTIONS*/
+        case TLBTRAP:
+        if((currentProc-> newTLBstate) == NULL){
+            Syscall2();
+        }else{
+            CopyState(caller, currentProc-> oldTLBstate);
+            LDST(currentProc-> newTLBstate);
+        }
+        break;
+
+        /*1 is Program Trap Exceptions*/
+        case PROGTRAP:
+            if((currentProc-> newPRGstate) == NULL){
+                Syscall2();
+            }else{
+                CopyState(caller, currentProc-> oldPRGstate);
+                LDST(currentProc-> newPRGstate);
+            }
+            break;
+
+        /*2 is SYS Exception!*/
+        case SYSTRAP:
+            if((currentProc->p_newState) == NULL){
+                Syscall2();
+            }else{
+                CopyState(caller, currentProc->p_oldState);
+                LDST(currentProc->p_newState);
+            }
+            break;
+    }
+}
