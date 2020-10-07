@@ -32,6 +32,7 @@ int semD[SEMNUM]; /* 49 Semaphore in the list */
 
 /* declares test() from the p2test file */
 extern void test();
+HIDDEN void genExceptionHandler
 
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
@@ -49,9 +50,9 @@ int main(){
     }
 
     passupvector foo = PASSUPVECTOR;
-    foo->tlb_refill_eReasonr = (memaddr) uTLB_RefilleReasonr;
+    foo->tlb_refill_Handler = (memaddr) uTLB_RefillHandler;
     foo->tlb_refill_stackPTR = (memaddr) 0x20001000;
-    foo->exceptioneReasonr = (memaddr) genExceptioneReasonr;
+    foo->exceptionHandler = (memaddr) genExceptionHandler;
     foo->s_stackPTR = 0x20001000;
 
 
