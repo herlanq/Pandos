@@ -26,7 +26,7 @@
 #define HIDDEN			  static
 #define EOS				    '\0'
 
-#define NULL 			    ((void *)0xFFFFFFFF)
+#define NULL 			  ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
 #define MAXINT            0xFFFFFFFF
 /* Sem number
@@ -51,14 +51,14 @@
 #define DEVREGSIZE	  16 		/* device register size in bytes */
 
 /* Define Interrupts  */
-#define MULTICORE 0x00000001
-#define CLOCK1 0x00000002
-#define CLOCK2 0x00000004
-#define DISKDEVICE 0x00000008
-#define FLASHDEVICE 0x00000010
-#define NETWORKDEVICE 0x00000020
-#define PRINTERDEVICE 0x00000040
-#define TERMINALDEVICE 0x00000080
+#define MULTICORE 0x00000010
+#define CLOCK1 0x00000020
+#define CLOCK2 0x00000040
+#define DISKDEVICE 0x00000080
+#define FLASHDEVICE 0x00000100
+#define NETWORKDEVICE 0x00000200
+#define PRINTERDEVICE 0x00000400
+#define TERMINALDEVICE 0x00000800
 
 #define C1I 1 /* clock 1 interrupt */
 #define C2I 2 /* clock 2 interrupt */
@@ -76,8 +76,8 @@
 /* NEW Processor State Areas */
 
 /* SYSCALL BREAK*/
-#define interrupt_newstate 0x200003D4
-#define interrupt_state 0X20000348
+#define sys_newstate 0x200003D4
+#define sys_state 0X20000348
 
 /* INTERRUPTS */
 #define INTERRUPT_NEW 0x2000008C
@@ -111,7 +111,7 @@
 #define KUSEG           0x80000000
 #define RAMSTART        0x20000000
 #define BIOSDATAPAGE    0x0FFFF000
-#define	PASSUPVECTOR	  0x0FFFF900
+#define	PASSUPVECTOR	0x0FFFF900
 #define RAMTOP          0x20001000
 
 /* Exceptions related constants */
