@@ -49,9 +49,9 @@ int main(){
     }
 
     passupvector foo = PASSUPVECTOR;
-    foo->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
+    foo->tlb_refill_eReasonr = (memaddr) uTLB_RefilleReasonr;
     foo->tlb_refill_stackPTR = (memaddr) 0x20001000;
-    foo->exceptionHandler = (memaddr) exception_handler;
+    foo->exceptioneReasonr = (memaddr) genExceptioneReasonr;
     foo->s_stackPTR = 0x20001000;
 
 
@@ -81,19 +81,21 @@ int main(){
     return 0;
 }
 
-void genExceptionHandler(/*im guessing we need to pass in the cause register*/){
-currentProc->p_s.s_cause && 0x000000FC;
-currentProc->p_s.s_cause << 2;          /*turning off the bits we don't need, and then shifting them over to make a comparison */
-int handle = currentProc->p_s.s_cause; 
-    if(handle == 0)
-        InterruptHandler();
-    if(handle == 1 || handle == 2 || handle == 3)
-        TlbTrapHandler();
-    if(handle == 4 || handle == 5 || handle == 6 || handle == 7)
-        PrgTrapHandler();
-    if(handle == 8){
-        /* should check cause register and syscall before going into syshandler
-        because if not we should hit the PrgTrapHandler() */
-        sysHandler();
-    }
+void genExceptionHandler(){
+/*turning off the bits we don't need, and then shifting them over to make a comparison */
+    state_PTR oldState;
+    int eReason;
+    oldState = (state_PTR) /*this is where previous state goes, need to find syntax */
+    eReason = (oldState->s_cause & 0x0000007C) << 2; 
+        if(eReason == 0)
+            InterruptHandler();
+        if(eReason == 1 || eReason == 2 || eReason == 3)
+            TlbTrapHandler();
+        if(eReason == 4 || eReason == 5 || eReason == 6 || eReason == 7)
+            PrgTraphandler();
+        if(eReason == 8){
+            /* should check cause register and syscall before going into syseReasonr
+            because if not we should hit the PrgTrapeReasonr() */
+            sysHandler();
+        }
 }
