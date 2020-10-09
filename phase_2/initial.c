@@ -28,11 +28,15 @@ int softBlockCount; /* Number of processes on the blocked queue */
 pcb_t *currentProc; /* Pointer to current process */
 pcb_t *readyQue; /* pointer to the ready queue */
 
+cpu_t startTOD;
+cpu_t sliceCNT;
+
 int semD[SEMNUM]; /* 49 Semaphore in the list */
 
 /* declares test() from the p2test file */
 extern void test();
-HIDDEN void genExceptionHandler
+HIDDEN void genExceptionHandler();
+extern void uTLB_RefillHandler();
 
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
