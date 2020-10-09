@@ -69,7 +69,7 @@ void scheduler(){
             if(softBlockCount > 0){
                 /* have processes that are blocked, need to wait with interrupts and exceptions enabled
                  * "Twiddling Thumbs" */
-                setSTATUS(ALLOFF | IEON | IECON | IMON);
+                setSTATUS(ALLOFF | IECON | IMON | TEBITON);
                 WAIT();
             }
         }

@@ -31,8 +31,12 @@ extern int semD[SEMNUM];
 /* 2 helper functions
  * 1 to compute the device number
  * 1 to call the scheduler */
-int getDevice(int lineNum);
-void CallScheduler();
+HIDDEN int getDevice(int lineNum);
+HIDDEN void CallScheduler();
+HIDDEN void PLS_Interrupt(cpu_t stop);
+HIDEEN void sudoClock_Interrupt();
+HIDDEN void terminal_interrupt(int *device_sema4);
+
 
 /* Function that determines the highest priority interrupt and gives control the to scheduler*/
 void InterruptHandler(){
@@ -46,8 +50,7 @@ void InterruptHandler(){
     /* V operation sema4 variables */
     int* sema4;
     int* sema4Add;
-
-    /* store device status in v0*/
+    /* store device status in v0 */
     int DevStatus;
 
     pcb_t *blockProc;
@@ -172,15 +175,16 @@ void CallScheduler(){
     scheduler();
 }
 
-void CopyState(state_t *oldState, state_t *newState){
+void CopyPaste(state_t *copied_state, state_t *pasted_state){
     /*Loop through all of the registers in the old state and write them into the new state*/
     int i;
     for (i = 0; i < STATEREGNUM; i++){
-        newState->s_reg[i] = oldState->s_reg[i];
+        pasted_state->s_reg[i] = copied_state->s_reg[i];
     }
     /*Move all of the contents from the old state into the new*/
-    newState->s_status = oldState->s_status;
-    newState->s_pc = oldState->s_pc;
-    newState->s_cause = oldState->s_cause;
+    pasted_state->s_entryHI = copied_state->s_entryHI;
+    pasted_state->s_status = copied_state->s_status;
+    pasted_state->s_pc = copied_state->s_pc;
+    pasted_state->s_cause = copied_state->s_cause;
 }
 
