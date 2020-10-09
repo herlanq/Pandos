@@ -33,8 +33,8 @@ extern cpu_t QuantumStart;
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
-	int mutex;		/*need to change this variable, not sure what to change it to*/
-	currentProc->p_s.s_pc += 4;
+	int mutex;
+
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
 		newPcb->p_supportStruct = a2;
@@ -42,7 +42,8 @@ void sysHandler(){
 		insertChild(newPcb, newPcb->p_child);
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
-		scheduler();
+		currentProc->p_s.s_pc += 4;
+		LDST(currentProc->p_s);
 	}
 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
@@ -52,6 +53,7 @@ void sysHandler(){
 		}
 		outProcQ(&readyQue, currentProc);
 		freePcb(currentProc);
+		currentProc->p_s.s_pc += 4;
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
@@ -59,8 +61,9 @@ void sysHandler(){
 		currentProc->p_s.s_pc += 4;
 		mutex--;
 		if(mutex < 0){
-			insertBlocked(&mutex, currentProc);
+			insertBlocked(&mutex, currentProc)
 			scheduler();
+			LDST(currentProc->p_s);
 		}
 
 		
@@ -68,23 +71,27 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
 	{
 		mutex++;
+		currentProc->p_s.s_pc += 4;
 		if(mutex <= 0){
 			int temp = removeBlocked(&mutex);
 			insertProcQ(&readyQue, temp);
-			scheduler();
+			LDST(currentProc->p_s);
 		}
 		
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
+		currentProc->p_s.s_pc += 4;
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
 	{
 		currentProc->p_s.s_v0 = currentProc->p_time;
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
+		currentProc->p_s.s_pc += 4;
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
@@ -92,8 +99,10 @@ void sysHandler(){
 		if(p_supportStruct == NULL)
 			currentProc->p_s.s_v0 = NULL;
 		currentProc->p_s.s_v0 = p_supportStruct;
+		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 >= 9)
+		currentProc->p_s.s_pc += 4;
 		PassUpOrDie();
 }
 
@@ -122,7 +131,7 @@ void PassUpOrDie(state_t *caller, int trigger){
             S;
         }else{
             CopyState(caller, currentProc-> oldTLBstate);
-            scheduler();
+            LDST(currentProc-> newTLBstate);
         }
         break;
 
@@ -132,7 +141,7 @@ void PassUpOrDie(state_t *caller, int trigger){
                 Syscall2();
             }else{
                 CopyState(caller, currentProc-> oldPRGstate);
-                scheduler();
+                LDST(currentProc-> newPRGstate);
             }
             break;
 
@@ -142,7 +151,7 @@ void PassUpOrDie(state_t *caller, int trigger){
                 Syscall2();
             }else{
                 CopyState(caller, currentProc->p_oldState);
-                scheduler();
+                LDST(currentProc->p_newState);
             }
             break;
     }
