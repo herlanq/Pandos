@@ -43,7 +43,7 @@ void sysHandler(){
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
 		currentProc->p_s.s_pc += 4;
-		LDST(currentProc->p_s);
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
@@ -63,7 +63,6 @@ void sysHandler(){
 		if(mutex < 0){
 			insertBlocked(&mutex, currentProc)
 			scheduler();
-			LDST(currentProc->p_s);
 		}
 
 		
@@ -75,7 +74,7 @@ void sysHandler(){
 		if(mutex <= 0){
 			int temp = removeBlocked(&mutex);
 			insertProcQ(&readyQue, temp);
-			LDST(currentProc->p_s);
+			scheduler();
 		}
 		
 	}
@@ -131,7 +130,7 @@ void PassUpOrDie(state_t *caller, int trigger){
             S;
         }else{
             CopyState(caller, currentProc-> oldTLBstate);
-            LDST(currentProc-> newTLBstate);
+           	scheduler();
         }
         break;
 
@@ -141,17 +140,17 @@ void PassUpOrDie(state_t *caller, int trigger){
                 Syscall2();
             }else{
                 CopyState(caller, currentProc-> oldPRGstate);
-                LDST(currentProc-> newPRGstate);
+                scheduler();
             }
             break;
 
         /*2 is SYS Exception!*/
         case SYSTRAP:
             if((currentProc->p_newState) == NULL){
-                Syscall2();
+                Syscall2(2,0,0,0);
             }else{
                 CopyState(caller, currentProc->p_oldState);
-                LDST(currentProc->p_newState);
+                scheduler();
             }
             break;
     }

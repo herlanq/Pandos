@@ -67,7 +67,7 @@ void scheduler(){
 
 /* Gives control over the machine to another process */
 void Context_Switch(pcb_PTR this_proc){
-    this_proc = currentProc;
+    currentProc = this_proc;
     /* load state of the current process... switching context */
     LDST(&(currentProc->p_s));
 
@@ -75,6 +75,7 @@ void Context_Switch(pcb_PTR this_proc){
 /* preps the interval timer for a new process given context switch
  * or preps the timer for an old process given a V operation or interrupt */
 void Ready_Timer(pcb_PTR current_process, cpu_t time){
+    cpu_t start = QUANTUM - current_process->p_time;
     STCK(start);
     /* set amount of time given for the process */
     setTIMER(time);

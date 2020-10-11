@@ -136,6 +136,7 @@
 #define IMON    0x0000FF00      /* Interrupt Masked */
 #define IEON	0x00000004      /* Turn interrupts ON*/
 #define IECON	0x00000001      /* Turn interrupts current ON */
+#define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 

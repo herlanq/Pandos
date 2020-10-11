@@ -55,9 +55,9 @@ int main(){
 
     passupvector foo = PASSUPVECTOR;
     foo->tlb_refill_Handler = (memaddr) uTLB_RefillHandler;
-    foo->tlb_refill_stackPTR = (memaddr) 0x20001000;
+    foo->tlb_refill_stackPTR = (memaddr) RAMTOP;
     foo->exceptionHandler = (memaddr) genExceptionHandler;
-    foo->s_stackPTR = 0x20001000;
+    foo->s_stackPTR = RAMTOP;
 
 
     /* Init pcb and asl */
@@ -91,7 +91,7 @@ void genExceptionHandler(){
     state_PTR oldState;
     int eReason;
     oldState = (state_PTR) /*this is where previous state goes, need to find syntax */
-    eReason = (oldState->s_cause & 0x0000007C) << 2; 
+    eReason = (oldState->s_cause & CAUSE) << 2; 
         if(eReason == 0)
             InterruptHandler();
         if(eReason == 1 || eReason == 2 || eReason == 3)
@@ -99,8 +99,10 @@ void genExceptionHandler(){
         if(eReason == 4 || eReason == 5 || eReason == 6 || eReason == 7)
             PrgTraphandler();
         if(eReason == 8){
-            /* should check cause register and syscall before going into syseReasonr
-            because if not we should hit the PrgTrapeReasonr() */
-            sysHandler();
+            /* should check cause register and syscall before going into sysHandler
+            because if not we should hit the PrgTrapHandler() */
+            if(currentProc->s_cause & UMOFF == 1)
+                sysHandler();
+            PrgTraphandler();
         }
 }
