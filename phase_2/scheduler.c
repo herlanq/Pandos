@@ -25,21 +25,9 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 
-/* Global Variables for scheduler.c
- * Tracks the timing of each running process */
-cpu_t compuTime; /* Keep track of time spent computing */
-cpu_t QuantumStart;
-
-/* 'scheduler()' is a round Robin algorithm that schedules each process that it is going to be executed.
- *
+/* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.
  */
 void scheduler(){
-    if(currentProc != NULL){ /* if the current process is null */
-        STCK(compuTime); /* get amount of time the process was running */
-        /* set current proc time to how long the process was running in cpu */
-        currentProc->p_time = (currentProc->p_time) + (compuTime - QuantumStart);
-    }
-
     /* set new process block pointer */
     pcb_t *proc;
 
@@ -47,26 +35,26 @@ void scheduler(){
     proc = removeProcQ(&readyQue);
 
     if(proc != NULL){ /* if removed process is not null*/
-        currentProc = proc;
-        STCK(QuantumStart);
-        setTIMER(QUANTUM);
-        LDST(&(currentProc->p_s);
+        Ready_Timer(proc, QUANTUM);
     }
+//    if(proc == NULL) { /* if removed process is null */
+//        /* set the current process to be null, there are no processes to be run */
+//        currentProc = NULL;
+//    }
 
-    if(proc == NULL){ /* if removed process is null */
-        /* set the current process to be null, there are no processes to be run */
-        currentProc = NULL;
-        /* check for remaining processes */
-        if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
-            HALT();
-        }
-
+    /* check for remaining processes */
+    if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
+        HALT();
+    }else{
         /* if there are still processes to be run */
-        if(processCount > 0){
-            if(softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
-                PANIC();
+        if (processCount > 0) {
+            if (softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
+                PANIC(); /* 'oh shit' moment */
             }
-            if(softBlockCount > 0){
+            if (softBlockCount > 0) {
+                currentProc = NULL;
+                setTIMER(100000); /* load timer with a large value */
+
                 /* have processes that are blocked, need to wait with interrupts and exceptions enabled
                  * "Twiddling Thumbs" */
                 setSTATUS(ALLOFF | IECON | IMON | TEBITON);
@@ -74,5 +62,23 @@ void scheduler(){
             }
         }
     }
+}
+/*                     HELPER FUNCTIONS TO DEAL WITH CONTEXT SWITCHES              */
+
+/* Gives control over the machine to another process */
+void Context_Switch(pcb_PTR this_proc){
+    this_proc = currentProc;
+    /* load state of the current process... switching context */
+    LDST(&(currentProc->p_s));
+
+}
+/* preps the interval timer for a new process given context switch
+ * or preps the timer for an old process given a V operation or interrupt */
+void Ready_Timer(pcb_PTR current_process, cpu_t time){
+    STCK(start);
+    /* set amount of time given for the process */
+    setTIMER(time);
+    /* context switch, make this process the current process */
+    Context_Switch(current_process);
 }
 

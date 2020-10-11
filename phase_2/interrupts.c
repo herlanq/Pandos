@@ -175,13 +175,14 @@ void CallScheduler(){
     scheduler();
 }
 
-void CopyPaste(state_t *copied_state, state_t *pasted_state){
-    /*Loop through all of the registers in the old state and write them into the new state*/
+/* Loop through all of the registers in the old state(copied state)
+ * and write them into the new state(pasted state) */
+void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     int i;
     for (i = 0; i < STATEREGNUM; i++){
         pasted_state->s_reg[i] = copied_state->s_reg[i];
     }
-    /*Move all of the contents from the old state into the new*/
+    /*Move all of the contents from the old state into the new state*/
     pasted_state->s_entryHI = copied_state->s_entryHI;
     pasted_state->s_status = copied_state->s_status;
     pasted_state->s_pc = copied_state->s_pc;

@@ -1,0 +1,142 @@
+Index: phase_2/initial.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/* Written by: Quinn Herlan, Kaleb Berry\n * CSCI 320-01 Operating Systems\n * Last modified 9/27\n *\n * The initial.c module serves as the main for the Pandos Implementation Operating System.\n * This module initializes code from Phase 1 and also initializes variables that are maintained within the the nucleus,\n * nucleus semaphores, instances a single process in the Ready Queue, and calls scheduler.\n */\n\n#include \"../h/const.h\"\n#include \"../h/types.h\"\n\n#include \"../h/pcb.h\"\n#include \"../h/asl.h\"\n\n#include \"../h/initial.h\"\n#include \"../h/interrupts.h\"\n#include \"../h/exceptions.h\"\n#include \"../h/scheduler.h\"\n\n#include \"../h/libumps.h\"\n\n\n/* Global Variables */\nint processCount; /* number of processes on the ready queue */\nint softBlockCount; /* Number of processes on the blocked queue */\n\npcb_t *currentProc; /* Pointer to current process */\npcb_t *readyQue; /* pointer to the ready queue */\n\nint semD[SEMNUM]; /* 49 Semaphore in the list */\n\n/* declares test() from the p2test file */\nextern void test();\nHIDDEN void genExceptionHandler\n\n/* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,\n * and declares variables that will be used throughout the phase 2 modules.\n * One the main is complete, it passes over to the scheduler */\nint main(){\n    /* init global variables */\n    processCount = 0;\n    softBlockCount = 0;\n    currentProc = NULL;\n    readyQue = mkEmptyProcQ();\n    /* init semaphores */\n    int i;\n    for(i=0; i < SEMNUM; i++){\n        semD[i] = 0;\n    }\n\n    passupvector foo = PASSUPVECTOR;\n    foo->tlb_refill_Handler = (memaddr) uTLB_RefillHandler;\n    foo->tlb_refill_stackPTR = (memaddr) 0x20001000;\n    foo->exceptionHandler = (memaddr) genExceptionHandler;\n    foo->s_stackPTR = 0x20001000;\n\n\n    /* Init pcb and asl */\n    initPcbs();\n    initASL();\n\n    /* load 100ms onto the pseudo clock */\n    LDIT(IOCLOCK);\n\n    /* alloc process to be set the current process, increment procCount */\n    currentProc = allocPcb();\n    currentProc->p_semAdd = NULL;\n    currentProc->p_time = 0;\n    currentProc->p_supportStruct = NULL;\n    processCount = processCount + 1;\n\n    /* insert current proc into the ready queue*/\n    insertProcQ(&readyQue, currentProc);\n\n    /* init current proc back to NULL */\n    currentProc = NULL;\n\n    /* Scheduler takes over the running process */\n    scheduler();\n\n    return 0;\n}\n\nvoid genExceptionHandler(){\n/*turning off the bits we don't need, and then shifting them over to make a comparison */\n    state_PTR oldState;\n    int eReason;\n    oldState = (state_PTR) /*this is where previous state goes, need to find syntax */\n    eReason = (oldState->s_cause & 0x0000007C) << 2; \n        if(eReason == 0)\n            InterruptHandler();\n        if(eReason == 1 || eReason == 2 || eReason == 3)\n            TlbTrapHandler();\n        if(eReason == 4 || eReason == 5 || eReason == 6 || eReason == 7)\n            PrgTraphandler();\n        if(eReason == 8){\n            /* should check cause register and syscall before going into syseReasonr\n            because if not we should hit the PrgTrapeReasonr() */\n            sysHandler();\n        }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- phase_2/initial.c	(revision 5f7d98dcc41da1a4a49b1680d152ed965904fa15)
++++ phase_2/initial.c	(date 1602269092449)
+@@ -28,11 +28,15 @@
+ pcb_t *currentProc; /* Pointer to current process */
+ pcb_t *readyQue; /* pointer to the ready queue */
+ 
++cpu_t startTOD;
++cpu_t sliceCNT;
++
+ int semD[SEMNUM]; /* 49 Semaphore in the list */
+ 
+ /* declares test() from the p2test file */
+ extern void test();
+-HIDDEN void genExceptionHandler
++HIDDEN void genExceptionHandler();
++extern void uTLB_RefillHandler();
+ 
+ /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
+  * and declares variables that will be used throughout the phase 2 modules.
+Index: phase_2/exceptions.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/* Written by: Quinn Herlan, Kaleb Berry\n * CSCI 320-01 Operating Systems\n * Last modified 9/27\n *\n *\n *\n */\n\n#include \"../h/const.h\"\n#include \"../h/types.h\"\n\n#include \"../h/pcb.h\"\n#include \"../h/asl.h\"\n\n#include \"../h/initial.h\"\n#include \"../h/interrupts.h\"\n#include \"../h/exceptions.h\"\n#include \"../h/scheduler.h\"\n\n#include \"../h/libumps.h\"\n\n/* Global Variables from initial.c */\nextern int processCount;\nextern int softBlockCount;\nextern pcb_t *currentProc;\nextern pcb_t *readyQue;\nextern int semD[SEMNUM];\n/* Variables for maintaining CPU time in scheduler.c*/\nextern cpu_t compuTime;\nextern cpu_t QuantumStart;\n\n\n/*Not sure what the type is of what we return on sysHandler, if anything at all*/\n\nvoid sysHandler(){\n\tint mutex;\n\n\tif(currentProc->p_s.s_a0 = 1){ /*situation of create process*/\n\t\tpcb_t newPcb->p_s = a1;\n\t\tnewPcb->p_supportStruct = a2;\n\t\tinsertProcQ(newPcb, newPcb->p_next);\n\t\tinsertChild(newPcb, newPcb->p_child);\n\t\tnewPcb->p_time = 0;\n\t\tnewPcb->p_semadd = NULL;\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tLDST(currentProc->p_s);\n\t}\n\telse if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/\n\t{\n\t\twhile (currentProc->p_child != NULL)\n\t\t{\n\t\t\tremoveChild(currentProc->p_child);\n\t\t}\n\t\toutProcQ(&readyQue, currentProc);\n\t\tfreePcb(currentProc);\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tscheduler();\n\t}\n\telse if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/\n\t{\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tmutex--;\n\t\tif(mutex < 0){\n\t\t\tinsertBlocked(&mutex, currentProc)\n\t\t\tscheduler();\n\t\t\tLDST(currentProc->p_s);\n\t\t}\n\n\t\t\n\t}\n\telse if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */\n\t{\n\t\tmutex++;\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tif(mutex <= 0){\n\t\t\tint temp = removeBlocked(&mutex);\n\t\t\tinsertProcQ(&readyQue, temp);\n\t\t\tLDST(currentProc->p_s);\n\t\t}\n\t\t\n\t}\n\telse if(currentProc->p_s.s_a0 = 5) /*I/O situation*/\n\t{\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tscheduler();\n\t}\n\telse if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */\n\t{\n\t\tcurrentProc->p_s.s_v0 = currentProc->p_time;\n\t\tcurrentProc->p_s.s_pc += 4;\n\t}\n\telse if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/\n\t{\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tscheduler();\n\t}\n\telse if(currentProc->p_s.s_a0 = 8) /*support pointer situation */\n\t{\n\t\tif(p_supportStruct == NULL)\n\t\t\tcurrentProc->p_s.s_v0 = NULL;\n\t\tcurrentProc->p_s.s_v0 = p_supportStruct;\n\t\tcurrentProc->p_s.s_pc += 4;\n\t}\n\telse if(currentProc->p_s.s_a0 >= 9)\n\t\tcurrentProc->p_s.s_pc += 4;\n\t\tPassUpOrDie();\n}\n\nvoid TlbTrapHandler(){\n\tPassUpOrDie();\n}\n\nvoid PrgTrapHandler(){\n\tPassUpOrDie();\n}\n\n/* If an exception has been encountered, it passes the error to the appropriate handler, if no exception\n * is found, it kills the process and all of its children\n * cases:\n * 1 - TLB Trap Handler\n * 2 - Program Trap Handler\n * 3 - Syscall 9+\n */\nvoid PassUpOrDie(state_t *caller, int trigger){\n    /* what exception is triggering */\n    switch (trigger){\n\n        /*0 is TLB EXCEPTIONS*/\n        case TLBTRAP:\n        if((currentProc-> newTLBstate) == NULL){\n            S;\n        }else{\n            CopyState(caller, currentProc-> oldTLBstate);\n            LDST(currentProc-> newTLBstate);\n        }\n        break;\n\n        /*1 is Program Trap Exceptions*/\n        case PROGTRAP:\n            if((currentProc-> newPRGstate) == NULL){\n                Syscall2();\n            }else{\n                CopyState(caller, currentProc-> oldPRGstate);\n                LDST(currentProc-> newPRGstate);\n            }\n            break;\n\n        /*2 is SYS Exception!*/\n        case SYSTRAP:\n            if((currentProc->p_newState) == NULL){\n                Syscall2();\n            }else{\n                CopyState(caller, currentProc->p_oldState);\n                LDST(currentProc->p_newState);\n            }\n            break;\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- phase_2/exceptions.c	(revision 5f7d98dcc41da1a4a49b1680d152ed965904fa15)
++++ phase_2/exceptions.c	(date 1602269092448)
+@@ -33,8 +33,8 @@
+ /*Not sure what the type is of what we return on sysHandler, if anything at all*/
+ 
+ void sysHandler(){
+-	int mutex;
+-
++	int mutex;		/*need to change this variable, not sure what to change it to*/
++	currentProc->p_s.s_pc += 4;
+ 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
+ 		pcb_t newPcb->p_s = a1;
+ 		newPcb->p_supportStruct = a2;
+@@ -42,8 +42,7 @@
+ 		insertChild(newPcb, newPcb->p_child);
+ 		newPcb->p_time = 0;
+ 		newPcb->p_semadd = NULL;
+-		currentProc->p_s.s_pc += 4;
+-		LDST(currentProc->p_s);
++		scheduler();
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
+ 	{
+@@ -53,7 +52,6 @@
+ 		}
+ 		outProcQ(&readyQue, currentProc);
+ 		freePcb(currentProc);
+-		currentProc->p_s.s_pc += 4;
+ 		scheduler();
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
+@@ -61,9 +59,8 @@
+ 		currentProc->p_s.s_pc += 4;
+ 		mutex--;
+ 		if(mutex < 0){
+-			insertBlocked(&mutex, currentProc)
++			insertBlocked(&mutex, currentProc);
+ 			scheduler();
+-			LDST(currentProc->p_s);
+ 		}
+ 
+ 		
+@@ -71,27 +68,23 @@
+ 	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
+ 	{
+ 		mutex++;
+-		currentProc->p_s.s_pc += 4;
+ 		if(mutex <= 0){
+ 			int temp = removeBlocked(&mutex);
+ 			insertProcQ(&readyQue, temp);
+-			LDST(currentProc->p_s);
++			scheduler();
+ 		}
+ 		
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
+ 	{
+-		currentProc->p_s.s_pc += 4;
+ 		scheduler();
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
+ 	{
+ 		currentProc->p_s.s_v0 = currentProc->p_time;
+-		currentProc->p_s.s_pc += 4;
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
+ 	{
+-		currentProc->p_s.s_pc += 4;
+ 		scheduler();
+ 	}
+ 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
+@@ -99,10 +92,8 @@
+ 		if(p_supportStruct == NULL)
+ 			currentProc->p_s.s_v0 = NULL;
+ 		currentProc->p_s.s_v0 = p_supportStruct;
+-		currentProc->p_s.s_pc += 4;
+ 	}
+ 	else if(currentProc->p_s.s_a0 >= 9)
+-		currentProc->p_s.s_pc += 4;
+ 		PassUpOrDie();
+ }
+ 
+@@ -131,7 +122,7 @@
+             S;
+         }else{
+             CopyState(caller, currentProc-> oldTLBstate);
+-            LDST(currentProc-> newTLBstate);
++            scheduler();
+         }
+         break;
+ 
+@@ -141,7 +132,7 @@
+                 Syscall2();
+             }else{
+                 CopyState(caller, currentProc-> oldPRGstate);
+-                LDST(currentProc-> newPRGstate);
++                scheduler();
+             }
+             break;
+ 
+@@ -151,7 +142,7 @@
+                 Syscall2();
+             }else{
+                 CopyState(caller, currentProc->p_oldState);
+-                LDST(currentProc->p_newState);
++                scheduler();
+             }
+             break;
+     }
