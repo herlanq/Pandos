@@ -53,7 +53,8 @@ void scheduler(){
             }
             if (softBlockCount > 0) {
                 currentProc = NULL;
-                setTIMER(100000); /* load timer with a large value */
+                /* disable timer by loading it with a large value */
+                setTIMER(100000);
 
                 /* have processes that are blocked, need to wait with interrupts and exceptions enabled
                  * "Twiddling Thumbs" */
