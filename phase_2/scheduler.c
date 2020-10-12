@@ -77,13 +77,8 @@ void Context_Switch(pcb_PTR this_proc){
  * or preps the timer for an old process given a V operation or interrupt.
  * Gives control to the */
 void Ready_Timer(pcb_PTR current_process, cpu_t time){
-<<<<<<< HEAD
     cpu_t start = QUANTUM - current_process->p_time;
     STCK(start);
-=======
-    (cpu_t*) start_time = ((current_process->p_time) - (QUANTUM));
-    STCK(start_time);
->>>>>>> 8bc79aafa849a5aff550bc012c0dc12e648e0d24
     /* set amount of time given for the process */
     setTIMER(time);
     /* context switch, make this process the current process */

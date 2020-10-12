@@ -132,38 +132,47 @@ void PrgTrapHandler(){
  * 2 - Program Trap Handler
  * 3 - Syscall 9+
  */
+
+/*new passuporDIE */
 void PassUpOrDie(int Excepttrigger){
-    /* what exception is triggering */
-    switch (Excepttrigger){
+	context_t context;
+	support_t sup;
+	context->c_stackPTR = currentProc->p_s.s_sp;
+	context->c_pc = currentProc->p_s.s_pc;
+	context->c_status = currentProc->p_s;
+	/*sup->sup_asid = currentProc->p_somthing with process ID */
+	sup->sup_exceptState = currentProc->p_s;
+	/*sup->sup_exceptContext = currentProc->context for some sort of thing */
+	state_PTR oldState = currentProc->p_oldState;
+	state_PTR currState = currentProc->p_newState;
 
-        /*0 is TLB EXCEPTIONS*/
-        case TLBTRAP:
-        if((currentProc-> newTLBstate) == NULL){
-            S;
-        }else{
-            CopyState(caller, currentProc-> oldTLBstate);
-           	scheduler();
-        }
-        break;
+	switch (Excepttrigger){
 
-        /*1 is Program Trap Exceptions*/
-        case PROGTRAP:
-            if((currentProc-> newPRGstate) == NULL){
-                Syscall2(TERMINATETHREAD,0,0,0);
-            }else{
-                CopyState(caller, currentProc-> oldPRGstate);
-                scheduler();
-            }
-            break;
+		case TLBTRAP:
+		if(currentProc->p_supportStruct == NULL)
+			Syscall2(TERMINATETHREAD,0,0,0);
+		else{
+			Copy_Paste(oldState, currState);
+			scheduler();
+		}
+		break;
 
-        /*2 is SYS Exception!*/
-        case SYSTRAP:
-            if((currentProc->p_newState) == NULL){
-                Syscall2(TERMINATETHREAD,0,0,0);
-            }else{
-                CopyState(caller, currentProc->p_oldState);
-                scheduler();
-            }
-            break;
-    }
+		case PROGTRAP:
+		if(currentProc->p_supportStruct == NULL)
+			Syscall2(TERMINATETHREAD,0,0,0);
+		else{
+			Copy_Paste(oldState, currState);
+			scheduler();
+		}
+		break;
+		case SYSTRAP{
+			if(currentProc->p_supportStruct == NULL)
+				Syscall2(TERMINATETHREAD,0,0,0);
+			else{
+				Copy_Paste(oldState, currState);
+				scheduler();
+			}
+			break;
+		}
+	}
 }
