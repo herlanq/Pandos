@@ -25,9 +25,6 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
-/* Variables for maintaining CPU time in scheduler.c*/
-extern cpu_t compuTime;
-extern cpu_t QuantumStart;
 
 
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/

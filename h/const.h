@@ -71,7 +71,7 @@
 #define FLASHINT 0x00001000  /* flash interrupt */
 #define NETWORKINT 0x00002000   /* network interrupt */
 #define PRINTERINT 0x00004000  /* printer interrupt */
-#define TERMINALINT 0x00008000  /* terminal interrupt */
+#define TERMINT 0x00008000  /* terminal interrupt */
 #define IOINTERRUPTS 0
 
 #define FIRSTBIT 0x00000001
@@ -98,6 +98,8 @@
 /* device common COMMAND codes */
 #define RESET			    0
 #define ACK				    1
+#define ON                  1
+#define OFF                 0
 
 /* Memory related constants */
 #define KSEG0           0x00000000
@@ -127,7 +129,8 @@
 
 /* ON/OFF bit manipulation */
 #define ALLOFF  0x00000000
-#define UMON   0x00000008     /* User Mode ON (Kernel Mode OFF)*/
+#define UMON    0x00000008     /* User Mode ON */
+#define UMOFF   0x00000008       /* User Mode OFF (kernel on) */
 #define IMON    0x0000FF00      /* Interrupt Masked */
 #define IEPON	0x00000004      /* Turn interrupts ON*/
 #define IECON	0x00000001      /* Turn interrupts current ON */

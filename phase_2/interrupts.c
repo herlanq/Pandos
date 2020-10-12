@@ -86,7 +86,7 @@ void InterruptHandler(){
         Device_InterruptH(PRINTER);
     }
     /* Terminal interrupt (special case) */
-    if((int_cause->s_cause & TERMINALINT) != 0) {
+    if((int_cause->s_cause & TERMINT) != 0) {
         /* terminal dev is on */
         Device_InterruptH(TERMINAL);
     }
