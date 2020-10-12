@@ -20,6 +20,10 @@ typedef struct device_t{
 	unsigned int d_command;
 	unsigned int d_data0;
 	unsigned int d_data1;
+    unsigned int t_recv_status;
+    unsigned int t_recv_command;
+    unsigned int t_transm_status;
+    unsigned int t_transm_command;
 } device_t;
 
 /* process control block type */
@@ -48,10 +52,10 @@ typedef struct semd_t {
     pcb_t *s_procQ;         /* tail pointer to a process queue */
 } semd_t;
 
-#define t_recv_status		d_status
-#define t_recv_command		d_command
-#define t_transm_status		d_data0
-#define t_transm_command	d_data1
+#define t_recv_status
+#define t_recv_command
+#define t_transm_status
+#define t_transm_command
 
 
 /* Bus Register Area */

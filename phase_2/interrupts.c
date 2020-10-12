@@ -27,153 +27,146 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 
-
-/* 2 helper functions
- * 1 to compute the device number
- * 1 to call the scheduler */
-HIDDEN int getDevice(int lineNum);
-HIDDEN void CallScheduler();
-HIDDEN void PLS_Interrupt(cpu_t stop);
-HIDEEN void sudoClock_Interrupt();
-HIDDEN void terminal_interrupt(int *device_sema4);
+/* separate functions for interrupt handling */
+HIDEEN void Device_InterruptH(int line);
+HIDDEN int terminal_interrupt(int *device_sema4);
 
 
-/* Function that determines the highest priority interrupt and gives control the to scheduler*/
+/* Function that determines the highest priority interrupt and
+ * gives control the to scheduler.
+ * PLS interrupts and Pseudo clock interrupts have their own separate handler functions */
 void InterruptHandler(){
-    unsigned int causeLine;
-    /* Variables for determining dev address and dev sema4 */
-    int tempLineNum;
-    int LineNum;
-    int DevSema4;
-    int devNum;
+    cpu_t start_clock;
+    cpu_t stop_clock;
+    cpu_t time_left = getTIMER();
+    state_PTR int_cause = ((state_PTR) BIOSDATAPAGE);
 
-    /* V operation sema4 variables */
-    int* sema4;
-    int* sema4Add;
-    /* store device status in v0 */
-    int DevStatus;
-
-    pcb_t *blockProc;
-    state_PTR caller;
-
-    /* get state of interrupt */
-    caller = (state_t*) INTERRUPT_OLD;
-
-    causeLine = caller->s_cause >> 8;
-    /* if multicore is on */
-    if((causeLine & CLOCK1) != 0){ /* PLT */
-        CallScheduler(); /* process quantum is up, move to new process */
-    }else if((causeLine & CLOCK2) != 0){ /* Pseudo clock */
-        /* access pseudo clock*/
-        sema4Add = (int*) &(semD[SEMNUM-1]);
-        /* free all currently blocked processes and insert them onto the ready queue */
-        while(headBlocked(sema4Add) != NULL){
-            /* remove blocked process */
-            blockProc = removeBlocked(sema4Add);
-            /* Put onto the ready queue */
-            if(blockProc != NULL){
-                insertProcQ(&readyQue, blockProc);
-                /* decrement softblock count*/
-                softBlockCount--;
-            }
-        }
-        /* Set sema4 back to 0 */
-        sema4Add = 0;
-        /* load pseudo clock, call scheduler for next process */
-        LDIT(PSUEDOCLOCKTIME);
-        CallScheduler();
-    }else if((causeLine & DISKDEVICE) != 0){
-        /* disk dev is on */
-        causeLine = DI;
-    }else if((causeLine & FLASHDEVICE) != 0){
-        /* flash dev is on */
-        causeLine = FI;
-    }else if((causeLine & NETWORKDEVICE) != 0){
-        /* network dev is on */
-        causeLine = NETWORKI;
-    }else if((causeLine & PRINTERDEVICE) != 0) {
-        /* printer dev is on */
-        causeLine = PRINTERI;
-    }else if((causeLine & TERMINALDEVICE) != 0) {
-        /* terminal dev is on */
-        causeLine = TERMINALI;
-    }else{
-        PANIC();
-    }
-    /* call helper function to get line number */
-    devNum = getDevice(LineNum);
-    /* 8 devices per line num */
-    DevSema4 = tempLineNum * DEVPERINT;
-    tempLineNum = causeLine;
-    /* find device */
-    DevSema4 = DevSema4 + DevNum;
-    device_t *devReg;
-    /* finding specific device register */
-    devReg = (device_t*)(0x10000000) + (tempLineNum * 0x80) + (devNum * 0x10);
-    /* terminal, differentiate between read/write */
-    if(LineNum == TERMINT){
-        if((devReg->d_status & 0xF) =! READY){
-            /* set dev status */
-            DevStatus = devReg->d_status;
-            /*ACK*/
-            devReg->d_command = ACK;
+    /* BEGIN INTERRUPT HANDLING */
+    /* PLT interrupt, quantum is up, time to switch to the next process */
+    if((int_cause->s_cause & PLTINT) != 0) {
+        if(currentProc != NULL){
+            /* compute time of the running process, move the processor state, call on the next process */
+            currentProc->p_time = (currentProc->p_time) + (stop_clock - start_clock);
+            Copy_Paste((state_PTR) BIOSDATAPAGE, &(currentProc->p_s));
+            insertProcQ(&readyQue, currentProc);
+            scheduler(); /* not sure if this is correct? It has to switch to a new proc */
         }else{
-            DevSema4 = DevSema4 + DEVPERINT;
-            DevStatus = devReg->d_status;
-            devReg->d_command = ACK;
-        }
-    }else{ /* not a terminal */
-        /* set status and ACK interrupt */
-        DevStatus = devReg->d_status;
-        devReg->d_command = ACK;
-    }
-    /* get sema4 for dev causing interrupt */
-    sema4Add = (&(semD[DevSema4]));
-    (*sema4Add) = (*sema4Add) + 1;
-    if((*sema4Add) <= 0){
-        /* Removed from blocked list */
-        blockProc = removeBlocked(sema4Add);
-        if(blockProc != NULL){
-            /* set status in v0 register and decrement softblockcount
-             * and insert into ready queue */
-            blockProc->p_s.s_v0 = DevStatus;
-            softBlockCount = softBlockCount - 1;
-            insertProcQ(&readyQue, blockProc);
+            PANIC();
         }
     }
-    CallScheduler();
+    /* Pseudo clock tick interrupt
+     * Awaken all of the processes that are waiting on the pseudo clock */
+    if((int_cause->s_cause & TIMERINT) != 0){
+        pcb_PTR proc;
+        LDIT(PSUEDOCLOCKTIME);
+        proc = removeBlocked(&CLOCK_SEMA);
+        while(proc !=NULL){
+            insertProcQ(&readyQue, proc);
+            softBlockCount--;
+            proc = removeBlocked(&CLOCK_SEMA);
+        }
+        CLOCKSEM = 0;
+        if(currentProc == NULL){
+            scheduler();
+        }
+    }
+    /* Disk interrupt */
+    if((int_cause->s_cause & DISKINT) != 0){
+        /* disk dev is on */
+        Device_InterruptH(DISK)
+    }
+    /* Flash interrupt */
+    if((int_cause->s_cause & FLASHINT) != 0){
+        /* flash dev is on */
+        Device_InterruptH(FLASH);
+    }
+    /* Printer interrupt */
+    if((int_cause->s_cause & PRINTERINT) != 0) {
+        /* printer dev is on */
+        Device_InterruptH(PRINTER);
+    }
+    /* Terminal interrupt (special case) */
+    if((int_cause->s_cause & TERMINALINT) != 0) {
+        /* terminal dev is on */
+        Device_InterruptH(TERMINAL);
+    }
+    if(currentProc != NULL){
+        /* assign run time before the interrupt to the current process
+         * and return control to the running process */
+        currentProc->p_time = currentProc->p_time + (stopTOD_clock + startTOD_clock);
+        Copy_Paste((state_PTR)BIOSDATAPAGE, &(currentProc->p_s));
+        Ready_Timer(currentProc, time_left);
+    }else{
+        HALT();
+    }
 }
+/* Interrupt handler for peripheral devices.
+ * V's the correct device semaphore and stores the device data. */
+HIDEEN void Device_InterruptH(int line){
+    unsigned int bitMAP;
+    volatile devregarea_t *deviceRegister;
+    /* Addressing */
+    deviceRegister = (devregarea_t *) RAMBASEADDR;
+    bitMAP = deviceRegister->interrupt_dev[line-DISK];
+    int device_number; /* interrupt device number */
+    int device_semaphore; /* interrupt device semaphore */
+    unsigned int status; /* status of the interrupting device */
+    pcb_PTR proc;
+
+    if((bitMAP & DEV0) != 0){
+        device_number = 0;
+    }
+    if((bitMAP & CLOCK1) != 0){
+        device_number = 1;
+    }
+    if((bitMAP & CLOCK2) != 0){
+        device_number = 2;
+    }
+    if((bitMAP & DISKDEVICE) != 0){
+        device_number = 3;
+    }
+    if((bitMAP & FLASHDEVICE) != 0){
+        device_number = 4;
+    }
+    if((bitMAP & NETWORKDEVICE) != 0){
+        device_number = 5;
+    }
+    if((bitMAP & PRINTERDEVICE) != 0){
+        device_number = 6;
+    }
+    if((bitMAP & TERMINALDEVICE) != 0){
+        device_number = 7;
+    }
+    /* get device semaphore */
+    device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
+    /* for terminal interrupts */
+    if(line == TERMINAL){
+        status = terminal_interrupt(&device_semaphore);
+    }else{
+        status = ((deviceRegister->devreg[device_semaphore]).d_status);
+        /* ACK the interrupt */
+        (deviceRegister->devreg[device_semaphore]).d_command = ACK;
+    }
+    /* V operation on the device semaphore */
+    semD[device_semaphore] = semD[device_semaphore] + 1;
+    /* wait for i/o */
+    if(semD[device_semaphore] <= 0){
+        proc = removeBlocked(&(semD[device_semaphore]));
+        if(proc != NULL){
+            proc->p_s.sv0 = status; /* save the process status */
+            insertProcQ(&readyQue, proc);
+            softBlockCount--;
+        } /* end inner IF */
+    }else{
+        proc->p_s = status;
+    } /* end outer IF */
+    /* if no process is running, call the scheduler to set the next process */
+    if(currentProc == NULL){
+        scheduler();
+    }
+}/* end Device_InterruptH */
 
 /*                                              HELPER FUNCTIONS                                                    */
-
-/* Take in the line number of the interrupt.
- * Bit shift until we find the first device causing the interrupt */
-void getDevice(int linenum){
-    int x;
-    /* area that is causing the interrupt */
-    devregarea_t *interrupt_device;
-    int DevLineNum;
-    unsigned int bitMapLine;
-    unsigned int bipMapActive;
-
-    int interrupt_deviceNum;
-    DevLineNum = linenum;
-
-
-}
-/* In charge of putting the process back on the ready queue and calling scheduler */
-void CallScheduler(){
-    state_t *temp;
-    temp = (state_t) INTERRUPT_OLD;
-    /* if current process is not null, put back on ready queue, call scheduler */
-    if(currentProc != NULL){
-        /* need to copy the state of the process */
-        CopyState(temp, &(currentProc->p_s));
-        insertProcQ(&readyQue, currentProc);
-    }
-    /* since no current process, call scheduler to get next process*/
-    scheduler();
-}
 
 /* Loop through all of the registers in the old state(copied state)
  * and write them into the new state(pasted state) */
@@ -188,4 +181,27 @@ void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     pasted_state->s_pc = copied_state->s_pc;
     pasted_state->s_cause = copied_state->s_cause;
 }
+
+/* returns the device status of a terminal interrupt
+ * deciphers between terminal read/write
+ * terminal write takes priority */
+HIDDEN int terminal_interrupt(int *device_sema4) {
+    unsigned int status;
+    volatile devregarea_t *devReg;
+    devReg = (devregarea_t *) RAMBASEADDR;
+    status = devReg->devreg[(*device_sema4)].t_transm_status;
+    /* handle the 'write' case */
+    if ((status & 0x0F) != READY) {
+        devReg->devreg[(*device_sema4)].t_transm_command = ACK;
+    } else { /* handle the 'read' case */
+        status = devReg->devreg[(*device_sema4)].t_recv_status;
+        devReg->devreg[(*device_sema4)].t_recv_command = ACK;
+        /* update device sema4 */
+        *device_sema4 = *device_sema4 + DEVPERINT;
+    }
+    return (status);
+}
+
+
+
 
