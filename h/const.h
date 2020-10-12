@@ -38,50 +38,42 @@
  * +1 for sudo
  * 49 total device semaphores */
 #define SEMNUM           49
-/* device interrupts */
-#define DISKINT			  3
-#define FLASHINT 		  4
-#define NETWINT 		  5
-#define PRNTINT 		  6
-#define TERMINT			  7
 
 #define DEVINTNUM		  5		  /* interrupt lines used by devices */
 #define DEVPERINT		  8		  /* devices per interrupt line */
 #define DEVREGLEN		  4		  /* device register field length in bytes, and regs per dev */	
 #define DEVREGSIZE	  16 		/* device register size in bytes */
 
-/* Define Interrupts  */
-#define MULTICORE 0x00000010
-#define CLOCK1 0x00000020
-#define CLOCK2 0x00000040
-#define DISKDEVICE 0x00000080
-#define FLASHDEVICE 0x00000100
-#define NETWORKDEVICE 0x00000200
-#define PRINTERDEVICE 0x00000400
-#define TERMINALDEVICE 0x00000800
+/* Define Devices and Device interrupts  */
+#define PLT 1
+#define TIMER 2
+#define DISK 3
+#define FLASH 4
+#define NETWORK 5
+#define PRINTER 6
+#define TERMINAL 7
 
-#define C1I 1 /* clock 1 interrupt */
-#define C2I 2 /* clock 2 interrupt */
-#define DI 3  /* disk interrupt */
-#define FI 4  /* flash interrupt */
-#define NETWORKI 5   /* network interrupt */
-#define PRINTERI 6   /* printer interrupt */
-#define TERMINALI 7  /* terminal interrupt */
+#define DEV0 0x00000001
+#define CLOCK1 0x00000002
+#define CLOCK2 0x00000004
+#define DISKDEVICE 0x00000008
+#define FLASHDEVICE 0x00000010
+#define NETWORKDEVICE 0x00000020
+#define PRINTERDEVICE 0x00000040
+#define TERMINALDEVICE 0x00000080
+
+#define PLTINT 0x00000200 /* clock 1 interrupt */
+#define TIMERINT 0x00000400 /* clock 2 interrupt */
+#define DISKINT 0x00000800  /* disk interrupt */
+#define FLASHINT 0x00001000  /* flash interrupt */
+#define NETWORKINT 0x00002000   /* network interrupt */
+#define PRINTERINT 0x00004000  /* printer interrupt */
+#define TERMINALINT 0x00008000  /* terminal interrupt */
+#define IOINTERRUPTS 0
 
 #define FIRSTBIT 0x00000001
 #define DEVPHYS 0x10000000
-#define PSUEDOCLOCKTIME 100
 #define TOTALDEVICES 8
-
-/* NEW Processor State Areas */
-
-/* SYSCALL BREAK*/
-#define sys_newstate 0x200003D4
-#define sys_state 0X20000348
-
-/* INTERRUPTS */
-#define INTERRUPT_NEW 0x2000008C
-#define INTERRUPT_OLD 0x20000000
 
 /* device register field number for non-terminal devices */
 #define STATUS			  0
@@ -124,18 +116,20 @@
 #define MAX(A,B)		((A) < (B) ? B : A)
 #define	ALIGNED(A)		(((unsigned)A & 0x3) == 0)
 
-#define IOCLOCK 100;
-#define QUANTUM 5;
+#define IOCLOCK 100000;
+#define QUANTUM 5000;
+#define PSUEDOCLOCKTIME 100000
+#define MAXTIME 0xFFFFFFFF;
 
 
 /* ON/OFF bit manipulation */
 #define ALLOFF  0x00000000
-#define UMOFF   0x00000008       /* User Mode OFF (Kernel Mode ON)*/
-#define UMON    0xFFFFFFF7     /* User Mode ON (Kernel Mode OFF)*/
-#define IMOFF   0xFFFF00FF      /* Interrupt UNMasked */
+#define UMON   0x00000008     /* User Mode ON (Kernel Mode OFF)*/
 #define IMON    0x0000FF00      /* Interrupt Masked */
-#define IEON	0x00000004      /* Turn interrupts ON*/
+#define IEPON	0x00000004      /* Turn interrupts ON*/
 #define IECON	0x00000001      /* Turn interrupts current ON */
+#define TEBITON	0x08000000
+#define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
