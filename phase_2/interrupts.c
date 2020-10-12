@@ -27,7 +27,7 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern int CLOCKSEM;
-
+extern cpu_t start_clock;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
 HIDDEN int terminal_interrupt(int device_sema4);
@@ -37,7 +37,6 @@ HIDDEN int terminal_interrupt(int device_sema4);
  * gives control the to scheduler.
  * PLS interrupts and Pseudo clock interrupts have their own separate handler functions */
 void InterruptHandler(){
-    cpu_t start_clock;
     cpu_t stop_clock;
     cpu_t time_left = getTIMER();
     STCK(stop_clock);

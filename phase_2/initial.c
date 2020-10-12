@@ -27,12 +27,11 @@ int softBlockCount; /* Number of processes on the blocked queue */
 
 pcb_t *currentProc; /* Pointer to current process */
 pcb_t *readyQue; /* pointer to the ready queue */
-
-cpu_t startTOD;
+cpu_t start_clock;
 cpu_t sliceCNT;
-
+unsigned int device_status[SEMNUM-1]; /* save device state area */
 int semD[SEMNUM]; /* 49 Semaphore in the list */
-#define CLOCKSEM semD[48];
+#define CLOCKSEM semD[SEMNUM-1] /* clock semaphore */
 
 /* declares test() from the p2test file */
 extern void test();
@@ -42,48 +41,56 @@ extern void uTLB_RefillHandler();
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
  * One the main is complete, it passes over to the scheduler */
-void main(){
+int main(){
     /* init global variables */
     processCount = 0;
     softBlockCount = 0;
     currentProc = NULL;
     readyQue = mkEmptyProcQ();
+    memaddr topOfRAM;
+    CLOCKSEM = 0;
     /* init semaphores */
     int i;
     for(i=0; i < SEMNUM; i++){
         semD[i] = 0;
     }
 
-    /*struct passupvector foo = (passupvector_t*) PASSUPVECTOR;
-    foo.tlb_refll_handler = (memaddr) uTLB_RefillHandler;
-    foo.tlb_refll_stackPtr = (memaddr) RAMTOP;
-    foo.execption_handler = (memaddr) genExceptionHandler;
-    foo->s_stackPTR = RAMTOP; commented out cuz it currently doesnt work*/
+    passupvector_t *passupvector;
+    passupvector->tlb_refll_handler = (memaddr) uTLB_RefillHandler();
+    passupvector->tlb_refll_stackPtr = NULL;
+    passupvector->execption_handler = (memaddr) genExceptionHandler();
+    passupvector->tlb_refll_stackPtr = NULL;
 
 
     /* Init pcb and asl */
     initPcbs();
     initASL();
 
-    /* load 100ms onto the pseudo clock */
-    LDIT(IOCLOCK);
+    /* load time onto the pseudo clock */
+    LDIT(PSUEDOCLOCKTIME);
+    RAMTOP(topOfRAM);
 
     /* alloc process to be set the current process, increment procCount */
     currentProc = allocPcb();
-    currentProc->p_semAdd = NULL;
-    currentProc->p_time = 0;
-    currentProc->p_supportStruct = NULL;
-    processCount = processCount + 1;
+    if(currentProc != NULL) {
+        currentProc->p_s.s_pc = currentProc->p_s.s_t9 = (memaddr)test;
+        currentProc->p_semAdd = NULL;
+        currentProc->p_time = 0;
+        currentProc->p_supportStruct = NULL;
+        processCount = processCount + 1;
 
-    /* insert current proc into the ready queue*/
-    insertProcQ(&readyQue, currentProc);
+        /* insert current proc into the ready queue*/
+        insertProcQ(&readyQue, currentProc);
 
-    /* init current proc back to NULL */
-    currentProc = NULL;
+        /* init current proc back to NULL */
+        currentProc = NULL;
 
-    /* Scheduler takes over the running process */
-    scheduler();
-
+        /* Scheduler takes over the running process */
+        scheduler();
+    }else{
+        PANIC();
+    }
+    return(0);
 }
 
 void genExceptionHandler(){
