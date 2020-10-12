@@ -33,7 +33,7 @@ extern cpu_t QuantumStart;
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
-	int mutex;
+	int mutex = 0;
 
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
@@ -43,7 +43,7 @@ void sysHandler(){
 		newPcb->p_time = 0;
 		newPcb->p_semadd = NULL;
 		currentProc->p_s.s_pc += 4;
-		LDST(currentProc->p_s);
+		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
 	{
@@ -63,7 +63,6 @@ void sysHandler(){
 		if(mutex < 0){
 			insertBlocked(&mutex, currentProc)
 			scheduler();
-			LDST(currentProc->p_s);
 		}
 
 		
@@ -75,13 +74,15 @@ void sysHandler(){
 		if(mutex <= 0){
 			int temp = removeBlocked(&mutex);
 			insertProcQ(&readyQue, temp);
-			LDST(currentProc->p_s);
+			scheduler();
 		}
 		
 	}
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
@@ -92,6 +93,8 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
@@ -107,11 +110,19 @@ void sysHandler(){
 }
 
 void TlbTrapHandler(){
-	PassUpOrDie();
+	/*need to pull the exception from the register and pass to PassUpOrDie; */
+	int trigger;
+	pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;
+	PassUpOrDie(trigger);
 }
 
 void PrgTrapHandler(){
-	PassUpOrDie();
+	/*need to pull the exception from the register and pass to PassUpOrDie; */
+	int trigger;
+	pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;
+	PassUpOrDie(trigger);
 }
 
 /* If an exception has been encountered, it passes the error to the appropriate handler, if no exception
@@ -121,38 +132,47 @@ void PrgTrapHandler(){
  * 2 - Program Trap Handler
  * 3 - Syscall 9+
  */
-void PassUpOrDie(state_t *caller, int trigger){
-    /* what exception is triggering */
-    switch (trigger){
 
-        /*0 is TLB EXCEPTIONS*/
-        case TLBTRAP:
-        if((currentProc-> newTLBstate) == NULL){
-            S;
-        }else{
-            CopyState(caller, currentProc-> oldTLBstate);
-            LDST(currentProc-> newTLBstate);
-        }
-        break;
+/*new passuporDIE */
+void PassUpOrDie(int Excepttrigger){
+	context_t context;
+	support_t sup;
+	context->c_stackPTR = currentProc->p_s.s_sp;
+	context->c_pc = currentProc->p_s.s_pc;
+	context->c_status = currentProc->p_s;
+	/*sup->sup_asid = currentProc->p_somthing with process ID */
+	sup->sup_exceptState = currentProc->p_s;
+	/*sup->sup_exceptContext = currentProc->context for some sort of thing */
+	state_PTR oldState = currentProc->p_oldState;
+	state_PTR currState = currentProc->p_newState;
 
-        /*1 is Program Trap Exceptions*/
-        case PROGTRAP:
-            if((currentProc-> newPRGstate) == NULL){
-                Syscall2();
-            }else{
-                CopyState(caller, currentProc-> oldPRGstate);
-                LDST(currentProc-> newPRGstate);
-            }
-            break;
+	switch (Excepttrigger){
 
-        /*2 is SYS Exception!*/
-        case SYSTRAP:
-            if((currentProc->p_newState) == NULL){
-                Syscall2();
-            }else{
-                CopyState(caller, currentProc->p_oldState);
-                LDST(currentProc->p_newState);
-            }
-            break;
-    }
+		case TLBTRAP:
+		if(currentProc->p_supportStruct == NULL)
+			Syscall2(TERMINATETHREAD,0,0,0);
+		else{
+			Copy_Paste(oldState, currState);
+			scheduler();
+		}
+		break;
+
+		case PROGTRAP:
+		if(currentProc->p_supportStruct == NULL)
+			Syscall2(TERMINATETHREAD,0,0,0);
+		else{
+			Copy_Paste(oldState, currState);
+			scheduler();
+		}
+		break;
+		case SYSTRAP{
+			if(currentProc->p_supportStruct == NULL)
+				Syscall2(TERMINATETHREAD,0,0,0);
+			else{
+				Copy_Paste(oldState, currState);
+				scheduler();
+			}
+			break;
+		}
+	}
 }
