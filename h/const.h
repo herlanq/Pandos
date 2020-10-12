@@ -11,6 +11,10 @@
 #define PAGESIZE		  4096			/* page size in bytes	*/
 #define WORDLEN			  4				  /* word size in bytes	*/
 
+#define TLBRTRAP 1
+#define PROGTRAP 2
+#define SYSTRAP  3
+
 
 
 /* timer, timescale, TOD-LO and other bus regs */
