@@ -16,7 +16,7 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "/usr/include/umps3/umps/libumps.h"
+#include "../h/libumps.h"
 
 typedef unsigned int devregtr;
 
