@@ -33,12 +33,13 @@ void sysHandler(){
 	int mutex = 0;
 
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
-		pcb_t newPcb->p_s = a1;
-		newPcb->p_supportStruct = a2;
+		pcb_PTR newPcb;
+		newPcb->p_s.s_a2 = currentProc->p_s.s_a2;
+		newPcb->p_supportStruct = currentProc->p_s.s_a2;
 		insertProcQ(newPcb, newPcb->p_next);
 		insertChild(newPcb, newPcb->p_child);
 		newPcb->p_time = 0;
-		newPcb->p_semadd = NULL;
+		newPcb->p_semAdd = NULL;
 		currentProc->p_s.s_pc += 4;
 		scheduler();
 	}
@@ -58,7 +59,7 @@ void sysHandler(){
 		currentProc->p_s.s_pc += 4;
 		mutex--;
 		if(mutex < 0){
-			insertBlocked(&mutex, currentProc)
+			insertBlocked(&mutex, currentProc);
 			scheduler();
 		}
 
@@ -78,7 +79,7 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
 		currentProc->p_s.s_pc += 4;
-		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		/*SYS3(PASSEREN, currentProc->p_semadd, 0,0);*/
 		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
@@ -90,15 +91,15 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
 		currentProc->p_s.s_pc += 4;
-		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		/*SYS3(PASSEREN, currentProc->p_semadd, 0,0);*/
 		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
-		if(p_supportStruct == NULL)
+		if(currentProc->p_supportStruct == NULL)
 			currentProc->p_s.s_v0 = NULL;
-		currentProc->p_s.s_v0 = p_supportStruct;
+		currentProc->p_s.s_v0 = currentProc->p_supportStruct;
 		currentProc->p_s.s_pc += 4;
 	}
 	else if(currentProc->p_s.s_a0 >= 9)
@@ -109,16 +110,16 @@ void sysHandler(){
 void TlbTrapHandler(){
 	/*need to pull the exception from the register and pass to PassUpOrDie; */
 	int trigger;
-	pcb_PTR old_state = (state_PTR) something
-	trigger = old_state & EXCEPTIONS;
+	/*pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;*/
 	PassUpOrDie(trigger);
 }
 
 void PrgTrapHandler(){
 	/*need to pull the exception from the register and pass to PassUpOrDie; */
 	int trigger;
-	pcb_PTR old_state = (state_PTR) something
-	trigger = old_state & EXCEPTIONS;
+	/*pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;*/
 	PassUpOrDie(trigger);
 }
 
@@ -134,18 +135,20 @@ void PrgTrapHandler(){
 void PassUpOrDie(int Excepttrigger){
 	context_t context;
 	support_t sup;
-	context->c_stackPTR = currentProc->p_s.s_sp;
-	context->c_pc = currentProc->p_s.s_pc;
-	context->c_status = currentProc->p_s;
+	context.c_stackPtr = currentProc->p_s.s_sp;
+	context.c_pc = currentProc->p_s.s_pc;
+	context.c_status = currentProc->p_s.s_status;
 	/*sup->sup_asid = currentProc->p_somthing with process ID */
-	sup->sup_exceptState = currentProc->p_s;
-	/*sup->sup_exceptContext = currentProc->context for some sort of thing */
+	sup.sup_exceptState = currentProc->p_s.s_cause;
+	state_PTR oldState;
+	state_PTR currState;
+	/*sup->sup_exceptContext = currentProc->context for some sort of thing 
 	state_PTR oldState = currentProc->p_oldState;
-	state_PTR currState = currentProc->p_newState;
+	state_PTR currState = currentProc->p_newState; */
 
 	switch (Excepttrigger){
 
-		case TLBTRAP:
+		case TLBRTRAP:
 		if(currentProc->p_supportStruct == NULL)
 			Syscall2(TERMINATETHREAD,0,0,0);
 		else{
@@ -162,14 +165,14 @@ void PassUpOrDie(int Excepttrigger){
 			scheduler();
 		}
 		break;
-		case SYSTRAP{
+		
+		case SYSTRAP:
 			if(currentProc->p_supportStruct == NULL)
 				Syscall2(TERMINATETHREAD,0,0,0);
 			else{
 				Copy_Paste(oldState, currState);
 				scheduler();
 			}
-			break;
-		}
+		break;
 	}
 }
