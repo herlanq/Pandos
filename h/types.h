@@ -26,6 +26,17 @@ typedef struct device_t{
     unsigned int t_transm_command;
 } device_t;
 
+#define STATEREGNUM 31
+
+typedef struct state_t {
+    unsigned int    s_entryHI;
+    unsigned int    s_cause;
+    unsigned int    s_status;
+    unsigned int    s_pc;
+    int             s_reg[STATEREGNUM];
+
+} state_t, *state_PTR;
+
 /* process control block type */
 typedef struct pcb_t {
     /* process queue fields */
@@ -102,17 +113,6 @@ typedef struct support_t {
 /* Exceptions related constants */
 #define PGFAULTEXCEPT 0
 #define GENERALEXCEPT 1
-
-#define STATEREGNUM	31
-typedef struct state_t {
-	unsigned int	s_entryHI;
-	unsigned int	s_cause;
-	unsigned int	s_status;
-	unsigned int 	s_pc;
-	int	 			s_reg[STATEREGNUM];
-
-} state_t, *state_PTR;
-
 #define	s_at	s_reg[0]
 #define	s_v0	s_reg[1]
 #define s_v1	s_reg[2]
