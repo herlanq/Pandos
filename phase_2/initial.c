@@ -101,7 +101,7 @@ void genExceptionHandler(){
         if(eReason == 8){
             /* should check cause register and syscall before going into sysHandler
             because if not we should hit the PrgTrapHandler() */
-            if(currentProc->s_cause & UMOFF == 1)
+            if(currentProc->s_cause & UMOFF)
                 sysHandler();
             PrgTraphandler();
         }

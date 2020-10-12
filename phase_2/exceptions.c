@@ -81,6 +81,8 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
@@ -91,6 +93,8 @@ void sysHandler(){
 	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
 	{
 		currentProc->p_s.s_pc += 4;
+		SYS3(PASSEREN, currentProc->p_semadd, 0,0);
+		setSTATUS(ALLOFF | IECON | IMON | TEBITON);
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
@@ -106,11 +110,19 @@ void sysHandler(){
 }
 
 void TlbTrapHandler(){
-	PassUpOrDie();
+	/*need to pull the exception from the register and pass to PassUpOrDie; */
+	int trigger;
+	pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;
+	PassUpOrDie(trigger);
 }
 
 void PrgTrapHandler(){
-	PassUpOrDie();
+	/*need to pull the exception from the register and pass to PassUpOrDie; */
+	int trigger;
+	pcb_PTR old_state = (state_PTR) something
+	trigger = old_state & EXCEPTIONS;
+	PassUpOrDie(trigger);
 }
 
 /* If an exception has been encountered, it passes the error to the appropriate handler, if no exception
@@ -120,9 +132,9 @@ void PrgTrapHandler(){
  * 2 - Program Trap Handler
  * 3 - Syscall 9+
  */
-void PassUpOrDie(state_t *caller, int trigger){
+void PassUpOrDie(int Excepttrigger){
     /* what exception is triggering */
-    switch (trigger){
+    switch (Excepttrigger){
 
         /*0 is TLB EXCEPTIONS*/
         case TLBTRAP:
@@ -137,7 +149,7 @@ void PassUpOrDie(state_t *caller, int trigger){
         /*1 is Program Trap Exceptions*/
         case PROGTRAP:
             if((currentProc-> newPRGstate) == NULL){
-                Syscall2();
+                Syscall2(TERMINATETHREAD,0,0,0);
             }else{
                 CopyState(caller, currentProc-> oldPRGstate);
                 scheduler();
@@ -147,7 +159,7 @@ void PassUpOrDie(state_t *caller, int trigger){
         /*2 is SYS Exception!*/
         case SYSTRAP:
             if((currentProc->p_newState) == NULL){
-                Syscall2(2,0,0,0);
+                Syscall2(TERMINATETHREAD,0,0,0);
             }else{
                 CopyState(caller, currentProc->p_oldState);
                 scheduler();
