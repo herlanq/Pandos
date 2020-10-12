@@ -90,7 +90,7 @@ void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     state_PTR oldState;
     int eReason;
-    oldState = (state_PTR) /*this is where previous state goes, need to find syntax */
+    oldState = currentProc->p_oldState; /*this is where previous state goes, need to find syntax */
     eReason = (oldState->s_cause & CAUSE) << 2; 
         if(eReason == 0)
             InterruptHandler();

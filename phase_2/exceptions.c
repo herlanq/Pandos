@@ -33,7 +33,7 @@ extern cpu_t QuantumStart;
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
-	int mutex;
+	int mutex = 0;
 
 	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
 		pcb_t newPcb->p_s = a1;
