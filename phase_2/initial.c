@@ -55,11 +55,12 @@ int main(){
         semD[i] = 0;
     }
 
-    passupvector_t *passupvector;
+    /*passupvector_t *passupvector;
     passupvector->tlb_refll_handler = (memaddr) uTLB_RefillHandler();
     passupvector->tlb_refll_stackPtr = NULL;
     passupvector->execption_handler = (memaddr) genExceptionHandler();
     passupvector->tlb_refll_stackPtr = NULL;
+     */
 
 
     /* Init pcb and asl */
@@ -68,7 +69,7 @@ int main(){
 
     /* load time onto the pseudo clock */
     LDIT(PSUEDOCLOCKTIME);
-    RAMTOP(topOfRAM);
+    /*RAMTOP(topOfRAM);*/
 
     /* alloc process to be set the current process, increment procCount */
     currentProc = allocPcb();
