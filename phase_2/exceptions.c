@@ -139,7 +139,7 @@ void PassUpOrDie(int Excepttrigger){
 	context.c_pc = currentProc->p_s.s_pc;
 	context.c_status = currentProc->p_s.s_status;
 	/*sup->sup_asid = currentProc->p_somthing with process ID */
-	sup.sup_exceptState = currentProc->p_s.s_cause;
+	/*sup.sup_exceptState = currentProc->p_s.s_cause;*/
 	state_PTR oldState;
 	state_PTR currState;
 	/*sup->sup_exceptContext = currentProc->context for some sort of thing 
