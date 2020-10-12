@@ -26,10 +26,11 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
+extern int CLOCKSEM;
 
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
-HIDDEN int terminal_interrupt(int *device_sema4);
+HIDDEN int terminal_interrupt(int device_sema4);
 
 
 /* Function that determines the highest priority interrupt and
@@ -39,6 +40,7 @@ void InterruptHandler(){
     cpu_t start_clock;
     cpu_t stop_clock;
     cpu_t time_left = getTIMER();
+    STCK(stop_clock);
     state_PTR int_cause = ((state_PTR) BIOSDATAPAGE);
 
     /* BEGIN INTERRUPT HANDLING */
@@ -59,11 +61,11 @@ void InterruptHandler(){
     if((int_cause->s_cause & TIMERINT) != 0){
         pcb_PTR proc;
         LDIT(PSUEDOCLOCKTIME);
-        proc = removeBlocked(&CLOCK_SEMA);
+        proc = removeBlocked(&CLOCKSEM);
         while(proc !=NULL){
             insertProcQ(&readyQue, proc);
             softBlockCount--;
-            proc = removeBlocked(&CLOCK_SEMA);
+            proc = removeBlocked(&CLOCKSEM);
         }
         CLOCKSEM = 0;
         if(currentProc == NULL){
@@ -73,7 +75,7 @@ void InterruptHandler(){
     /* Disk interrupt */
     if((int_cause->s_cause & DISKINT) != 0){
         /* disk dev is on */
-        Device_InterruptH(DISK)
+        Device_InterruptH(DISK);
     }
     /* Flash interrupt */
     if((int_cause->s_cause & FLASHINT) != 0){
@@ -93,7 +95,7 @@ void InterruptHandler(){
     if(currentProc != NULL){
         /* assign run time before the interrupt to the current process
          * and return control to the running process */
-        currentProc->p_time = currentProc->p_time + (stopTOD_clock + startTOD_clock);
+        currentProc->p_time = currentProc->p_time + (stop_clock + start_clock);
         Copy_Paste((state_PTR)BIOSDATAPAGE, &(currentProc->p_s));
         Ready_Timer(currentProc, time_left);
     }else{
@@ -141,7 +143,7 @@ HIDDEN void Device_InterruptH(int line){
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
     /* for terminal interrupts */
     if(line == TERMINAL){
-        status = terminal_interrupt(&device_semaphore);
+        status = terminal_interrupt(device_semaphore);
     }else{
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
@@ -158,7 +160,7 @@ HIDDEN void Device_InterruptH(int line){
             softBlockCount--;
         } /* end inner IF */
     }else{
-        proc->p_s = status;
+        semD[device_semaphore] = status;
     } /* end outer IF */
     /* if no process is running, call the scheduler to set the next process */
     if(currentProc == NULL){
@@ -185,20 +187,22 @@ void Copy_Paste(state_t *copied_state, state_t *pasted_state){
 /* returns the device status of a terminal interrupt
  * deciphers between terminal read/write
  * terminal write takes priority */
-HIDDEN int terminal_interrupt(int *device_sema4) {
+HIDDEN int terminal_interrupt(int device_sema4) {
     unsigned int status;
     volatile devregarea_t *devReg;
     devReg = (devregarea_t *) RAMBASEADDR;
-    status = devReg->devreg[(*device_sema4)].t_transm_status;
-    /* handle the 'write' case */
+ /*   status = devReg->devreg[(device_sema4)].t_transm_status;
+    *//* handle the 'write' case *//*
     if ((status & 0x0F) != READY) {
-        devReg->devreg[(*device_sema4)].t_transm_command = ACK;
-    } else { /* handle the 'read' case */
-        status = devReg->devreg[(*device_sema4)].t_recv_status;
-        devReg->devreg[(*device_sema4)].t_recv_command = ACK;
-        /* update device sema4 */
-        *device_sema4 = *device_sema4 + DEVPERINT;
+        (devReg->devreg[(device_sema4)]).t_transm_command = ACK;
+
+    }else{ *//* handle the 'read' case *//*
+        status = ((devReg->devreg[device_sema4]).t_recv_status);
+        (devReg->devreg[device_sema4]).t_recv_command = ACK;
+        *//* update device sema4 *//*
+        device_sema4 = device_sema4 + DEVPERINT;
     }
+    */
     return (status);
 }
 

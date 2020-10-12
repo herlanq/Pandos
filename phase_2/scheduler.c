@@ -37,10 +37,10 @@ void scheduler(){
     if(proc != NULL){ /* if removed process is not null*/
         Ready_Timer(proc, QUANTUM);
     }
-//    if(proc == NULL) { /* if removed process is null */
-//        /* set the current process to be null, there are no processes to be run */
-//        currentProc = NULL;
-//    }
+   /*if(proc == NULL) {
+        currentProc = NULL;
+   }
+    */
 
     /* check for remaining processes */
     if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
@@ -77,10 +77,9 @@ void Context_Switch(pcb_PTR this_proc){
  * or preps the timer for an old process given a V operation or interrupt.
  * Gives control to the */
 void Ready_Timer(pcb_PTR current_process, cpu_t time){
-    (cpu_t*) start_time = ((QUANTUM) - (current_process->p_time));
+    cpu_t start_time;
+    start_time = ((QUANTUM) - (current_process->p_time));
     STCK(start_time);
-    cpu_t start = QUANTUM - current_process->p_time;
-    STCK(start);
     /* set amount of time given for the process */
     setTIMER(time);
     /* context switch, make this process the current process */

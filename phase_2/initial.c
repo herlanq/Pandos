@@ -32,6 +32,7 @@ cpu_t startTOD;
 cpu_t sliceCNT;
 
 int semD[SEMNUM]; /* 49 Semaphore in the list */
+#define CLOCKSEM semD[48];
 
 /* declares test() from the p2test file */
 extern void test();
