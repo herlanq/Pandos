@@ -49,6 +49,16 @@
 #define DEVREGLEN		  4		  /* device register field length in bytes, and regs per dev */	
 #define DEVREGSIZE	  16 		/* device register size in bytes */
 
+/* system call codes */
+#define	CREATETHREAD	1	/* create thread */
+#define	TERMINATETHREAD	2	/* terminate thread */
+#define	PASSERN			3	/* P a semaphore */
+#define	VERHOGEN		4	/* V a semaphore */
+#define	WAITIO			5	/* delay on a io semaphore */
+#define	GETCPUTIME		6	/* get cpu time used to date */
+#define	WAITCLOCK		7	/* delay on the clock semaphore */
+#define	GETSPTPTR		8	/* return support structure ptr. */
+
 /* Define Devices and Device interrupts  */
 #define PLT 1
 #define TIMER 2
