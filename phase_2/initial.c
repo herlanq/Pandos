@@ -41,7 +41,7 @@ extern void uTLB_RefillHandler();
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
  * One the main is complete, it passes over to the scheduler */
-int main(){
+void main(){
     /* init global variables */
     processCount = 0;
     softBlockCount = 0;
@@ -53,11 +53,11 @@ int main(){
         semD[i] = 0;
     }
 
-    passupvector foo = PASSUPVECTOR;
-    foo->tlb_refill_Handler = (memaddr) uTLB_RefillHandler;
-    foo->tlb_refill_stackPTR = (memaddr) RAMTOP;
-    foo->exceptionHandler = (memaddr) genExceptionHandler;
-    foo->s_stackPTR = RAMTOP;
+    /*struct passupvector foo = (passupvector_t*) PASSUPVECTOR;
+    foo.tlb_refll_handler = (memaddr) uTLB_RefillHandler;
+    foo.tlb_refll_stackPtr = (memaddr) RAMTOP;
+    foo.execption_handler = (memaddr) genExceptionHandler;
+    foo->s_stackPTR = RAMTOP; commented out cuz it currently doesnt work*/
 
 
     /* Init pcb and asl */
@@ -83,26 +83,25 @@ int main(){
     /* Scheduler takes over the running process */
     scheduler();
 
-    return 0;
 }
 
 void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     state_PTR oldState;
     int eReason;
-    oldState = currentProc->p_oldState; /*this is where previous state goes, need to find syntax */
+    oldState = currentProc->p_prev; /*this is where previous state goes, need to find syntax */
     eReason = (oldState->s_cause & CAUSE) << 2; 
         if(eReason == 0)
             InterruptHandler();
         if(eReason == 1 || eReason == 2 || eReason == 3)
             TlbTrapHandler();
         if(eReason == 4 || eReason == 5 || eReason == 6 || eReason == 7)
-            PrgTraphandler();
+            PrgTrapHandler();
         if(eReason == 8){
             /* should check cause register and syscall before going into sysHandler
             because if not we should hit the PrgTrapHandler() */
-            if(currentProc->s_cause & UMOFF)
-                sysHandler();
-            PrgTraphandler();
+            /*if(currentProc->s_cause & UMOFF)
+                sysHandler();           Commented out because it currently doesnt work*/
+            PrgTrapHandler();
         }
 }

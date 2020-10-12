@@ -11,8 +11,6 @@
 #define PAGESIZE		  4096			/* page size in bytes	*/
 #define WORDLEN			  4				  /* word size in bytes	*/
 
-#define ON 1
-#define OFF 2
 
 
 /* timer, timescale, TOD-LO and other bus regs */
@@ -121,10 +119,10 @@
 #define MAX(A,B)		((A) < (B) ? B : A)
 #define	ALIGNED(A)		(((unsigned)A & 0x3) == 0)
 
-#define IOCLOCK 100000;
-#define QUANTUM 5000;
+#define IOCLOCK 100000
+#define QUANTUM 5000
 #define PSUEDOCLOCKTIME 100000
-#define MAXTIME 0xFFFFFFFF;
+#define MAXTIME 0xFFFFFFFF
 
 
 /* ON/OFF bit manipulation */

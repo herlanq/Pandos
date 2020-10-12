@@ -28,7 +28,7 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 
 /* separate functions for interrupt handling */
-HIDEEN void Device_InterruptH(int line);
+HIDDEN void Device_InterruptH(int line);
 HIDDEN int terminal_interrupt(int *device_sema4);
 
 
@@ -102,7 +102,7 @@ void InterruptHandler(){
 }
 /* Interrupt handler for peripheral devices.
  * V's the correct device semaphore and stores the device data. */
-HIDEEN void Device_InterruptH(int line){
+HIDDEN void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
     /* Addressing */
@@ -153,7 +153,7 @@ HIDEEN void Device_InterruptH(int line){
     if(semD[device_semaphore] <= 0){
         proc = removeBlocked(&(semD[device_semaphore]));
         if(proc != NULL){
-            proc->p_s.sv0 = status; /* save the process status */
+            proc->p_s.s_v0 = status; /* save the process status */
             insertProcQ(&readyQue, proc);
             softBlockCount--;
         } /* end inner IF */
