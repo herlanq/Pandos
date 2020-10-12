@@ -10,12 +10,13 @@
  *
  *		Aborts as soon as an error is detected.
  *
+ *      Modified by Michael Goldweber on May 15, 2004
  *		Modified by Michael Goldweber on June 19, 2020
  */
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "/usr/local/include/umps3/umps/libumps.e"
+#include "/usr/include/umps3/umps/libumps.h"
 
 typedef unsigned int devregtr;
 
@@ -57,14 +58,14 @@ typedef unsigned int devregtr;
 
 
 /* system call codes */
-#define	CREATETHREAD	  1	/* create thread */
+#define	CREATETHREAD	1	/* create thread */
 #define	TERMINATETHREAD	2	/* terminate thread */
-#define	PASSERN			    3	/* P a semaphore */
-#define	VERHOGEN		    4	/* V a semaphore */
-#define	WAITIO			    5	/* delay on a io semaphore */
-#define	GETCPUTIME		  6	/* get cpu time used to date */
-#define	WAITCLOCK		    7	/* delay on the clock semaphore */
-#define	GETSPTPTR		    8	/* return support structure ptr. */
+#define	PASSERN			3	/* P a semaphore */
+#define	VERHOGEN		4	/* V a semaphore */
+#define	WAITIO			5	/* delay on a io semaphore */
+#define	GETCPUTIME		6	/* get cpu time used to date */
+#define	WAITCLOCK		7	/* delay on the clock semaphore */
+#define	GETSPTPTR		8	/* return support structure ptr. */
 
 #define CREATENOGOOD	-1
 
@@ -78,15 +79,15 @@ SEMAPHORE term_mut=1,	/* for mutual exclusion on terminal */
 		s[MAXSEM+1],	/* semaphore array */
 		testsem=0,		/* for a simple test */
 		startp2=0,		/* used to start p2 */
-		endp2=0,		  /* used to signal p2's demise */
-		endp3=0,		  /* used to signal p3's demise */
-		blkp4=1,		  /* used to block second incaration of p4 */
-		synp4=0,		  /* used to allow p4 incarnations to synhronize */
-		endp4=0,		  /* to signal demise of p4 */
-		endp5=0,		  /* to signal demise of p5 */
-		endp8=0,		  /* to signal demise of p8 */
+		endp2=0,		/* used to signal p2's demise */
+		endp3=0,		/* used to signal p3's demise */
+		blkp4=1,		/* used to block second incaration of p4 */
+		synp4=0,		/* used to allow p4 incarnations to synhronize */
+		endp4=0,		/* to signal demise of p4 */
+		endp5=0,		/* to signal demise of p5 */
+		endp8=0,		/* to signal demise of p8 */
 		endcreate=0,	/* for a p8 leaf to signal its creation */
-		blkp8=0;		  /* to block p8 */
+		blkp8=0;		/* to block p8 */
 
 state_t p2state, p3state, p4state, p5state,	p6state, p7state,p8rootstate, 
         child1state, child2state, gchild1state, gchild2state, gchild3state, gchild4state;
@@ -94,12 +95,12 @@ state_t p2state, p3state, p4state, p5state,	p6state, p7state,p8rootstate,
 /* support structure for p5 */
 support_t pFiveSupport;
 
-int		p1p2synch=0;	/* to check on p1/p2 synchronization */
+int		p1p2synch=0;			/* to check on p1/p2 synchronization */
 
-int 	p8inc;			/* p8's incarnation number */ 
-int		p4inc=1;		/* p4 incarnation number */
+int 	p8inc;					/* p8's incarnation number */ 
+int		p4inc=1;				/* p4 incarnation number */
 
-unsigned int p5Stack;	/* so we can allocate new stack for 2nd p5 */
+unsigned int p5Stack;			/* so we can allocate new stack for 2nd p5 */
 
 int creation = 0; 				/* return code for SYSCALL invocation */
 memaddr *p5MemLocation = 0;		/* To cause a p5 trap */
@@ -235,9 +236,9 @@ void test() {
 
 	print("p2 was started\n");
 
-	SYSCALL(VERHOGEN, (int)&startp2, 0, 0);					/* V(startp2)   */
+	SYSCALL(VERHOGEN, (int)&startp2, 0, 0);								/* V(startp2)   */
 
-	SYSCALL(PASSERN, (int)&endp2, 0, 0);					/* P(endp2)     */
+	SYSCALL(PASSERN, (int)&endp2, 0, 0);								/* P(endp2)     */
 
 	/* make sure we really blocked */
 	if (p1p2synch == 0)
@@ -247,30 +248,28 @@ void test() {
 
 	print("p3 is started\n");
 
-	SYSCALL(PASSERN, (int)&endp3, 0, 0);					/* P(endp3)     */
+	SYSCALL(PASSERN, (int)&endp3, 0, 0);								/* P(endp3)     */
 
 	SYSCALL(CREATETHREAD, (int)&p4state, (int) NULL, 0);				/* start p4     */
 
 	pFiveSupport.sup_exceptContext[GENERALEXCEPT].c_stackPtr = (int) p5Stack;
-/*	pFiveSupport.sup_exceptContext[GENERALEXCEPT].c_stackPtr = (int) &(pFiveSupport.sup_stackGen[500]); */
 	pFiveSupport.sup_exceptContext[GENERALEXCEPT].c_status = ALLOFF | IEPBITON | CAUSEINTMASK | TEBITON;
 	pFiveSupport.sup_exceptContext[GENERALEXCEPT].c_pc =  (memaddr) p5gen;
 	pFiveSupport.sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = p5Stack;
-/*	pFiveSupport.sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = &(pFiveSupport.sup_stackMM[500]); */
 	pFiveSupport.sup_exceptContext[PGFAULTEXCEPT].c_status = ALLOFF | IEPBITON | CAUSEINTMASK | TEBITON;
 	pFiveSupport.sup_exceptContext[PGFAULTEXCEPT].c_pc =  (memaddr) p5mm;
 	
-	SYSCALL(CREATETHREAD, (int)&p5state, (int) &(pFiveSupport), 0); 			/* start p5     */
+	SYSCALL(CREATETHREAD, (int)&p5state, (int) &(pFiveSupport), 0); 	/* start p5     */
 
 	SYSCALL(CREATETHREAD, (int)&p6state, (int) NULL, 0);				/* start p6		*/
 
 	SYSCALL(CREATETHREAD, (int)&p7state, (int) NULL, 0);				/* start p7		*/
 
-	SYSCALL(PASSERN, (int)&endp5, 0, 0);					/* P(endp5)		*/ 
+	SYSCALL(PASSERN, (int)&endp5, 0, 0);								/* P(endp5)		*/ 
 
 	print("p1 knows p5 ended\n");
 
-	SYSCALL(PASSERN, (int)&blkp4, 0, 0);					/* P(blkp4)		*/
+	SYSCALL(PASSERN, (int)&blkp4, 0, 0);								/* P(blkp4)		*/
 
 	/* now for a more rigorous check of process termination */
 	for (p8inc=0; p8inc<4; p8inc++) {
@@ -487,8 +486,8 @@ void p5mm() {
 	}
 	
 	pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_status = pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_status | KUPBITON;	/* user mode on 	*/
-	pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_pc = (memaddr)p5b;   										/* return to p5b()	*/
-	pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_t9 = (memaddr)p5b;											/* return to p5b()	*/
+	pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_pc = (memaddr)p5b;   						/* return to p5b()	*/
+	pFiveSupport.sup_exceptState[PGFAULTEXCEPT].s_t9 = (memaddr)p5b;						/* return to p5b()	*/
 
 	LDST(&(pFiveSupport.sup_exceptState[PGFAULTEXCEPT]));
 }
@@ -519,11 +518,9 @@ void p5() {
 }
 
 void p5a() {
-	unsigned int p5Status;
-	
 	/* generage a TLB exception after a TLB-Refill event */
 
-	p5MemLocation = (memaddr) 0x80000000;
+	p5MemLocation = (memaddr *) 0x80000000;
 	*p5MemLocation = 42;
 }
 
