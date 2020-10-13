@@ -140,7 +140,7 @@ void Device_InterruptH(int line){
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
 
     /* for terminal interrupts */
-    if(line == TERMINAL){ /* distiguish between read/write cases */
+    if(line == TERMINAL){ /* distinguish between read/write cases */
         if ((deviceRegister->devreg[device_semaphore].t_transm_status & 0x0F) != READY) { /* handle write */
             status = deviceRegister->devreg[device_semaphore].t_transm_status;
             deviceRegister->devreg[device_semaphore].t_transm_command = ACK;
