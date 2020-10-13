@@ -63,10 +63,10 @@ typedef struct semd_t {
     pcb_t *s_procQ;         /* tail pointer to a process queue */
 } semd_t;
 
-#define t_recv_status
-#define t_recv_command
-#define t_transm_status
-#define t_transm_command
+#define t_recv_status       d_status
+#define t_recv_command      d_command
+#define t_transm_status     d_data0
+#define t_transm_command    d_data1
 
 
 /* Bus Register Area */
