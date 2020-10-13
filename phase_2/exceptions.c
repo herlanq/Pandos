@@ -34,7 +34,7 @@ HIDDEN void PassUpOrDie(int Excepttrigger);
 
 void sysHandler(){
 	currentProc->p_s.s_pc += 4;
-	if(currentProc->p_s.s_a0 = 1){ /*situation of create process*/
+	if(currentProc->p_s.s_a0 == 1){ /*situation of create process*/
 		pcb_PTR newPcb = allocPcb();
 		if(newPcb == NULL){
 			currentProc->p_s.s_v0 = -1;
@@ -52,7 +52,7 @@ void sysHandler(){
 		currentProc->p_s.s_v0 = 1;
 		scheduler();
 	}
-	else if(currentProc->p_s.s_a0 = 2) /*situation to terminate process*/
+	else if(currentProc->p_s.s_a0 == 2) /*situation to terminate process*/
 	{
 		while (currentProc->p_child != NULL)
 		{
@@ -62,7 +62,7 @@ void sysHandler(){
 		freePcb(currentProc);
 		scheduler();
 	}
-	else if(currentProc->p_s.s_a0 = 3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
+	else if(currentProc->p_s.s_a0 ==3) /*Passeren situation, dont think this is the correct syntax but this is what he put on the board in class*/
 	{
 		int *mutex = &currentProc->p_s.s_a1;
 		mutex--;
@@ -76,7 +76,7 @@ void sysHandler(){
 
 		
 	}
-	else if(currentProc->p_s.s_a0 = 4) /*Verhogen situation, same notes as above */
+	else if(currentProc->p_s.s_a0 == 4) /*Verhogen situation, same notes as above */
 	{
 		int *mutex = &currentProc->p_s.s_a1;
 		mutex++;
@@ -87,7 +87,7 @@ void sysHandler(){
 		scheduler();
 		
 	}
-	else if(currentProc->p_s.s_a0 = 5) /*I/O situation*/
+	else if(currentProc->p_s.s_a0 == 5) /*I/O situation*/
 	{
 		int lineNum = currentProc->p_s.s_a1;
 		int devNum = (currentProc->p_s.s_a2) + ((lineNum-3)*DEVPERINT);
@@ -100,7 +100,7 @@ void sysHandler(){
 		softBlockCount++;
 		blocker(devNum);
 	}
-	else if(currentProc->p_s.s_a0 = 6) /*get CPU time situation */
+	else if(currentProc->p_s.s_a0 == 6) /*get CPU time situation */
 	{
 		cpu_t current_TOD;
 		STCK(current_TOD);
@@ -108,7 +108,7 @@ void sysHandler(){
 		currentProc->p_s.s_v0 = current_TOD;
 		scheduler();
 	}
-	else if(currentProc->p_s.s_a0 = 7) /*wait clock situation*/
+	else if(currentProc->p_s.s_a0 == 7) /*wait clock situation*/
 	{
 		semD[SEMNUM]--;
 
@@ -116,11 +116,11 @@ void sysHandler(){
 			scheduler();
 		blocker(semD[SEMNUM]);
 	}
-	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
+	else if(currentProc->p_s.s_a0 == 8) /*support pointer situation */
 	{
 		if(currentProc->p_supportStruct == NULL)
-			currentProc->p_s.s_v0 = NULL;
-		currentProc->p_s.s_v0 = currentProc->p_supportStruct;
+			currentProc->p_s.s_v0 = (int) NULL;
+		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 >= 9)
