@@ -41,7 +41,7 @@ extern void uTLB_RefillHandler();
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
  * and declares variables that will be used throughout the phase 2 modules.
  * One the main is complete, it passes over to the scheduler */
-void main(){
+int main(){
     /* init global variables */
     processCount = 0;
     softBlockCount = 0;
@@ -92,6 +92,7 @@ void main(){
     }else{
         PANIC();
     }
+    return(0);
 }
 
 void genExceptionHandler(){
