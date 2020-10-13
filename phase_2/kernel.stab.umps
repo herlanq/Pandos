@@ -2,6 +2,8 @@ MPSA00000054 0000002E
 genExceptionHandler              :FUN:0x20002F7C:0x00000174:LOC
 Device_InterruptH                :FUN:0x20003450:0x000002E0:LOC
 terminal_interrupt               :FUN:0x20003824:0x00000030:LOC
+PassUpOrDie                      :FUN:0x20003C24:0x0000012C:LOC
+blocker                          :FUN:0x20003D50:0x000000E4:LOC
 semdTable.1052                   :OBJ:0x20006050:0x00000108:LOC
 pcbFree_h                        :OBJ:0x20006160:0x00000004:LOC
 pcbInit.1035                     :OBJ:0x20006164:0x00000DC0:LOC
@@ -12,7 +14,6 @@ print                            :FUN:0x200010F0:0x0000011C:GLB
 p5Stack                          :OBJ:0x20006FBC:0x00000004:GLB
 headProcQ                        :FUN:0x20004D88:0x00000058:GLB
 setSTATUS                        :FUN:0x200053BC:0x0000001C:GLB
-PassUpOrDie                      :FUN:0x20003C24:0x0000012C:GLB
 creation                         :OBJ:0x2000603C:0x00000004:GLB
 term_mut                         :OBJ:0x20006000:0x00000004:GLB
 search                           :FUN:0x20004498:0x000000E0:GLB
@@ -122,7 +123,6 @@ setINDEX                         :FUN:0x2000534C:0x0000001C:GLB
 p2state                          :OBJ:0x200076C4:0x0000008C:GLB
 getPRID                          :FUN:0x20005338:0x00000014:GLB
 uTLB_RefillHandler               :FUN:0x2000120C:0x0000005C:GLB
-blocker                          :FUN:0x20003D50:0x000000E4:GLB
 sysHandler                       :FUN:0x20003A60:0x00000154:GLB
 getTIMER                         :FUN:0x200052D4:0x00000014:GLB
 blkp4                            :OBJ:0x20006004:0x00000004:GLB

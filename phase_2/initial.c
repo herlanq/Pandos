@@ -47,7 +47,6 @@ int main(){
     softBlockCount = 0;
     currentProc = NULL;
     readyQue = mkEmptyProcQ();
-    memaddr topOfRAM;
     /* init semaphores */
     int i;
     for(i=0; i < SEMNUM; i++){
@@ -101,9 +100,9 @@ void genExceptionHandler(){
     eReason = (currentProc->p_s.s_cause & CAUSE) >> 2; 
         if(eReason == 0)
             InterruptHandler();
-        if(eReason == 1 | eReason == 2 | eReason == 3)
+        if((eReason == 1) | (eReason == 2) | (eReason == 3))
             TlbTrapHandler();
-        if(eReason == 4 | eReason == 5 | eReason == 6 | eReason == 7)
+        if((eReason == 4) | (eReason == 5) | (eReason == 6) | (eReason == 7))
             PrgTrapHandler();
         if(eReason == 8){
             if(currentProc->p_s.s_cause & UMOFF)

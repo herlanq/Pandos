@@ -102,7 +102,7 @@ void InterruptHandler(){
 }
 /* Interrupt handler for peripheral devices.
  * V's the correct device semaphore and stores the device data. */
-HIDDEN void Device_InterruptH(int line){
+void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
     /* Addressing */
@@ -185,14 +185,14 @@ void Copy_Paste(state_t *copied_state, state_t *pasted_state){
 /* returns the device status of a terminal interrupt
  * deciphers between terminal read/write
  * terminal write takes priority */
-HIDDEN int terminal_interrupt(int device_sema4) {
+int terminal_interrupt(int device_sema4) {
     unsigned int status;
     volatile devregarea_t *devReg;
     devReg = (devregarea_t *) RAMBASEADDR;
  /*   status = devReg->devreg[(device_sema4)].t_transm_status;
     *//* handle the 'write' case *//*
     if ((status & 0x0F) != READY) {
-        (devReg->devreg[(device_sema4)]).t_transm_command = ACK;
+        (devReg->devreg[(device_sema4)]).t_transm_command = ACK;		Not working for some reason.
 
     }else{ *//* handle the 'read' case *//*
         status = ((devReg->devreg[device_sema4]).t_recv_status);

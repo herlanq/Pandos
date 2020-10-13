@@ -27,6 +27,9 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 
+HIDDEN void blocker(int devNum);
+HIDDEN void PassUpOrDie(int Excepttrigger);
+
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 
 void sysHandler(){
@@ -111,7 +114,7 @@ void sysHandler(){
 
 		if(semD[SEMNUM] >= 0)
 			scheduler();
-		blocker();
+		blocker(semD[SEMNUM]);
 	}
 	else if(currentProc->p_s.s_a0 = 8) /*support pointer situation */
 	{
@@ -121,7 +124,7 @@ void sysHandler(){
 		scheduler();
 	}
 	else if(currentProc->p_s.s_a0 >= 9)
-		PassUpOrDie();
+		PassUpOrDie(GENERALEXCEPT);
 }
 
 void TlbTrapHandler(){
