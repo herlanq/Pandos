@@ -36,7 +36,7 @@ void scheduler(){
     proc = removeProcQ(&readyQue);
 
     if(proc != NULL){ /* if removed process is not null*/
-        Ready_Timer(proc, 5);
+        Ready_Timer(proc, QUANTUM);
     }
    /*if(proc == NULL) {
         currentProc = NULL;
