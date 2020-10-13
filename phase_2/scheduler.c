@@ -24,6 +24,7 @@ extern int processCount;
 extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
+extern cpu_t start_clock;
 
 /* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.
  */
@@ -35,7 +36,7 @@ void scheduler(){
     proc = removeProcQ(&readyQue);
 
     if(proc != NULL){ /* if removed process is not null*/
-        Ready_Timer(proc, QUANTUM);
+        Ready_Timer(proc, 5);
     }
    /*if(proc == NULL) {
         currentProc = NULL;
@@ -77,9 +78,7 @@ void Context_Switch(pcb_PTR this_proc){
  * or preps the timer for an old process given a V operation or interrupt.
  * Gives control to the */
 void Ready_Timer(pcb_PTR current_process, cpu_t time){
-    cpu_t start_time;
-    start_time = ((QUANTUM) - (current_process->p_time));
-    STCK(start_time);
+    STCK(start_clock);
     /* set amount of time given for the process */
     setTIMER(time);
     /* context switch, make this process the current process */
