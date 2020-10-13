@@ -29,7 +29,6 @@ extern int semD[SEMNUM];
 extern cpu_t start_clock;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
-HIDDEN int terminal_interrupt(int device_sema4);
 
 
 /* Function that determines the highest priority interrupt and
@@ -139,9 +138,16 @@ void Device_InterruptH(int line){
     }
     /* get device semaphore */
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
+
     /* for terminal interrupts */
-    if(line == TERMINAL){
-        status = terminal_interrupt(device_semaphore);
+    if(line == TERMINAL){ /* distiguish between read/write cases */
+        if ((deviceRegister->devreg[device_semaphore].t_transm_status & 0x0F) != READY) { /* handle write */
+            status = deviceRegister->devreg[device_semaphore].t_transm_status;
+            deviceRegister->devreg[device_semaphore].t_transm_command = ACK;
+        }else{ /* handle read */
+            status = deviceRegister->devreg[device_semaphore].t_recv_status;
+            deviceRegister->devreg[device_semaphore].t_recv_command = ACK;
+        }
     }else{
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
@@ -182,27 +188,6 @@ void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     pasted_state->s_cause = copied_state->s_cause;
 }
 
-/* returns the device status of a terminal interrupt
- * deciphers between terminal read/write
- * terminal write takes priority */
-int terminal_interrupt(int device_sema4) {
-    unsigned int status;
-    volatile devregarea_t *devReg;
-    devReg = (devregarea_t *) RAMBASEADDR;
- /*   status = devReg->devreg[(device_sema4)].t_transm_status;
-    *//* handle the 'write' case *//*
-    if ((status & 0x0F) != READY) {
-        (devReg->devreg[(device_sema4)]).t_transm_command = ACK;		Not working for some reason.
-
-    }else{ *//* handle the 'read' case *//*
-        status = ((devReg->devreg[device_sema4]).t_recv_status);
-        (devReg->devreg[device_sema4]).t_recv_command = ACK;
-        *//* update device sema4 *//*
-        device_sema4 = device_sema4 + DEVPERINT;
-    }
-    */
-    return (status);
-}
 
 
 
