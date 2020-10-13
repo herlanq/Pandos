@@ -9,6 +9,6 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 
-extern int main();
+extern void main();
 
 #endif
