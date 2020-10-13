@@ -149,27 +149,27 @@ void PassUpOrDie(int Excepttrigger){
 	switch (Excepttrigger){
 
 		case TLBRTRAP:
-		if(currentProc->p_supportStruct == NULL)
-			Syscall2(TERMINATETHREAD,0,0,0);
-		else{
+		if(currentProc->p_supportStruct == NULL) {
+            /*Syscall2(TERMINATETHREAD,0,0,0);*/
+        }else{
 			Copy_Paste(oldState, currState);
 			scheduler();
 		}
 		break;
 
 		case PROGTRAP:
-		if(currentProc->p_supportStruct == NULL)
-			Syscall2(TERMINATETHREAD,0,0,0);
-		else{
+		if(currentProc->p_supportStruct == NULL) {
+            /*Syscall2(TERMINATETHREAD,0,0,0);*/
+        }else{
 			Copy_Paste(oldState, currState);
 			scheduler();
 		}
 		break;
 		
 		case SYSTRAP:
-			if(currentProc->p_supportStruct == NULL)
-				Syscall2(TERMINATETHREAD,0,0,0);
-			else{
+			if(currentProc->p_supportStruct == NULL) {
+                /*Syscall2(TERMINATETHREAD,0,0,0);*/
+            }else{
 				Copy_Paste(oldState, currState);
 				scheduler();
 			}

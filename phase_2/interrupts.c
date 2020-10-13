@@ -26,7 +26,6 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
-extern int CLOCKSEM;
 extern cpu_t start_clock;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
@@ -60,13 +59,13 @@ void InterruptHandler(){
     if((int_cause->s_cause & TIMERINT) != 0){
         pcb_PTR proc;
         LDIT(PSUEDOCLOCKTIME);
-        proc = removeBlocked(&CLOCKSEM);
+        proc = removeBlocked(&semD[SEMNUM-1]);
         while(proc !=NULL){
             insertProcQ(&readyQue, proc);
             softBlockCount--;
-            proc = removeBlocked(&CLOCKSEM);
+            proc = removeBlocked(&semD[SEMNUM-1]);
         }
-        CLOCKSEM = 0;
+        semD[SEMNUM-1] = 0;
         if(currentProc == NULL){
             scheduler();
         }

@@ -31,7 +31,8 @@ cpu_t start_clock;
 cpu_t sliceCNT;
 unsigned int device_status[SEMNUM-1]; /* save device state area */
 int semD[SEMNUM]; /* 49 Semaphore in the list */
-#define CLOCKSEM semD[SEMNUM-1] /* clock semaphore */
+#define CLOCKSEM semD[SEMNUM-1]
+
 
 /* declares test() from the p2test file */
 extern void test();
@@ -48,7 +49,6 @@ int main(){
     currentProc = NULL;
     readyQue = mkEmptyProcQ();
     memaddr topOfRAM;
-    CLOCKSEM = 0;
     /* init semaphores */
     int i;
     for(i=0; i < SEMNUM; i++){
