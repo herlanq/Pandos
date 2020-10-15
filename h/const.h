@@ -84,7 +84,11 @@
 #define NETWORKINT 0x00002000   /* network interrupt */
 #define PRINTERINT 0x00004000  /* printer interrupt */
 #define TERMINT 0x00008000  /* terminal interrupt */
-#define IOINTERRUPTS 0
+
+#define SHIFT 2
+#define IOINTERRUPT 0
+#define TLBEXCEPTION 3
+#define SYSEXCEPTION 8
 
 #define FIRSTBIT 0x00000001
 #define DEVPHYS 0x10000000
@@ -122,10 +126,6 @@
 #define BIOSDATAPAGE    0x0FFFF000
 #define	PASSUPVECTOR	0x0FFFF900
 #define RAMTOP          0x20001000
-
-/* Exceptions related constants */
-#define	PGFAULTEXCEPT	  0
-#define GENERALEXCEPT	  1
 
 
 /* operations */
