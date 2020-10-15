@@ -97,17 +97,16 @@ int main(){
 void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     int eReason;
-    state_PTR oldState = (memaddr) BIOSDATAPAGE;
-    eReason = (oldState->s_cause & CAUSE) >> 2; 
-        if(eReason == 0)
+    state_PTR oldState = (state_PTR) BIOSDATAPAGE;
+    eReason = (oldState->s_cause & CAUSE) >> SHIFT;
+        if(eReason == IOINTERRUPT){
             InterruptHandler();
-        if((eReason == 1) | (eReason == 2) | (eReason == 3))
-            TlbTrapHandler();
-        if((eReason == 4) | (eReason == 5) | (eReason == 6) | (eReason == 7))
-            PrgTrapHandler();
-        if(eReason == 8){
-            if(currentProc->p_s.s_cause & UMOFF)
-                sysHandler();
-            PrgTrapHandler();
         }
+        if((eReason <= TLBEXCEPTION){
+            TlbTrapHandler();
+        }
+        if(eReason == SYSEXCEPTION){
+            sysHandler();
+        }
+    PrgTrapHandler();
 }
