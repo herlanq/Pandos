@@ -145,6 +145,7 @@ void PrgTrapHandler(){
 
 /*new passuporDIE */
 void PassUpOrDie(int Excepttrigger){
+	currentProc->p_s.s_pc += 4;
 	support_t* supportStruct = currentProc->p_supportStruct;
 	context_t context;
 	context = currentProc->p_supportStruct->sup_exceptContext[Excepttrigger];

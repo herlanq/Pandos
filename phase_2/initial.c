@@ -97,7 +97,8 @@ int main(){
 void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     int eReason;
-    eReason = (currentProc->p_s.s_cause & CAUSE) >> 2; 
+    state_PTR oldState = (memaddr) BIOSDATAPAGE;
+    eReason = (oldState->s_cause & CAUSE) >> 2; 
         if(eReason == 0)
             InterruptHandler();
         if((eReason == 1) | (eReason == 2) | (eReason == 3))
