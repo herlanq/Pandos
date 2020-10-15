@@ -102,7 +102,7 @@ void genExceptionHandler(){
         if(eReason == IOINTERRUPT){
             InterruptHandler();
         }
-        if((eReason <= TLBEXCEPTION){
+        if(eReason <= TLBEXCEPTION){
             TlbTrapHandler();
         }
         if(eReason == SYSEXCEPTION){
