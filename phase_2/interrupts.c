@@ -28,80 +28,92 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 extern int exception_check;
+extern unsigned int device_status[SEMNUM-1];
 int termChecker;
 int devcheck;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
-
+HIDDEN int terminal_interruptH(int *devSem);
 
 /* Function that determines the highest priority interrupt and
  * gives control the to scheduler.
  * PLS interrupts and Pseudo clock interrupts have their own separate handler functions */
 void InterruptHandler(){
     cpu_t stop_clock;
-    cpu_t time_left = getTIMER();
+    cpu_t time_left;
+    time_left = getTIMER();
     STCK(stop_clock);
-    state_PTR int_cause = ((state_PTR) BIOSDATAPAGE);
+    /*state_PTR int_cause = ((state_PTR) BIOSDATAPAGE);*/
 
     /* BEGIN INTERRUPT HANDLING */
+
     /* PLT interrupt, quantum is up, time to switch to the next process */
-    if((int_cause->s_cause & PLTINT) != 0) {
+    if ((((state_PTR)BIOSDATAPAGE)->s_cause & PLTINT) != 0) {
         if(currentProc != NULL){
             /* compute time of the running process, move the processor state, call on the next process */
             currentProc->p_time = (currentProc->p_time) + (stop_clock - start_clock);
             Copy_Paste((state_PTR) BIOSDATAPAGE, &(currentProc->p_s));
             insertProcQ(&readyQue, currentProc);
-            scheduler(); /* not sure if this is correct? It has to switch to a new proc */
+            Context_Switch(currentProc); /* not sure if this is correct? It has to switch to a new proc */ /* switched to context switch */
+            /* else: no current proc */
         }else{
             PANIC();
         }
     }
+
     /* Pseudo clock tick interrupt
      * Awaken all of the processes that are waiting on the pseudo clock */
-    if((int_cause->s_cause & TIMERINT) != 0){
+    if((((state_PTR)BIOSDATAPAGE)->s_cause & TIMERINT) != 0){
         pcb_PTR proc;
         LDIT(PSUEDOCLOCKTIME);
-        proc = removeBlocked(&semD[SEMNUM-1]);
+        proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         while(proc !=NULL){
             insertProcQ(&readyQue, proc);
             softBlockCount--;
-            proc = removeBlocked(&semD[SEMNUM-1]);
+            proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         }
-        semD[SEMNUM-1] = 0;
+        semD[SEMNUM-1] = 0; /*CLOCKSEM = semD[SEMNUM-1]*/
         if(currentProc == NULL){
-            scheduler();
+            Context_Switch(currentProc);
         }
     }
+
     /* Disk interrupt */
-    if((int_cause->s_cause & DISKINT) != 0){
+    if((((state_PTR)BIOSDATAPAGE)->s_cause & DISKINT) != 0){
         /* disk dev is on */
         Device_InterruptH(DISK);
     }
+
     /* Flash interrupt */
-    if((int_cause->s_cause & FLASHINT) != 0){
+    if((((state_PTR)BIOSDATAPAGE)->s_cause & FLASHINT) != 0){
         /* flash dev is on */
         Device_InterruptH(FLASH);
     }
+
     /* Printer interrupt */
-    if((int_cause->s_cause & PRINTERINT) != 0) {
+    if((((state_PTR)BIOSDATAPAGE)->s_cause & PRINTERINT) != 0) {
         /* printer dev is on */
         Device_InterruptH(PRINTER);
     }
+
     /* Terminal interrupt (special case) */
-    if((int_cause->s_cause & TERMINT) != 0) {
+    if((((state_PTR)BIOSDATAPAGE)->s_cause & TERMINT) != 0) {
         /* terminal dev is on */
         Device_InterruptH(TERMINAL);
     }
+
     if(currentProc != NULL){
         /* assign run time before the interrupt to the current process
-         * and return control to the running process */
+         * and return control to the current running process */
         currentProc->p_time = currentProc->p_time + (stop_clock + start_clock);
-        Copy_Paste((state_PTR)BIOSDATAPAGE, &(currentProc->p_s));
+        Copy_Paste(((state_PTR)BIOSDATAPAGE), &(currentProc->p_s));
         Ready_Timer(currentProc, time_left);
+        /* else: no current proc */
     }else{
         HALT();
     }
 }
+
 /* Interrupt handler for peripheral devices.
  * V's the correct device semaphore and stores the device data. */
 void Device_InterruptH(int line){
@@ -147,15 +159,7 @@ void Device_InterruptH(int line){
 
     /* for terminal interrupts */
     if(line == TERMINAL){ /* distinguish between read/write cases */
-        if ((deviceRegister->devreg[device_semaphore].t_transm_status & 0x0F) != READY) { /* handle write */
-    		termChecker++; /*we are hitting this point which is correct because we are writing, but we never back out of this point, or write anymore than the P */
-            status = deviceRegister->devreg[device_semaphore].t_transm_status;
-            deviceRegister->devreg[device_semaphore].t_transm_command = ACK;
-        }else{ /* handle read */
-        	termChecker--;
-            status = deviceRegister->devreg[device_semaphore].t_recv_status;
-            deviceRegister->devreg[device_semaphore].t_recv_command = ACK;
-        }
+        status = terminal_interruptH(&device_semaphore);
     }else{
     	termChecker = 69420;
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
@@ -173,13 +177,34 @@ void Device_InterruptH(int line){
             softBlockCount--;
         } /* end inner IF */
     }else{
-        semD[device_semaphore] = status;
+        device_status[device_semaphore] = status;
     } /* end outer IF */
+
     /* if no process is running, call the scheduler to set the next process */
     if(currentProc == NULL){
-        scheduler();
+        Context_Switch(currentProc);
     }
 }/* end Device_InterruptH */
+
+/*                                          Terminal Interrupt Handler                                               */
+
+HIDDEN int terminal_interruptH(int *devSem){
+    volatile devregarea_t *deviceRegister;
+    unsigned int status;
+    deviceRegister = (devregarea_t *) RAMBASEADDR;
+    if ((deviceRegister->devreg[*devSem].t_transm_status & 0x0F) != READY) { /* handle write */
+        termChecker++; /*we are hitting this point which is correct because we are writing, but we never back out of this point, or write anymore than the P */
+        status = deviceRegister->devreg[*devSem].t_transm_status;
+        deviceRegister->devreg[*devSem].t_transm_command = ACK;
+    }else{ /* handle read */
+        termChecker--;
+        status = deviceRegister->devreg[*devSem].t_recv_status;
+        deviceRegister->devreg[*devSem].t_recv_command = ACK;
+        *devSem = *devSem + DEVPERINT;
+    }
+    return(status);
+}
+
 
 /*                                              HELPER FUNCTIONS                                                    */
 
