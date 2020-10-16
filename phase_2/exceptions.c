@@ -99,7 +99,7 @@ void sysHandler(){
 			devNum = devNum + DEVPERINT;
 		semD[devNum]--;
 		if(semD[devNum] >= 0){
-			currentProc->p_s.s_v0 = device_status[devNum];
+			/*currentProc->p_s.s_v0 = device_status[devNum]; */
 			Context_Switch(currentProc);
 		}
 		softBlockCount++;

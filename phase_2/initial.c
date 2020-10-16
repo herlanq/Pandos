@@ -99,7 +99,8 @@ void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     int eReason;
     state_PTR oldState = (state_PTR) BIOSDATAPAGE;
-    Copy_Paste(oldState, &currentProc->p_s);
+    if(currentProc != NULL)
+        Copy_Paste(oldState, &currentProc->p_s);
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
     exception_check = eReason;
         if(eReason == IOINTERRUPT){
