@@ -27,6 +27,7 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
+extern int exception_check;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
 
@@ -178,6 +179,7 @@ void Device_InterruptH(int line){
  * and write them into the new state(pasted state) */
 void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     int i;
+    exception_check = currentProc->p_s.s_a0;
     for (i = 0; i < STATEREGNUM; i++){
         pasted_state->s_reg[i] = copied_state->s_reg[i];
     }
