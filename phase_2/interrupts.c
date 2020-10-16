@@ -28,6 +28,8 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 extern int exception_check;
+int termChecker;
+int devcheck;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
 
@@ -106,6 +108,7 @@ void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
     /* Addressing */
+    /*currentProc->p_s.s_v0 = device_status[devNum]; this line was in our exceptions for SYS5, removed by mikey. */
     deviceRegister = (devregarea_t *) RAMBASEADDR;
     bitMAP = deviceRegister->interrupt_dev[line-DISK];
     int device_number; /* interrupt device number */
@@ -113,7 +116,7 @@ void Device_InterruptH(int line){
     unsigned int status; /* status of the interrupting device */
     pcb_PTR proc;
 
-    if((bitMAP & DEV0) != 0){
+    if((bitMAP & DEV0) != 0){ /*possibly hitting this function logic every time? maybe check the bitMap logic with the constants */
         device_number = 0;
     }
     if((bitMAP & CLOCK1) != 0){
@@ -139,17 +142,22 @@ void Device_InterruptH(int line){
     }
     /* get device semaphore */
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
+    devcheck = 47;
+    devcheck = device_number; /*I put this down here to show that we are never setting device number to any value. it remains zero. */
 
     /* for terminal interrupts */
     if(line == TERMINAL){ /* distinguish between read/write cases */
         if ((deviceRegister->devreg[device_semaphore].t_transm_status & 0x0F) != READY) { /* handle write */
+    		termChecker++; /*we are hitting this point which is correct because we are writing, but we never back out of this point, or write anymore than the P */
             status = deviceRegister->devreg[device_semaphore].t_transm_status;
             deviceRegister->devreg[device_semaphore].t_transm_command = ACK;
         }else{ /* handle read */
+        	termChecker--;
             status = deviceRegister->devreg[device_semaphore].t_recv_status;
             deviceRegister->devreg[device_semaphore].t_recv_command = ACK;
         }
     }else{
+    	termChecker = 69420;
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
