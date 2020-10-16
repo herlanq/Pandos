@@ -30,6 +30,7 @@ cpu_t start_clock;
 cpu_t sliceCNT;
 unsigned int device_status[SEMNUM-1]; /* save device state area */
 int semD[SEMNUM]; /* 49 Semaphore in the list */
+int exception_check;
 #define CLOCKSEM semD[SEMNUM-1]
 
 
@@ -73,7 +74,7 @@ int main(){
     pcb_PTR proc = allocPcb();
     if(proc != NULL) {
         processCount = processCount + 1;
-        memaddr ramtop = RAMBASEADDR + RAMBASESIZE;
+        memaddr ramtop = *(int*)RAMBASEADDR + *(int*)RAMBASESIZE;
         proc->p_s.s_sp = (memaddr) ramtop;
         proc->p_s.s_pc = (memaddr) test;
         proc->p_s.s_t9 = (memaddr) test;
@@ -97,8 +98,10 @@ int main(){
 void genExceptionHandler(){
 /*turning off the bits we don't need, and then shifting them over to make a comparison */
     int eReason;
-    state_PTR oldState = (state_PTR) BIOSDATAPAGE;
+    state_PTR oldState = (memaddr) BIOSDATAPAGE;
+    Copy_Paste(oldState, &currentProc->p_s);
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
+    exception_check = eReason;
         if(eReason == IOINTERRUPT){
             InterruptHandler();
         }

@@ -26,6 +26,8 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
+extern int exception_check;
+extern unsigned int device_status[SEMNUM-1];
 
 HIDDEN void blocker(int devNum);
 HIDDEN void PassUpOrDie(int Excepttrigger);
@@ -34,6 +36,7 @@ HIDDEN void PassUpOrDie(int Excepttrigger);
 
 void sysHandler(){
 	currentProc->p_s.s_pc += 4;
+	exception_check = currentProc->p_s.s_a0;
 	if(currentProc->p_s.s_a0 == 1){ /*situation of create process*/
 		pcb_PTR newPcb = allocPcb();
 		if(newPcb == NULL){
@@ -71,8 +74,9 @@ void sysHandler(){
 			STCK(stop_clock);
 			currentProc->p_time = currentProc->p_time + (stop_clock - start_clock);
 			insertBlocked(mutex, currentProc);
+			scheduler();
 		}
-		scheduler();
+		Context_Switch(currentProc);
 
 		
 	}
@@ -84,7 +88,7 @@ void sysHandler(){
 			pcb_PTR temp = removeBlocked(mutex);
 			insertProcQ(&readyQue, temp);
 		}
-		scheduler();
+		Context_Switch(currentProc);
 		
 	}
 	else if(currentProc->p_s.s_a0 == 5) /*I/O situation*/
@@ -95,10 +99,11 @@ void sysHandler(){
 			devNum = devNum + DEVPERINT;
 		semD[devNum]--;
 		if(semD[devNum] >= 0){
-			scheduler();
+			currentProc->p_s.s_v0 = device_status[devNum];
+			Context_Switch(currentProc);
 		}
 		softBlockCount++;
-		blocker(devNum);
+		blocker(&(semD[devNum]));
 	}
 	else if(currentProc->p_s.s_a0 == 6) /*get CPU time situation */
 	{
@@ -149,13 +154,14 @@ void PassUpOrDie(int Excepttrigger){
 	support_t* supportStruct = currentProc->p_supportStruct;
 	context_t context;
 	context = currentProc->p_supportStruct->sup_exceptContext[Excepttrigger];
-	if(supportStruct == NULL)
+	if(supportStruct != NULL)
 	{
-		SYSCALL(TERMINATETHREAD, 0, 0, 0);
-		scheduler();
+		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
+		LDCXT(context.c_stackPtr, context.c_status, context.c_pc);
 	}
-	Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
-	LDCXT(context.c_stackPtr, context.c_status, context.c_pc);
+	SYSCALL(TERMINATETHREAD, 0, 0, 0);
+	scheduler();
+	
 }
 
 void blocker(int devNum){
