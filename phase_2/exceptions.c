@@ -103,7 +103,7 @@ void sysHandler(){
 			Context_Switch(currentProc);
 		}
 		softBlockCount++;
-		blocker(&(semD[devNum]));
+		blocker(semD[devNum]);
 	}
 	else if(currentProc->p_s.s_a0 == 6) /*get CPU time situation */
 	{
