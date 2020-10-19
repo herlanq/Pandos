@@ -28,11 +28,18 @@ extern int semD[SEMNUM];
 extern cpu_t start_clock;
 extern int exception_check;
 extern unsigned int device_status[SEMNUM-1];
+int aflag1;
+int aflag11;
 
 HIDDEN void blocker(int devNum);
 HIDDEN void PassUpOrDie(int Excepttrigger);
 
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
+
+void debugE(int a, int b, int c, int d){
+	int i = 47;
+	i++;
+}
 
 void sysHandler(){
 	currentProc->p_s.s_pc += 4;
@@ -102,7 +109,9 @@ void sysHandler(){
 			Context_Switch(currentProc);
 		}
 		softBlockCount++;
-		blocker(semD[devNum]);
+		aflag1 = devNum;
+		aflag11 = &(semD[devNum]);
+		blocker(devNum);
 	}
 	else if(currentProc->p_s.s_a0 == 6) /*get CPU time situation */
 	{
@@ -166,8 +175,10 @@ void PassUpOrDie(int Excepttrigger){
 void blocker(int devNum){
 	cpu_t TOD_stop;
 	STCK(TOD_stop);
+	int b;
 	currentProc->p_time = currentProc->p_time + (TOD_stop - start_clock);
-	insertBlocked(&semD[devNum], currentProc);
+	b = insertBlocked(&semD[devNum], currentProc);
+	debugE(devNum, b, semD[devNum], 0);
 	currentProc = NULL;
 	scheduler();
 }

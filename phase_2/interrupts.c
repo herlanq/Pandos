@@ -31,9 +31,17 @@ extern int exception_check;
 extern unsigned int device_status[SEMNUM-1];
 int termChecker;
 int devcheck;
+int aflag2;
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
 HIDDEN int terminal_interruptH(int *devSem);
+
+void debug(int a, int b, int c, int d){
+	int i = 42;
+	i++;
+
+	
+}
 
 /* Function that determines the highest priority interrupt and
  * gives control the to scheduler.
@@ -128,7 +136,7 @@ void Device_InterruptH(int line){
     int device_number; /* interrupt device number */
     int device_semaphore; /* interrupt device semaphore */
     unsigned int status; /* register status of the interrupting device */
-    pcb_PTR proc;
+    pcb_PTR proc2;
 
     if((bitMAP & DEV0) != 0){ /*possibly hitting this function logic every time? maybe check the bitMap logic with the constants */
         device_number = 0;
@@ -161,17 +169,21 @@ void Device_InterruptH(int line){
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
     }
     /* V operation on the device semaphore */
+    aflag2 = device_semaphore;
     semD[device_semaphore] = semD[device_semaphore] + 1;
 
     /* wait for i/o */
     if(semD[device_semaphore] <= 0){
-        proc = removeBlocked(&(semD[device_semaphore]));
-        if(proc != NULL){
+    	aflag2 = &(semD[device_semaphore]);
+    	debug((int)proc2,device_semaphore,semD[device_semaphore],0);
+        proc2 = removeBlocked(&(semD[device_semaphore]));
+        debug((int)proc2,0,0,0);
+        if(proc2 != NULL){
         	devcheck = 9;
-            proc->p_s.s_v0 = status; /* save status */
-            insertProcQ(&readyQue, proc);
+            proc2->p_s.s_v0 = status; /* save status */
+            insertProcQ(&readyQue, proc2);
             softBlockCount = softBlockCount - 1; /* update SBC*/
-        } /* end inner IF */
+        }  /* end inner IF */
     }else{
         device_status[device_semaphore] = status; /* store device status */
     } /* end outer IF */
@@ -220,6 +232,8 @@ void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     pasted_state->s_pc = copied_state->s_pc;
     pasted_state->s_cause = copied_state->s_cause;
 }
+
+
 
 
 
