@@ -28,7 +28,6 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 extern int exception_check;
-extern unsigned int device_status[SEMNUM-1];
 int termChecker;
 int devcheck;
 int aflag2;
@@ -127,7 +126,7 @@ void InterruptHandler(){
 
 /* Interrupt handler for peripheral devices.
  * V's the correct device semaphore and stores the device data. */
-void Device_InterruptH(int line){
+HIDDEN void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
     /* Addressing */
@@ -135,7 +134,7 @@ void Device_InterruptH(int line){
     bitMAP = deviceRegister->interrupt_dev[line-DISK];
     int device_number; /* interrupt device number */
     int device_semaphore; /* interrupt device semaphore */
-    unsigned int status; /* register status of the interrupting device */
+    unsigned int stat2; /* register status of the interrupting device */
     pcb_PTR proc2;
 
     if((bitMAP & DEV0) != 0){ /*possibly hitting this function logic every time? maybe check the bitMap logic with the constants */
@@ -157,33 +156,30 @@ void Device_InterruptH(int line){
     }
     /* get device semaphore */
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
-    devcheck = 47;
-    devcheck = device_number; /*I put this down here to show that we are never setting device number to any value. it remains zero. */
 
     /* For terminal interrupts */
     if(line == TERMINAL){
-        status = terminal_interruptH(device_semaphore); /* call function for handling terminal interrupts */
+        stat2 = terminal_interruptH(device_semaphore); /* call function for handling terminal interrupts */
+        debug(7, stat2, device_semaphore, device_number);
     }else{
-        status = ((deviceRegister->devreg[device_semaphore]).d_status);
+        stat2 = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
     }
     /* V operation on the device semaphore */
-    aflag2 = device_semaphore;
     semD[device_semaphore] = semD[device_semaphore] + 1;
 
     /* wait for i/o */
     if(semD[device_semaphore] <= 0){
-    	aflag2 = &(semD[device_semaphore]);
         proc2 = removeBlocked(&(semD[device_semaphore]));
         if(proc2 != NULL){
         	devcheck = 9;
-            proc2->p_s.s_v0 = status; /* save status */
+            proc2->p_s.s_v0 = stat2; /* save status */
             insertProcQ(&readyQue, proc2);
             softBlockCount = softBlockCount - 1; /* update SBC*/
         }  /* end inner IF */
     }else{
-        device_status[device_semaphore] = status; /* store device status */
+        deviceRegister->devreg[device_semaphore].d_status = stat2; /* store device status */
     } /* end outer IF */
 
     /* if no process is running, call the scheduler to set the next process */
