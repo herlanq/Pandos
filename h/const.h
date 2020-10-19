@@ -46,6 +46,7 @@
 
 #define DEVINTNUM		  5		  /* interrupt lines used by devices */
 #define DEVPERINT		  8		  /* devices per interrupt line */
+#define DEVICECNT         (DEVPERINT * DEVINTNUM)
 #define DEVREGLEN		  4		  /* device register field length in bytes, and regs per dev */	
 #define DEVREGSIZE	  16 		/* device register size in bytes */
 
@@ -69,13 +70,13 @@
 #define TERMINAL 7
 
 #define DEV0 0x00000001
-#define CLOCK1 0x00000002
-#define CLOCK2 0x00000004
-#define DISKDEVICE 0x00000008
-#define FLASHDEVICE 0x00000010
-#define NETWORKDEVICE 0x00000020
-#define PRINTERDEVICE 0x00000040
-#define TERMINALDEVICE 0x00000080
+#define DEV1 0x00000002
+#define DEV2 0x00000004
+#define DEV3 0x00000008
+#define DEV4 0x00000010
+#define DEV5 0x00000020
+#define DEV6 0x00000040
+#define DEV7 0x00000080
 
 #define PLTINT 0x00000200 /* clock 1 interrupt */
 #define TIMERINT 0x00000400 /* clock 2 interrupt */

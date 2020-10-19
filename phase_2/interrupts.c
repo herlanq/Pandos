@@ -52,7 +52,9 @@ void InterruptHandler(){
         if(currentProc != NULL){
             /* compute time of the running process, move the processor state, call on the next process */
             currentProc->p_time = (currentProc->p_time) + (stop_clock - start_clock);
+            /* store processor state */
             Copy_Paste((state_PTR) BIOSDATAPAGE, &(currentProc->p_s));
+            /* add process back on to the ready que and switch to another process */
             insertProcQ(&readyQue, currentProc);
             Context_Switch(currentProc); /* not sure if this is correct? It has to switch to a new proc */ /* switched to context switch */
             /* else: no current proc */
@@ -65,6 +67,7 @@ void InterruptHandler(){
      * Awaken all of the processes that are waiting on the pseudo clock */
     if((((state_PTR)BIOSDATAPAGE)->s_cause & TIMERINT) != 0){
         pcb_PTR proc;
+        /* ACK */
         LDIT(PSUEDOCLOCKTIME);
         proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         while(proc !=NULL){
@@ -72,6 +75,7 @@ void InterruptHandler(){
             softBlockCount--;
             proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         }
+        /* set the semaphore to = 0 */
         semD[SEMNUM-1] = 0; /*CLOCKSEM = semD[SEMNUM-1]*/
         if(currentProc == NULL){
             Context_Switch(currentProc);
@@ -101,11 +105,10 @@ void InterruptHandler(){
         /* terminal dev is on */
         Device_InterruptH(TERMINAL);
     }
-
+    /* assign run time before the interrupt to the current process
+     * and return control to the current running process */
     if(currentProc != NULL){
-        /* assign run time before the interrupt to the current process
-         * and return control to the current running process */
-        currentProc->p_time = currentProc->p_time + (stop_clock + start_clock);
+        currentProc->p_time = currentProc->p_time + (stop_clock - start_clock);
         Copy_Paste(((state_PTR)BIOSDATAPAGE), &(currentProc->p_s));
         Ready_Timer(currentProc, time_left);
         /* else: no current proc */
@@ -120,36 +123,28 @@ void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
     /* Addressing */
-    /*currentProc->p_s.s_v0 = device_status[devNum]; this line was in our exceptions for SYS5, removed by mikey. */
     deviceRegister = (devregarea_t *) RAMBASEADDR;
     bitMAP = deviceRegister->interrupt_dev[line-DISK];
     int device_number; /* interrupt device number */
     int device_semaphore; /* interrupt device semaphore */
-    unsigned int status; /* status of the interrupting device */
+    unsigned int status; /* register status of the interrupting device */
     pcb_PTR proc;
 
     if((bitMAP & DEV0) != 0){ /*possibly hitting this function logic every time? maybe check the bitMap logic with the constants */
         device_number = 0;
-    }
-    if((bitMAP & CLOCK1) != 0){
+    }else if((bitMAP & DEV1) != 0){
         device_number = 1;
-    }
-    if((bitMAP & CLOCK2) != 0){
+    }else if((bitMAP & DEV2) != 0){
         device_number = 2;
-    }
-    if((bitMAP & DISKDEVICE) != 0){
+    }else if((bitMAP & DEV3) != 0){
         device_number = 3;
-    }
-    if((bitMAP & FLASHDEVICE) != 0){
+    }else if((bitMAP & DEV4) != 0){
         device_number = 4;
-    }
-    if((bitMAP & NETWORKDEVICE) != 0){
+    }else if((bitMAP & DEV5) != 0){
         device_number = 5;
-    }
-    if((bitMAP & PRINTERDEVICE) != 0){
+    }else if((bitMAP & DEV6) != 0){
         device_number = 6;
-    }
-    if((bitMAP & TERMINALDEVICE) != 0){
+    }else{
         device_number = 7;
     }
     /* get device semaphore */
@@ -157,9 +152,9 @@ void Device_InterruptH(int line){
     devcheck = 47;
     devcheck = device_number; /*I put this down here to show that we are never setting device number to any value. it remains zero. */
 
-    /* for terminal interrupts */
-    if(line == TERMINAL){ /* distinguish between read/write cases */
-        status = terminal_interruptH(&device_semaphore);
+    /* For terminal interrupts */
+    if(line == TERMINAL){
+        status = terminal_interruptH(&device_semaphore); /* call function for handling terminal interrupts */
     }else{
     	termChecker = 69420;
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
@@ -168,16 +163,17 @@ void Device_InterruptH(int line){
     }
     /* V operation on the device semaphore */
     semD[device_semaphore] = semD[device_semaphore] + 1;
+
     /* wait for i/o */
     if(semD[device_semaphore] <= 0){
         proc = removeBlocked(&(semD[device_semaphore]));
         if(proc != NULL){
-            proc->p_s.s_v0 = status; /* save the process status */
+            proc->p_s.s_v0 = status; /* save status */
             insertProcQ(&readyQue, proc);
-            softBlockCount--;
+            softBlockCount = softBlockCount - 1; /* update SBC*/
         } /* end inner IF */
     }else{
-        device_status[device_semaphore] = status;
+        device_status[device_semaphore] = status; /* store device status */
     } /* end outer IF */
 
     /* if no process is running, call the scheduler to set the next process */
@@ -192,6 +188,7 @@ HIDDEN int terminal_interruptH(int *devSem){
     volatile devregarea_t *deviceRegister;
     unsigned int status;
     deviceRegister = (devregarea_t *) RAMBASEADDR;
+    /* terminal write case takes priority over terminal read case */
     if ((deviceRegister->devreg[*devSem].t_transm_status & 0x0F) != READY) { /* handle write */
         termChecker++; /*we are hitting this point which is correct because we are writing, but we never back out of this point, or write anymore than the P */
         status = deviceRegister->devreg[*devSem].t_transm_status;
@@ -200,6 +197,7 @@ HIDDEN int terminal_interruptH(int *devSem){
         termChecker--;
         status = deviceRegister->devreg[*devSem].t_recv_status;
         deviceRegister->devreg[*devSem].t_recv_command = ACK;
+        /* update dev sema4 for the terminal read situation */
         *devSem = *devSem + DEVPERINT;
     }
     return(status);
