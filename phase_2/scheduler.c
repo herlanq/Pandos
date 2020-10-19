@@ -25,6 +25,7 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern cpu_t start_clock;
+int flag;
 
 /* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.
  */
@@ -38,10 +39,7 @@ void scheduler(){
     if(proc != NULL){ /* if removed process is not null*/
         Ready_Timer(proc, QUANTUM);
     }
-   /*if(proc == NULL) {
-        currentProc = NULL;
-   }
-    */
+   
 
     /* check for remaining processes */
     if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
@@ -59,7 +57,9 @@ void scheduler(){
 
                 /* have processes that are blocked, need to wait with interrupts and exceptions enabled
                  * "Twiddling Thumbs" */
-                setSTATUS(ALLOFF | IECON | IMON | TEBITON);
+                unsigned int sendingStatus = (ALLOFF | IECON | IMON | TEBITON);
+                setSTATUS(sendingStatus);
+                flag = 1;
                 WAIT();
             }
         }

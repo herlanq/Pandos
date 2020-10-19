@@ -93,6 +93,7 @@ void sysHandler(){
 	}
 	else if(currentProc->p_s.s_a0 == 5) /*I/O situation*/
 	{
+		exception_check = 6969420;
 		int lineNum = currentProc->p_s.s_a1;
 		int devNum = (currentProc->p_s.s_a2) + ((lineNum-3)*DEVPERINT);
 		if((lineNum == TERMINT) & (currentProc->p_s.s_a3 == 1))

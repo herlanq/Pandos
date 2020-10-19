@@ -147,7 +147,7 @@
 #define IMON    0x0000FF00      /* Interrupt Masked */
 #define IEPON	0x00000004      /* Turn interrupts ON*/
 #define IECON	0x00000001      /* Turn interrupts current ON */
-#define TEBITON	0x08000000
+#define TEBITON	0x08000000		/*Timer enabled bit ON */
 #define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
 
 /* Macro to load the Interval Timer */
