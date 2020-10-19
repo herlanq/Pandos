@@ -156,7 +156,6 @@ void Device_InterruptH(int line){
     if(line == TERMINAL){
         status = terminal_interruptH(&device_semaphore); /* call function for handling terminal interrupts */
     }else{
-    	termChecker = 69420;
         status = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
@@ -168,6 +167,7 @@ void Device_InterruptH(int line){
     if(semD[device_semaphore] <= 0){
         proc = removeBlocked(&(semD[device_semaphore]));
         if(proc != NULL){
+        	devcheck = 9;
             proc->p_s.s_v0 = status; /* save status */
             insertProcQ(&readyQue, proc);
             softBlockCount = softBlockCount - 1; /* update SBC*/
@@ -178,7 +178,7 @@ void Device_InterruptH(int line){
 
     /* if no process is running, call the scheduler to set the next process */
     if(currentProc == NULL){
-        Context_Switch(currentProc);
+        scheduler();
     }
 }/* end Device_InterruptH */
 
