@@ -39,13 +39,6 @@ int aflag2;
 HIDDEN void Device_InterruptH(int line);
 HIDDEN int terminal_interruptH(int *devSem);
 
-/* debug function */
-void debug(int a, int b, int c, int d){
-	int i = 42;
-	i++;
-
-	
-}
 
 /* Function that determines the highest priority interrupt and
  * gives control the to scheduler.
@@ -55,7 +48,6 @@ void InterruptHandler(){
     cpu_t time_left;
     time_left = getTIMER();
     STCK(stop_clock);
-    /*state_PTR int_cause = ((state_PTR) BIOSDATAPAGE);*/
 
     /* BEGIN INTERRUPT HANDLING */
 
@@ -68,7 +60,7 @@ void InterruptHandler(){
             Copy_Paste((state_PTR) BIOSDATAPAGE, &(currentProc->p_s));
             /* add process back on to the ready que and switch to another process */
             insertProcQ(&readyQue, currentProc);
-            Context_Switch(currentProc); /* not sure if this is correct? It has to switch to a new proc */ /* switched to context switch */
+            Context_Switch(currentProc);
             /* else: no current proc */
         }else{
             PANIC();
@@ -117,6 +109,7 @@ void InterruptHandler(){
         /* terminal dev is on */
         Device_InterruptH(TERMINAL);
     }
+
     /* assign run time before the interrupt to the current process
      * and return control to the current running process */
     if(currentProc != NULL){
@@ -134,9 +127,11 @@ void InterruptHandler(){
 HIDDEN void Device_InterruptH(int line){
     unsigned int bitMAP;
     volatile devregarea_t *deviceRegister;
+
     /* Addressing */
     deviceRegister = (devregarea_t *) RAMBASEADDR;
     bitMAP = deviceRegister->interrupt_dev[line-DISK];
+
     int device_number; /* interrupt device number */
     int device_semaphore; /* interrupt device semaphore */
     unsigned int intstatus; /* register status of the interrupting device */
@@ -159,18 +154,21 @@ HIDDEN void Device_InterruptH(int line){
     }else{
         device_number = 7;
     }
+
     /* get device semaphore */
     device_semaphore = ((line - DISK) * DEVPERINT) + device_number;
 
     /* For terminal interrupts */
     if(line == TERMINAL){
         intstatus = terminal_interruptH(&device_semaphore); /* call function for handling terminal interrupts */
-        debug(7, intstatus, device_semaphore, device_number);
+
+    /* if not a terminal device interrupt */
     }else{
         intstatus = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
     }
+
     /* V operation on the device semaphore */
     semD[device_semaphore] = semD[device_semaphore] + 1;
 
@@ -178,7 +176,7 @@ HIDDEN void Device_InterruptH(int line){
     if(semD[device_semaphore] <= 0){
         p = removeBlocked(&(semD[device_semaphore]));
         if(p != NULL){
-        	devcheck = 9;
+        	devcheck = 9; /* debug line */
             p->p_s.s_v0 = intstatus; /* save status */
             insertProcQ(&readyQue, p);
             softBlockCount = softBlockCount - 1; /* update SBC*/
