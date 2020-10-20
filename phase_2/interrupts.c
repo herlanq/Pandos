@@ -27,14 +27,19 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
+/* debug globals */
 extern int exception_check;
+unsigned int termcommand;
+unsigned int termstat;
 int termChecker;
 int devcheck;
 int aflag2;
+
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
-HIDDEN int terminal_interruptH(int devSem);
+HIDDEN int terminal_interruptH(int *devSem);
 
+/* debug function */
 void debug(int a, int b, int c, int d){
 	int i = 42;
 	i++;
@@ -134,10 +139,10 @@ HIDDEN void Device_InterruptH(int line){
     bitMAP = deviceRegister->interrupt_dev[line-DISK];
     int device_number; /* interrupt device number */
     int device_semaphore; /* interrupt device semaphore */
-    unsigned int stat2; /* register status of the interrupting device */
-    pcb_PTR proc2;
+    unsigned int intstatus; /* register status of the interrupting device */
+    pcb_PTR p;
 
-    if((bitMAP & DEV0) != 0){ /*possibly hitting this function logic every time? maybe check the bitMap logic with the constants */
+    if((bitMAP & DEV0) != 0){
         device_number = 0;
     }else if((bitMAP & DEV1) != 0){
         device_number = 1;
@@ -159,10 +164,10 @@ HIDDEN void Device_InterruptH(int line){
 
     /* For terminal interrupts */
     if(line == TERMINAL){
-        stat2 = terminal_interruptH(device_semaphore); /* call function for handling terminal interrupts */
-        debug(7, stat2, device_semaphore, device_number);
+        intstatus = terminal_interruptH(&device_semaphore); /* call function for handling terminal interrupts */
+        debug(7, intstatus, device_semaphore, device_number);
     }else{
-        stat2 = ((deviceRegister->devreg[device_semaphore]).d_status);
+        intstatus = ((deviceRegister->devreg[device_semaphore]).d_status);
         /* ACK the interrupt */
         (deviceRegister->devreg[device_semaphore]).d_command = ACK;
     }
@@ -171,15 +176,15 @@ HIDDEN void Device_InterruptH(int line){
 
     /* wait for i/o */
     if(semD[device_semaphore] <= 0){
-        proc2 = removeBlocked(&(semD[device_semaphore]));
-        if(proc2 != NULL){
+        p = removeBlocked(&(semD[device_semaphore]));
+        if(p != NULL){
         	devcheck = 9;
-            proc2->p_s.s_v0 = stat2; /* save status */
-            insertProcQ(&readyQue, proc2);
+            p->p_s.s_v0 = intstatus; /* save status */
+            insertProcQ(&readyQue, p);
             softBlockCount = softBlockCount - 1; /* update SBC*/
         }  /* end inner IF */
     }else{
-        deviceRegister->devreg[device_semaphore].d_status = stat2; /* store device status */
+        deviceRegister->devreg[device_semaphore].d_status = intstatus; /* store device status */
     } /* end outer IF */
 
     /* if no process is running, call the scheduler to set the next process */
@@ -190,25 +195,22 @@ HIDDEN void Device_InterruptH(int line){
 
 /*                                          Terminal Interrupt Handler                                               */
 
-HIDDEN int terminal_interruptH(int devSem){
+HIDDEN int terminal_interruptH(int *devSem){
     volatile devregarea_t *deviceRegister;
     unsigned int status;
     deviceRegister = (devregarea_t *) RAMBASEADDR;
-    int a = deviceRegister->devreg[devSem].t_transm_status;
-    debug(1,a,termChecker,0);
+
     /* terminal write case takes priority over terminal read case */
-    if ((deviceRegister->devreg[devSem].t_transm_status & 0x0F) != READY) { /* handle write */
-        termChecker++; /*we are hitting this point which is correct because we are writing, but we never back out of this point, or write anymore than the P */
-        status = deviceRegister->devreg[devSem].t_transm_status;
-        deviceRegister->devreg[devSem].t_transm_command = ACK;
-    }else{ /* handle read */
-        termChecker--;
-        status = deviceRegister->devreg[devSem].t_recv_status;
-        deviceRegister->devreg[devSem].t_recv_command = ACK;
+    if ((deviceRegister->devreg[(*devSem)].t_transm_status & 0x0F) != READY) { /* handle write casse */
+        status = deviceRegister->devreg[(*devSem)].t_transm_status;
+        deviceRegister->devreg[(*devSem)].t_transm_command = ACK;
+
+    }else{ /* handle read case if not write case */
+        status = deviceRegister->devreg[(*devSem)].t_recv_status;
+        deviceRegister->devreg[(*devSem)].t_recv_command = ACK;
         /* update dev sema4 for the terminal read situation */
-        devSem = devSem + DEVPERINT;
+        (*devSem) = (*devSem) + DEVPERINT;
     }
-    debug(10,status,termChecker,0);
     return(status);
 }
 
