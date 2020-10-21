@@ -109,7 +109,7 @@ void sysHandler(){
 	/* I/O situation */
 	else if(currentProc->p_s.s_a0 == 5){
 		int lineNum = currentProc->p_s.s_a1;
-		int devNum = (currentProc->p_s.s_a2);
+		int devNum = currentProc->p_s.s_a2;
 		/* get device sema4 using the device number */
 		devNum = devNum + ((lineNum - DISK) * DEVPERINT);
 

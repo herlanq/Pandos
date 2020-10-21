@@ -149,6 +149,7 @@
 #define IECON	0x00000001      /* Turn interrupts current ON */
 #define TEBITON	0x08000000		/*Timer enabled bit ON */
 #define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
+#define CLEARCAUSE 0xFFFFFF00
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
