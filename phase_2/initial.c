@@ -19,6 +19,7 @@
 #include "../h/scheduler.h"
 
 #include "../h/libumps.h"
+
 /* Internal and External Function Declaration*/
 extern void test(); /* declares test() from the p2test file */
 HIDDEN void genExceptionHandler();
@@ -50,9 +51,9 @@ int main(){
     /* initializing the pass up vector */
     passupvector_t *passupvector = (passupvector_t*) PASSUPVECTOR;
     passupvector->tlb_refll_handler = (memaddr) uTLB_RefillHandler;
-    passupvector->tlb_refll_stackPtr = (memaddr) PASSUPVECTOR + 0x04;
+    passupvector->tlb_refll_stackPtr = (memaddr) 0x20001000;
     passupvector->execption_handler = (memaddr) genExceptionHandler;
-    passupvector->exception_stackPtr = (memaddr) PASSUPVECTOR + 0x04;
+    passupvector->exception_stackPtr = (memaddr) 0x20001000;
 
     /* Init pcb and asl */
     initPcbs();
