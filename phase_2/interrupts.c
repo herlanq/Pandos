@@ -27,6 +27,7 @@ extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
+
 /* debug globals */
 extern int exception_check;
 unsigned int termcommand;
@@ -46,8 +47,8 @@ HIDDEN int terminal_interruptH(int *devSem);
 void InterruptHandler(){
     cpu_t stop_clock;
     cpu_t time_left;
-    time_left = getTIMER();
     STCK(stop_clock);
+    time_left = getTIMER();
 
     /* BEGIN INTERRUPT HANDLING */
 
@@ -71,7 +72,6 @@ void InterruptHandler(){
      * Awaken all of the processes that are waiting on the pseudo clock */
     if((((state_PTR)BIOSDATAPAGE)->s_cause & TIMERINT) != 0){
         pcb_PTR proc;
-        /* ACK */
         LDIT(PSUEDOCLOCKTIME);
         proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         while(proc !=NULL){
@@ -82,7 +82,7 @@ void InterruptHandler(){
         /* set the semaphore to = 0 */
         semD[SEMNUM-1] = 0; /*CLOCKSEM = semD[SEMNUM-1]*/
         if(currentProc == NULL){
-            Context_Switch(currentProc);
+            scheduler();
         }
     }
 

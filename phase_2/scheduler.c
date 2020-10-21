@@ -42,15 +42,12 @@ void scheduler(){
    
 
     /* check for remaining processes */
-    if(processCount == 0){ /* if procCNT is equal to 0, everything finished running properly */
+    /* if procCNT is equal to 0, everything finished running properly, no processes to be run */
+    if(processCount == 0){
         HALT();
-    }else{
-        /* if there are still processes to be run */
+    }else{ /* if there are still processes to be run */
         if (processCount > 0) {
-            if (softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
-                PANIC(); /* 'oh shit' moment */
-            }
-            if (softBlockCount > 0) {
+            if (softBlockCount > 0){
                 currentProc = NULL;
                 /* disable timer by loading it with a large value */
                 setTIMER(MAXTIME);
@@ -62,9 +59,14 @@ void scheduler(){
                 flag = 1;
                 WAIT();
             }
+            /* deadlock */
+            if(softBlockCount == 0){ /* have processes but not on ready queue or blocked queue */
+                PANIC(); /* 'oh shit' moment */
+            }
         }
     }
-}
+} /* end scheduler */
+
 /*                     HELPER FUNCTIONS TO DEAL WITH CONTEXT SWITCHES              */
 
 /* Gives control over the machine to another process */
