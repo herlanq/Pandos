@@ -27,6 +27,12 @@ extern pcb_t *readyQue;
 extern cpu_t start_clock;
 int flag;
 
+void debugS(int a, int b, int c, int d){
+    int i = 231;
+    i++;
+}
+
+
 /* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.
  */
 void scheduler(){
@@ -79,6 +85,7 @@ void Context_Switch(pcb_PTR this_proc){
  * or preps the timer for an old process given a V operation or interrupt.
  * Gives control to the */
 void Ready_Timer(pcb_PTR current_process, cpu_t time){
+    debugS(10, start_clock, time, 0);
     STCK(start_clock);
     /* set amount of time given for the process */
     setTIMER(time);
