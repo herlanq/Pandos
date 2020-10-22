@@ -50,7 +50,7 @@ void sysHandler(){
 		pcb_PTR newPcb = allocPcb();
         support_t *data;
 		data = (support_t*) currentProc->p_s.s_a2;
-		currentProc->p_s.s_v0 = -1;
+		/*currentProc->p_s.s_v0 = -1; this line should only happen if there is not any PCB's left*/
 
 		/* if a new process is created */
 		if(newPcb != NULL) {

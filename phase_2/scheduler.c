@@ -56,7 +56,6 @@ void scheduler(){
                  * "Twiddling Thumbs" */
                 unsigned int sendingStatus = (ALLOFF | IECON | IMON | TEBITON);
                 setSTATUS(sendingStatus);
-                flag = 1;
                 WAIT();
             }
             /* deadlock */
