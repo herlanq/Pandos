@@ -45,6 +45,7 @@ void sysHandler(){
 	currentProc->p_s.s_pc += 4;
 	exception_check = currentProc->p_s.s_a0;
 
+	/*                  SYS 1                */
     /* situation of create process */
 	if(currentProc->p_s.s_a0 == 1){
 		pcb_PTR newPcb = allocPcb();
@@ -68,6 +69,7 @@ void sysHandler(){
 		Context_Switch(currentProc);
 	} /* end create process case */
 
+	/*                  SYS 2                */
 	/* situation to terminate process */
 	else if(currentProc->p_s.s_a0 == 2){
 		while (currentProc->p_child != NULL){
@@ -78,6 +80,7 @@ void sysHandler(){
 		scheduler();
 	} /* end terminate process case */
 
+	/*                  SYS 3                */
 	/* Passeren situation */
 	else if(currentProc->p_s.s_a0 ==3){
 		int *mutex = &currentProc->p_s.s_a1;
@@ -92,6 +95,7 @@ void sysHandler(){
 		Context_Switch(currentProc);
 	} /* end PASSEREN case */
 
+	/*                  SYS 4                */
 	/* Verhogen situation */
 	else if(currentProc->p_s.s_a0 == 4){
 		int *mutex = (int *) &currentProc->p_s.s_a1;
@@ -106,7 +110,8 @@ void sysHandler(){
 		Context_Switch(currentProc);
 	} /* end Verhogen case */
 
-	/* I/O situation */
+	/*                  SYS 5                */
+	/* Wait for I/O situation */
 	else if(currentProc->p_s.s_a0 == 5){
 		int lineNum = currentProc->p_s.s_a1;
 		int devNum = currentProc->p_s.s_a2;
@@ -125,6 +130,7 @@ void sysHandler(){
         }
 	} /* end I/O case */
 
+	/*                  SYS 6                */
 	/* get CPU time situation */
 	else if(currentProc->p_s.s_a0 == 6){
 		cpu_t current_TOD;
@@ -134,6 +140,7 @@ void sysHandler(){
 		Context_Switch(currentProc);
 	} /* end get CPU time case */
 
+	/*                  SYS 7                */
 	/* wait for pseudo clock tick situation*/
 	else if(currentProc->p_s.s_a0 == 7){
 		semD[SEMNUM-1]--;
@@ -144,12 +151,14 @@ void sysHandler(){
 		Context_Switch(currentProc);
 	} /* end wait for clock case */
 
-	/* support pointer situation */
+	/*                  SYS 8                */
+	/* Get support data situation */
 	else if(currentProc->p_s.s_a0 == 8){
 		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		Context_Switch(currentProc);
 	} /* end support pointer case */
 
+    /*                  SYS 9+                */
 	/* If syscall exception is >= 9, call passupordie */
 	if(currentProc->p_s.s_a0 >= 9){
 		PassUpOrDie(GENERALEXCEPT);
@@ -188,6 +197,8 @@ void PassUpOrDie(int Excepttrigger){
 	scheduler();
 }
 
+/* Helper function used to block the current process. It stores off the amount of time that the process was running,
+ * Inserts the current process onto the blocked queue, and calls the scheduler to get the next process */
 HIDDEN void blocker(int *blocking){
 	cpu_t TOD_stop;
 	STCK(TOD_stop);
