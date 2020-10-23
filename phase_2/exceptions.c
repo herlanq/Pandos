@@ -42,16 +42,24 @@ void debugE(int a, int b, int c, int d){
 }
 
 void sysHandler(){
+    state_PTR syscall_state;
+	cpu_t current_time;
+	syscall_state = (state_PTR) BIOSDATAPAGE;
+	exception_check = syscall_state->s_a0;
+	/*exception_check = currentProc->p_s.s_a0;*/
+
+    /* store process state */
+	Copy_Paste(syscall_state, &(currentProc->p_s));
+	/* update PC */
 	currentProc->p_s.s_pc += 4;
-	exception_check = currentProc->p_s.s_a0;
 
 	/*                  SYS 1                */
     /* situation of create process */
-	if(currentProc->p_s.s_a0 == 1){
+	if(exception_check == 1){
 		pcb_PTR newPcb = allocPcb();
         support_t *data;
 		data = (support_t*) currentProc->p_s.s_a2;
-		/*currentProc->p_s.s_v0 = -1; this line should only happen if there is not any PCB's left*/
+		currentProc->p_s.s_v0 = 0;
 
 		/* if a new process is created */
 		if(newPcb != NULL) {
@@ -71,7 +79,7 @@ void sysHandler(){
 
 	/*                  SYS 2                */
 	/* situation to terminate process */
-	else if(currentProc->p_s.s_a0 == 2){
+	else if(exception_check == 2){
 		while (currentProc->p_child != NULL){
 			removeChild(currentProc->p_child);
 		}
@@ -82,22 +90,18 @@ void sysHandler(){
 
 	/*                  SYS 3                */
 	/* Passeren situation */
-	else if(currentProc->p_s.s_a0 ==3){
+	else if(exception_check == 3){
 		int *mutex = &currentProc->p_s.s_a1;
 		mutex--;
 		if(mutex < 0){
-			cpu_t stop_clock;
-			STCK(stop_clock);
-			currentProc->p_time = currentProc->p_time + (stop_clock - start_clock);
-			insertBlocked(mutex, currentProc);
-			scheduler();
+		    blocker(mutex);
 		}
 		Context_Switch(currentProc);
 	} /* end PASSEREN case */
 
 	/*                  SYS 4                */
 	/* Verhogen situation */
-	else if(currentProc->p_s.s_a0 == 4){
+	else if(exception_check == 4){
 		int *mutex = (int *) &currentProc->p_s.s_a1;
         pcb_PTR temp;
         (*mutex)++;
@@ -112,7 +116,7 @@ void sysHandler(){
 
 	/*                  SYS 5                */
 	/* Wait for I/O situation */
-	else if(currentProc->p_s.s_a0 == 5){
+	else if(exception_check == 5){
 		int lineNum = currentProc->p_s.s_a1;
 		int devNum = currentProc->p_s.s_a2;
 		/* get device sema4 using the device number */
@@ -132,17 +136,16 @@ void sysHandler(){
 
 	/*                  SYS 6                */
 	/* get CPU time situation */
-	else if(currentProc->p_s.s_a0 == 6){
-		cpu_t current_TOD;
-		STCK(current_TOD);
-		current_TOD = (current_TOD - start_clock) + currentProc->p_time;
-		currentProc->p_s.s_v0 = current_TOD;
+	else if(exception_check == 6){
+		STCK(current_time);
+		current_time = (current_time - start_clock) + currentProc->p_time;
+		currentProc->p_s.s_v0 = current_time;
 		Context_Switch(currentProc);
 	} /* end get CPU time case */
 
 	/*                  SYS 7                */
 	/* wait for pseudo clock tick situation*/
-	else if(currentProc->p_s.s_a0 == 7){
+	else if(exception_check == 7){
 		semD[SEMNUM-1]--;
 		if(semD[SEMNUM-1] < 0){
 		    softBlockCount++;
@@ -153,14 +156,14 @@ void sysHandler(){
 
 	/*                  SYS 8                */
 	/* Get support data situation */
-	else if(currentProc->p_s.s_a0 == 8){
+	else if(exception_check == 8){
 		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		Context_Switch(currentProc);
 	} /* end support pointer case */
 
     /*                  SYS 9+                */
 	/* If syscall exception is >= 9, call passupordie */
-	if(currentProc->p_s.s_a0 >= 9){
+    else{
 		PassUpOrDie(GENERALEXCEPT);
 	} /* end syscall exception >= 9 case */
 

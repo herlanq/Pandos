@@ -45,7 +45,6 @@ void scheduler(){
     if(proc != NULL){ /* if removed process is not null*/
         Ready_Timer(proc, QUANTUM);
     }
-   
 
     /* check for remaining processes */
     /* if procCNT is equal to 0, everything finished running properly, no processes to be run */
