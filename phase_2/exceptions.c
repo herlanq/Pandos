@@ -90,10 +90,11 @@ void sysHandler(){
 
 	/*                  SYS 3                */
 	/* Passeren situation */
-	else if(exception_check == 3){
-		int *mutex = &currentProc->p_s.s_a1;
-		mutex--;
-		if(mutex < 0){
+	else if(exception_check == 3){ /* changed pointer references throughout: i think that was our issue*/
+		int *mutex;
+		mutex = (int*)currentProc->p_s.s_a1;; /*&currentProc->p_s.s_a1;*/
+        (*mutex) -= 1;
+		if((*mutex) < 0){
 		    blocker(mutex);
 		}
 		Context_Switch(currentProc);
@@ -102,9 +103,10 @@ void sysHandler(){
 	/*                  SYS 4                */
 	/* Verhogen situation */
 	else if(exception_check == 4){
-		int *mutex = (int *) &currentProc->p_s.s_a1;
+		int *mutex;
+		mutex = (int *)currentProc->p_s.s_a1; /*&currentProc->p_s.s_a1;*/
         pcb_PTR temp;
-        (*mutex)++;
+        (*mutex) += 1;
 		if((*mutex) <= 0){
 			temp = removeBlocked(mutex);
 			if(temp != NULL){
