@@ -48,10 +48,13 @@ void sysHandler(){
 
 	syscall_state = (state_PTR) BIOSDATAPAGE;
 	syscall = syscall_state->s_a0;
-	/*exception_check = currentProc->p_s.s_a0;*/
+	int usermode = (currentProc->p_s.s_status & UMON);
 
-	/* check for user mode */
-
+	/* check for user mode
+	 * if syscall > 8, or in user mode, pass up or die */
+	if(syscall >= 1 && syscall <= 8 && usermode != 0){
+	    PassUpOrDie(GENERALEXCEPT);
+	}
 
     /* store process state */
 	Copy_Paste(syscall_state, &(currentProc->p_s));
@@ -85,12 +88,12 @@ void sysHandler(){
 	/*                  SYS 2                */
 	/* situation to terminate process */
 	else if(syscall == 2){
-	     while (currentProc->p_child != NULL){
+	     /*while (currentProc->p_child != NULL){
 			removeChild(currentProc->p_child);
 		}
 		outProcQ(&readyQue, currentProc);
-		freePcb(currentProc);
-	    /* terminate_process(currentProc); */
+		freePcb(currentProc); */
+	    terminate_process(currentProc);
 		scheduler();
 	} /* end terminate process case */
 

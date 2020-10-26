@@ -31,7 +31,6 @@ int softBlockCount; /* Number of processes on the blocked queue */
 pcb_t *currentProc; /* Pointer to current process */
 pcb_t *readyQue; /* pointer to the ready queue */
 cpu_t start_clock;
-cpu_t sliceCNT;
 int semD[SEMNUM]; /* 49 Semaphore in the list, [0 - 48] */
 #define CLOCKSEM semD[SEMNUM-1] /* clock sema4 in the device sema4 list , == semD[48] */
 
