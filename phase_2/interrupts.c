@@ -69,7 +69,7 @@ void InterruptHandler(){
         proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         while(proc !=NULL){
             insertProcQ(&readyQue, proc);
-            softBlockCount--;
+            softBlockCount -= 1;
             proc = removeBlocked(&semD[SEMNUM-1]); /*CLOCKSEM = semD[SEMNUM-1]*/
         }
         /* set the semaphore to = 0 */

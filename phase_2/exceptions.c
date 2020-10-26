@@ -67,7 +67,7 @@ void sysHandler(){
 
 		/* if a new process is created */
 		if(newPcb != NULL) {
-            processCount++;
+            processCount += 1;
             Copy_Paste((state_PTR) currentProc->p_s.s_a1, &(newPcb->p_s));
             newPcb->p_supportStruct = NULL;
             if (data != NULL || data != 0){
@@ -133,7 +133,7 @@ void sysHandler(){
 		if(semD[devNum] >= 0){
 			Context_Switch(currentProc);
 		}else{
-            softBlockCount++;
+            softBlockCount += 1;
             blocker(&(semD[devNum]));
         }
 	} /* end I/O case */
@@ -152,7 +152,7 @@ void sysHandler(){
 	else if(syscall == 7){
         (semD[SEMNUM-1])--;
 		if((semD[SEMNUM-1]) < 0){
-		    softBlockCount++;
+		    softBlockCount +=1 ;
             blocker(&(semD[SEMNUM - 1]));
         }
 		Context_Switch(currentProc);
@@ -228,12 +228,12 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
         if(proc != NULL){
             temp = proc->p_semAdd;
             if(temp >= &semD[0] && temp <= &semD[SEMNUM-1]){ /* update the softblock count */
-                softBlockCount--;
+                softBlockCount -= 1;
             }else{ /* V the semaphore */
                 (*temp)++;
             }
         }
     }
-    processCount--; /* since the process is being terminated, decrement the proc count */
+    processCount -= 1; /* since the process is being terminated, decrement the proc count */
     freePcb(term_proc); /* free up the terminated process's pcb */
 }
