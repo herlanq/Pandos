@@ -199,6 +199,7 @@ void PrgTrapHandler(){
  */
 void PassUpOrDie(int Excepttrigger){
 	if(currentProc->p_supportStruct != NULL){
+		debugE(10, 0,0,0);
 		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
 		LDCXT(currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_stackPtr,
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_status,
