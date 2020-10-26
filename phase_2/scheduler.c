@@ -70,7 +70,7 @@ void scheduler(){
 void Context_Switch(pcb_PTR this_proc){
     currentProc = this_proc;
     /* load state of the current process... switching context */
-    LDST(&(currentProc->p_s));
+    LDST(&(this_proc->p_s));
 
 }
 /* preps the interval timer for a new process a given context switch
