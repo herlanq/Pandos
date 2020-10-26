@@ -98,9 +98,9 @@ void genExceptionHandler(){
     state_PTR oldState = (state_PTR) BIOSDATAPAGE;
 
     /* if the current process != NULL, copy all of its register values and paste them into a new state */
-    if(currentProc != NULL){
+    /* if(currentProc != NULL){
         Copy_Paste(oldState, &currentProc->p_s);
-    }
+    } */
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
         if(eReason == IOINTERRUPT){
             InterruptHandler();

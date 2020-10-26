@@ -216,7 +216,6 @@ HIDDEN void blocker(int *blocking){
 HIDDEN void terminate_process(pcb_PTR term_proc){
     pcb_PTR proc; /* temp proc pointer */
     int *temp; /* temp sema4 pointer */
-    processCount--; /* since the process is being terminated, decrement the proc count */
     while(term_proc->p_child != NULL){
         terminate_process(removeChild(term_proc));
     }
@@ -228,12 +227,13 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
         proc = outBlocked(term_proc);
         if(proc != NULL){
             temp = proc->p_semAdd;
-            if(temp >= &semD[0] && temp <= &semD[SEMNUM-1]){
+            if(temp >= &semD[0] && temp <= &semD[SEMNUM-1]){ /* update the softblock count */
                 softBlockCount--;
-            }else{
+            }else{ /* V the semaphore */
                 (*temp)++;
             }
         }
     }
+    processCount--; /* since the process is being terminated, decrement the proc count */
     freePcb(term_proc); /* free up the terminated process's pcb */
 }
