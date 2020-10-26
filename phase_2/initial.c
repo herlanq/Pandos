@@ -72,7 +72,7 @@ int main(){
     /* alloc process to be set as the current process, increment procCount */
     proc = allocPcb();
     if(proc != NULL) {
-        processCount = processCount + 1;
+        processCount += 1;
         memaddr ramtop = *(int*)RAMBASEADDR + *(int*)RAMBASESIZE;
         proc->p_s.s_sp = (memaddr) ramtop;
         proc->p_s.s_pc = (memaddr) test;

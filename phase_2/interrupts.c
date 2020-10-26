@@ -172,7 +172,7 @@ HIDDEN void Device_InterruptH(int line){
         if(p != NULL){
             p->p_s.s_v0 = intstatus; /* save status */
             insertProcQ(&readyQue, p); /* insert the process onto the ready queue */
-            softBlockCount = softBlockCount - 1; /* update SBC*/
+            softBlockCount -= 1; /* update SBC*/
         }  /* end inner IF */
     }else{
         deviceRegister->devreg[device_semaphore].d_status = intstatus; /* store device status */
