@@ -47,6 +47,7 @@ HIDDEN int terminal_interruptH(int *devSem);
 void InterruptHandler(){
     cpu_t stop_clock;
     cpu_t time_left;
+
     STCK(stop_clock);
     time_left = getTIMER();
 
@@ -61,7 +62,7 @@ void InterruptHandler(){
             Copy_Paste((state_PTR) BIOSDATAPAGE, &(currentProc->p_s));
             /* add process back on to the ready que and switch to another process */
             insertProcQ(&readyQue, currentProc);
-            Context_Switch(currentProc);
+            scheduler();
             /* else: no current proc */
         }else{
             PANIC();
