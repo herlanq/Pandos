@@ -18,6 +18,10 @@
         "asid": 64,
         "file": "kernel.stab.umps"
     },
+<<<<<<< HEAD
     "tlb-floor-address": "0x80000000",
+=======
+    "tlb-floor-address": "0x20040000",
+>>>>>>> 4ff1242291eb166ac7e211897947febf3eb4123f
     "tlb-size": 16
 }

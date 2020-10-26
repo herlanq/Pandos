@@ -88,11 +88,6 @@ void sysHandler(){
 	/*                  SYS 2                */
 	/* situation to terminate process */
 	else if(syscall == 2){
-	     /*while (currentProc->p_child != NULL){
-			removeChild(currentProc->p_child);
-		}
-		outProcQ(&readyQue, currentProc);
-		freePcb(currentProc); */
 	    terminate_process(currentProc);
 		scheduler();
 	} /* end terminate process case */
@@ -202,6 +197,7 @@ void PrgTrapHandler(){
  */
 void PassUpOrDie(int Excepttrigger){
 	if(currentProc->p_supportStruct != NULL){
+		debugE(10, 0,0,0);
 		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
 		LDCXT(currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_stackPtr,
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_status,
