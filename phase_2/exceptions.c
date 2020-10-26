@@ -28,12 +28,12 @@ extern int semD[SEMNUM];
 extern cpu_t start_clock;
 
 /* debug variables */
-extern int exception_check;
 int aflag1;
 int aflag11;
 
 HIDDEN void blocker(int *blocking);
 HIDDEN void PassUpOrDie(int Excepttrigger);
+HIDDEN void terminate_process(pcb_PTR term_proc);
 
 /*Not sure what the type is of what we return on sysHandler, if anything at all*/
 void debugE(int a, int b, int c, int d){
@@ -42,11 +42,16 @@ void debugE(int a, int b, int c, int d){
 }
 
 void sysHandler(){
-    state_PTR syscall_state;
-	cpu_t current_time;
+    state_PTR syscall_state; /* address of system state */
+	cpu_t current_time; /* current time */
+    int syscall; /* current syscall number */
+
 	syscall_state = (state_PTR) BIOSDATAPAGE;
-	exception_check = syscall_state->s_a0;
+	syscall = syscall_state->s_a0;
 	/*exception_check = currentProc->p_s.s_a0;*/
+
+	/* check for user mode */
+
 
     /* store process state */
 	Copy_Paste(syscall_state, &(currentProc->p_s));
@@ -55,7 +60,7 @@ void sysHandler(){
 
 	/*                  SYS 1                */
     /* situation of create process */
-	if(exception_check == 1){
+	if(syscall == 1){
 		pcb_PTR newPcb = allocPcb();
         support_t *data;
 		data = (support_t*) currentProc->p_s.s_a2;
@@ -68,41 +73,44 @@ void sysHandler(){
             newPcb->p_supportStruct = NULL;
             if (data != NULL || data != 0){
                 newPcb->p_supportStruct = data;
-            } else {
-                currentProc->p_s.s_v0 = READY;
-                insertProcQ(&readyQue, newPcb);
-                insertChild(currentProc, newPcb);
-            } /* end inner if */
-        } /* end outer if */
+            }
+            currentProc->p_s.s_v0 = READY;
+            insertProcQ(&readyQue, newPcb);
+            insertChild(currentProc, newPcb);
+        }
+		/* switch context */
 		Context_Switch(currentProc);
 	} /* end create process case */
 
 	/*                  SYS 2                */
 	/* situation to terminate process */
-	else if(exception_check == 2){
-		while (currentProc->p_child != NULL){
+	else if(syscall == 2){
+	    /* while (currentProc->p_child != NULL){
 			removeChild(currentProc->p_child);
 		}
 		outProcQ(&readyQue, currentProc);
-		freePcb(currentProc);
+		freePcb(currentProc); */
+	    terminate_process(currentProc);
 		scheduler();
 	} /* end terminate process case */
 
 	/*                  SYS 3                */
 	/* Passeren situation */
-	else if(exception_check == 3){ /* changed pointer references throughout: i think that was our issue*/
+	else if(syscall == 3){ /* changed pointer references throughout: i think that was our issue*/
 		int *mutex;
 		mutex = (int*)currentProc->p_s.s_a1;; /*&currentProc->p_s.s_a1;*/
         (*mutex) -= 1;
+        /* block and call scheduler or switch context */
 		if((*mutex) < 0){
 		    blocker(mutex);
+		}else{
+            Context_Switch(currentProc);
 		}
-		Context_Switch(currentProc);
 	} /* end PASSEREN case */
 
 	/*                  SYS 4                */
 	/* Verhogen situation */
-	else if(exception_check == 4){
+	else if(syscall == 4){
 		int *mutex;
 		mutex = (int *)currentProc->p_s.s_a1; /*&currentProc->p_s.s_a1;*/
         pcb_PTR temp;
@@ -118,7 +126,7 @@ void sysHandler(){
 
 	/*                  SYS 5                */
 	/* Wait for I/O situation */
-	else if(exception_check == 5){
+	else if(syscall == 5){
 		int lineNum = currentProc->p_s.s_a1;
 		int devNum = currentProc->p_s.s_a2;
 		/* get device sema4 using the device number */
@@ -138,7 +146,7 @@ void sysHandler(){
 
 	/*                  SYS 6                */
 	/* get CPU time situation */
-	else if(exception_check == 6){
+	else if(syscall == 6){
 		STCK(current_time);
 		current_time = (current_time - start_clock) + currentProc->p_time;
 		currentProc->p_s.s_v0 = current_time;
@@ -147,9 +155,9 @@ void sysHandler(){
 
 	/*                  SYS 7                */
 	/* wait for pseudo clock tick situation*/
-	else if(exception_check == 7){
-		semD[SEMNUM-1]--;
-		if(semD[SEMNUM-1] < 0){
+	else if(syscall == 7){
+        (semD[SEMNUM-1])--;
+		if((semD[SEMNUM-1]) < 0){
 		    softBlockCount++;
             blocker(&(semD[SEMNUM - 1]));
         }
@@ -158,7 +166,7 @@ void sysHandler(){
 
 	/*                  SYS 8                */
 	/* Get support data situation */
-	else if(exception_check == 8){
+	else if(syscall == 8){
 		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		Context_Switch(currentProc);
 	} /* end support pointer case */
@@ -198,7 +206,8 @@ void PassUpOrDie(int Excepttrigger){
 		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
 		LDCXT(context.c_stackPtr, context.c_status, context.c_pc);
 	}
-	SYSCALL(TERMINATETHREAD, 0, 0, 0);
+	/*SYSCALL(TERMINATETHREAD, 0, 0, 0); */
+	terminate_process(currentProc);
 	scheduler();
 }
 
@@ -211,4 +220,30 @@ HIDDEN void blocker(int *blocking){
 	insertBlocked(blocking, currentProc);
 	currentProc = NULL;
 	scheduler();
+}
+
+/* Helper function used to recursively kill a process and all of its children */
+HIDDEN void terminate_process(pcb_PTR term_proc){
+    pcb_PTR proc; /* temp proc pointer */
+    int *temp; /* temp sema4 pointer */
+    while(term_proc->p_child != NULL){
+        terminate_process(removeChild(term_proc));
+    }
+    if(term_proc == NULL){
+        outChild(term_proc);
+    }else if(term_proc->p_semAdd == NULL){
+        outProcQ(&readyQue, term_proc);
+    }else{
+        proc = outBlocked(term_proc);
+        if(proc != NULL){
+            temp = proc->p_semAdd;
+            if(temp >= &semD[0] && temp <= &semD[SEMNUM-1]){
+                softBlockCount--;
+            }else{
+                (*temp)++;
+            }
+        }
+    }
+    freePcb(term_proc);
+    processCount--;
 }
