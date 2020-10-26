@@ -28,14 +28,6 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 
-/* debug globals */
-extern int exception_check;
-unsigned int termcommand;
-unsigned int termstat;
-int termChecker;
-int devcheck;
-int aflag2;
-
 /* separate functions for interrupt handling */
 HIDDEN void Device_InterruptH(int line);
 HIDDEN int terminal_interruptH(int *devSem);
@@ -138,6 +130,7 @@ HIDDEN void Device_InterruptH(int line){
     unsigned int intstatus; /* register status of the interrupting device */
     pcb_PTR p;
 
+    /* logic to determine which specific device number is causing an interrupt */
     if((bitMAP & DEV0) != 0){
         device_number = 0;
     }else if((bitMAP & DEV1) != 0){
@@ -177,9 +170,8 @@ HIDDEN void Device_InterruptH(int line){
     if(semD[device_semaphore] <= 0){
         p = removeBlocked(&(semD[device_semaphore]));
         if(p != NULL){
-        	devcheck = 9; /* debug line */
             p->p_s.s_v0 = intstatus; /* save status */
-            insertProcQ(&readyQue, p);
+            insertProcQ(&readyQue, p); /* insert the process onto the ready queue */
             softBlockCount = softBlockCount - 1; /* update SBC*/
         }  /* end inner IF */
     }else{
@@ -220,7 +212,6 @@ HIDDEN int terminal_interruptH(int *devSem){
  * and write them into the new state(pasted state) */
 void Copy_Paste(state_t *copied_state, state_t *pasted_state){
     int i;
-    exception_check = currentProc->p_s.s_a0;
     for (i = 0; i < STATEREGNUM; i++){
         pasted_state->s_reg[i] = copied_state->s_reg[i];
     }

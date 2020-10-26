@@ -3,7 +3,7 @@
  * Last modified 10/15
  *
  * The Nucleus guarantees finite progress (does not allow starvation) thus, every ready process will have
- * an opportunity to execute. This module implements a simple preemptive round-robin scheduling algorithm with
+ * an opportunity to execute. This module implements a round-robin scheduling algorithm with
  * a time slice value of 5 milliseconds.
  */
 #include "../h/const.h"
@@ -25,16 +25,8 @@ extern int softBlockCount;
 extern pcb_t *currentProc;
 extern pcb_t *readyQue;
 extern cpu_t start_clock;
-int flag;
 
-void debugS(int a, int b, int c, int d){
-    int i = 231;
-    i++;
-}
-
-
-/* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.
- */
+/* 'scheduler()' uses a round Robin algorithm to schedule each process that it is going to be executed.*/
 void scheduler(){
     /* set new process block pointer */
     pcb_t *proc;
@@ -50,6 +42,7 @@ void scheduler(){
     /* if procCNT is equal to 0, everything finished running properly, no processes to be run */
     if(processCount == 0){
         HALT();
+
     }else{ /* if there are still processes to be run */
         if (processCount > 0) {
             if (softBlockCount > 0){

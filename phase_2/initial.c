@@ -34,13 +34,9 @@ cpu_t start_clock;
 int semD[SEMNUM]; /* 49 Semaphore in the list, [0 - 48] */
 #define CLOCKSEM semD[SEMNUM-1] /* clock sema4 in the device sema4 list , == semD[48] */
 
-/* debug variables */
-int exception_check;
-
-
 /* This is the starting point, the main, of the OS. This initializes variables, sets memory addresses,
- * and declares variables that will be used throughout the phase 2 modules.
- * One the main is complete, it passes over to the scheduler */
+ * and declares variables that will be used throughout phase 2 modules.
+ * One the main is complete, it passes control over to the scheduler */
 int main(){
     /* init local variables */
     processCount = 0;
@@ -73,7 +69,7 @@ int main(){
     /* load time onto the pseudo clock */
     LDIT(PSUEDOCLOCKTIME);
 
-    /* alloc process to be set the current process, increment procCount */
+    /* alloc process to be set as the current process, increment procCount */
     proc = allocPcb();
     if(proc != NULL) {
         processCount = processCount + 1;
@@ -83,7 +79,7 @@ int main(){
         proc->p_s.s_t9 = (memaddr) test;
         proc->p_s.s_status = (ALLOFF | IECON | IMON | TEBITON);
 
-        /* insert current proc into the ready queue*/
+        /* insert current proc onto the ready queue*/
         insertProcQ(&readyQue, proc);
 
         /* Call the Scheduler for the next process to take over */
@@ -94,7 +90,9 @@ int main(){
     return(0);
 }
 
-/* Calls the appropriate exception handler based on the cause */
+/* Calls the appropriate exception handler based on the cause
+ * based on the cause, the general exception handle either calls the interrupts handler, exception handler,
+ * TlbTrapHandler (which calls pass up or die), or PrgTrapHandler (which also calls pass up or die) */
 void genExceptionHandler(){
     int eReason;
     state_PTR oldState = (state_PTR) BIOSDATAPAGE;
@@ -104,7 +102,6 @@ void genExceptionHandler(){
         Copy_Paste(oldState, &currentProc->p_s);
     }
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
-    exception_check = eReason;
         if(eReason == IOINTERRUPT){
             InterruptHandler();
         }

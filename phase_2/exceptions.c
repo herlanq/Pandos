@@ -27,20 +27,13 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 
-/* debug variables */
-int aflag1;
-int aflag11;
+/* local function declaration */
+HIDDEN void blocker(int *blocking); /* helper function to block processes */
+HIDDEN void PassUpOrDie(int Excepttrigger); /* function used to kill a pass up a process or terminate it and all of its children */
+HIDDEN void terminate_process(pcb_PTR term_proc); /* helper function used to recursively terminate a process an all of its children */
 
-HIDDEN void blocker(int *blocking);
-HIDDEN void PassUpOrDie(int Excepttrigger);
-HIDDEN void terminate_process(pcb_PTR term_proc);
 
-/*Not sure what the type is of what we return on sysHandler, if anything at all*/
-void debugE(int a, int b, int c, int d){
-	int i = 47;
-	i++;
-}
-
+/* */
 void sysHandler(){
     state_PTR syscall_state; /* address of system state */
 	cpu_t current_time; /* current time */
@@ -58,8 +51,11 @@ void sysHandler(){
 
     /* store process state */
 	Copy_Paste(syscall_state, &(currentProc->p_s));
+
 	/* update PC */
 	currentProc->p_s.s_pc += 4;
+
+/*                                             Begin Syscall Handler                                                  */
 
 	/*                  SYS 1                */
     /* situation of create process */
@@ -183,7 +179,6 @@ void sysHandler(){
 void TlbTrapHandler(){
 	PassUpOrDie(PGFAULTEXCEPT);
 }
-
 void PrgTrapHandler(){
 	PassUpOrDie(GENERALEXCEPT);
 }
@@ -197,14 +192,12 @@ void PrgTrapHandler(){
  */
 void PassUpOrDie(int Excepttrigger){
 	if(currentProc->p_supportStruct != NULL){
-		debugE(10, 0,0,0);
 		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
 		LDCXT(currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_stackPtr,
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_status,
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_pc);
 	}
-	SYSCALL(TERMINATETHREAD, 0, 0, 0);
-	/* terminate_process(currentProc); */
+	terminate_process(currentProc);
 	scheduler();
 }
 
