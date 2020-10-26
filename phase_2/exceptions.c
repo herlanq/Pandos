@@ -90,7 +90,7 @@ void sysHandler(){
 		}
 		outProcQ(&readyQue, currentProc);
 		freePcb(currentProc);
-	    /*terminate_process(currentProc);*/
+	    /* terminate_process(currentProc); */
 		scheduler();
 	} /* end terminate process case */
 
@@ -198,13 +198,11 @@ void PrgTrapHandler(){
  * 3 - Syscall 9+
  */
 void PassUpOrDie(int Excepttrigger){
-	/* currentProc->p_s.s_pc += 4; */
-	support_t* supportStruct = currentProc->p_supportStruct;
-	context_t context;
-	context = currentProc->p_supportStruct->sup_exceptContext[Excepttrigger];
-	if(supportStruct != NULL){
+	if(currentProc->p_supportStruct != NULL){
 		Copy_Paste((state_t*) BIOSDATAPAGE, &(currentProc->p_supportStruct->sup_exceptState[Excepttrigger]));
-		LDCXT(context.c_stackPtr, context.c_status, context.c_pc);
+		LDCXT(currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_stackPtr,
+              currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_status,
+              currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_pc);
 	}
 	SYSCALL(TERMINATETHREAD, 0, 0, 0);
 	/* terminate_process(currentProc); */
