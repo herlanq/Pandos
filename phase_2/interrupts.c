@@ -113,7 +113,7 @@ void InterruptHandler(){
     }else{
         HALT();
     }
-}
+} /* end InterruptHandler */
 
 /* Interrupt handler for peripheral devices.
  * V's the correct device semaphore and stores the device data. */
@@ -166,18 +166,15 @@ HIDDEN void Device_InterruptH(int line){
     /* V operation on the device semaphore */
     semD[device_semaphore] = semD[device_semaphore] + 1;
 
-    /* wait for i/o */
-    if(semD[device_semaphore] <= 0){
+    /* if already waited for i/o */
+    if(semD[device_semaphore] <= 0) {
         p = removeBlocked(&(semD[device_semaphore]));
-        if(p != NULL){
+        if (p != NULL) {
             p->p_s.s_v0 = intstatus; /* save status */
             insertProcQ(&readyQue, p); /* insert the process onto the ready queue */
             softBlockCount -= 1; /* update SBC*/
-        }  /* end inner IF */
-    }else{
-        deviceRegister->devreg[device_semaphore].d_status = intstatus; /* store device status */
-    } /* end outer IF */
-
+        }
+    }
     /* if no process is running, call the scheduler to set the next process */
     if(currentProc == NULL){
         scheduler();

@@ -38,9 +38,10 @@ int semD[SEMNUM]; /* 49 Semaphore in the list, [0 - 48] */
  * and declares variables that will be used throughout phase 2 modules.
  * One the main is complete, it passes control over to the scheduler */
 int main(){
-    /* init local variables */
+    /* init global variables */
     processCount = 0;
     softBlockCount = 0;
+    /* create pointer to a process block */
     pcb_PTR proc;
 
     /* initializing the pass up vector */
@@ -97,10 +98,6 @@ void genExceptionHandler(){
     int eReason;
     state_PTR oldState = (state_PTR) BIOSDATAPAGE;
 
-    /* if the current process != NULL, copy all of its register values and paste them into a new state */
-    /* if(currentProc != NULL){
-        Copy_Paste(oldState, &currentProc->p_s);
-    } */
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
         if(eReason == IOINTERRUPT){
             InterruptHandler();
