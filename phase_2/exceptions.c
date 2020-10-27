@@ -1,6 +1,6 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 10/15
+ * Last modified 10/26
  *
  *
  *
@@ -238,4 +238,7 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
     }
     freePcb(term_proc); /* free up the terminated process's pcb */
     processCount -= 1; /* since the process is being terminated and the pcb is freed up, decrement the proc count */
+    if(processCount == 0){
+        scheduler();
+    }
 }

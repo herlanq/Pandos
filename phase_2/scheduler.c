@@ -1,6 +1,6 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 10/15
+ * Last modified 10/26
  *
  * The Nucleus guarantees finite progress (does not allow starvation) thus, every ready process will have
  * an opportunity to execute. This module implements a round-robin scheduling algorithm with
