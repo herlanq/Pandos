@@ -73,14 +73,14 @@ int main(){
     /* alloc process to be set as the current process, increment procCount */
     proc = allocPcb();
     if(proc != NULL) {
-        processCount += 1;
         memaddr ramtop = *(int*)RAMBASEADDR + *(int*)RAMBASESIZE;
         proc->p_s.s_sp = (memaddr) ramtop;
         proc->p_s.s_pc = (memaddr) test;
         proc->p_s.s_t9 = (memaddr) test;
         proc->p_s.s_status = (ALLOFF | IECON | IMON | TEBITON);
 
-        /* insert current proc onto the ready queue*/
+        /* insert current proc onto the ready queue and increment the proc count */
+        processCount += 1;
         insertProcQ(&readyQue, proc);
 
         /* Call the Scheduler for the next process to take over */
@@ -99,14 +99,15 @@ void genExceptionHandler(){
     state_PTR oldState = (state_PTR) BIOSDATAPAGE;
 
     eReason = (oldState->s_cause & CAUSE) >> SHIFT;
-        if(eReason == IOINTERRUPT){
-            InterruptHandler();
-        }
-        if(eReason <= TLBEXCEPTION){
-            TlbTrapHandler();
-        }
-        if(eReason == SYSEXCEPTION){
-            sysHandler();
-        }
-    PrgTrapHandler();
+    if(eReason == IOINTERRUPT){
+        InterruptHandler();
+    }
+    if(eReason <= TLBEXCEPTION){
+        TlbTrapHandler();
+    }
+    if(eReason == SYSEXCEPTION){
+        sysHandler();
+    }else{
+        PrgTrapHandler();
+    }
 }

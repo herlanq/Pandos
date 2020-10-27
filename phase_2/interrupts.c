@@ -182,7 +182,7 @@ HIDDEN void Device_InterruptH(int line){
 }/* end Device_InterruptH */
 
 /*                                          Terminal Interrupt Handler                                               */
-
+/* Returns the device status specified by a terminal read or terminal write case */
 HIDDEN int terminal_interruptH(int *devSem){
     volatile devregarea_t *deviceRegister;
     unsigned int status;
