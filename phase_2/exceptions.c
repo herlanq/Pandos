@@ -90,9 +90,9 @@ void sysHandler(){
 
 	/*                  SYS 3                */
 	/* Passeren situation */
-	else if(syscall == 3){ /* changed pointer references throughout: i think that was our issue*/
+	else if(syscall == 3){
 		int *mutex;
-		mutex = (int*)currentProc->p_s.s_a1;; /*&currentProc->p_s.s_a1;*/
+		mutex = (int*)currentProc->p_s.s_a1;
         (*mutex) -= 1;
         /* block and call scheduler or switch context */
 		if((*mutex) < 0){
@@ -106,7 +106,7 @@ void sysHandler(){
 	/* Verhogen situation */
 	else if(syscall == 4){
 		int *mutex;
-		mutex = (int *)currentProc->p_s.s_a1; /*&currentProc->p_s.s_a1;*/
+		mutex = (int *)currentProc->p_s.s_a1;
         pcb_PTR temp;
         (*mutex) += 1;
 		if((*mutex) <= 0){
@@ -197,8 +197,8 @@ void PassUpOrDie(int Excepttrigger){
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_status,
               currentProc->p_supportStruct->sup_exceptContext[Excepttrigger].c_pc);
 	}
-	terminate_process(currentProc);
-	scheduler();
+    terminate_process(currentProc);
+    scheduler();
 }
 
 /* Helper function used to block the current process. It stores off the amount of time that the process was running,
