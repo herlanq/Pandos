@@ -2,7 +2,10 @@
  * CSCI 320-01 Operating Systems
  * Last modified 10/26
  *
- *
+ * A Syscall exception occurs when the SYSCALL assembly instruction is executed. If the syscall request in not in
+ * kernel mode (in user mode) or the syscall is not syscalls 1-8, this invokes a pass up or die scenario.
+ * If the that is process making a SYSCALL request is in kernel mode and a0 contains a syscall value of 1-8 then the
+ * Nucleus should perform the proper syscall given the value that is in a0.
  *
  */
 
