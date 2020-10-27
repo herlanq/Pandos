@@ -77,6 +77,7 @@ int main(){
         proc->p_s.s_sp = (memaddr) ramtop;
         proc->p_s.s_pc = (memaddr) test;
         proc->p_s.s_t9 = (memaddr) test;
+        proc->p_supportStruct = NULL;
         proc->p_s.s_status = (ALLOFF | IECON | IMON | TEBITON);
 
         /* insert current proc onto the ready queue and increment the proc count */
