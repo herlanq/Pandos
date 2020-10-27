@@ -218,7 +218,7 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
     int *temp; /* temp sema4 pointer */
 
     /* recursively call terminate_process until the process has no more children */
-    while(term_proc->p_child != NULL){
+    while(!emptyChild(term_proc)){
         terminate_process(removeChild(term_proc));
     }
     if(term_proc == currentProc){
