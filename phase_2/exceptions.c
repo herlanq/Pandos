@@ -216,10 +216,11 @@ HIDDEN void blocker(int *blocking){
 HIDDEN void terminate_process(pcb_PTR term_proc){
     pcb_PTR proc; /* temp proc pointer */
     int *temp; /* temp sema4 pointer */
+
     while(term_proc->p_child != NULL){
         terminate_process(removeChild(term_proc));
     }
-    if(term_proc == NULL){
+    if(term_proc == currentProc){
         outChild(term_proc);
     }else if(term_proc->p_semAdd == NULL){
         outProcQ(&readyQue, term_proc);
