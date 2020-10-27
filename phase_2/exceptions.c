@@ -238,6 +238,7 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
     }
     freePcb(term_proc); /* free up the terminated process's pcb */
     processCount -= 1; /* since the process is being terminated and the pcb is freed up, decrement the proc count */
+    /* if there are no more processes to be run, invoke the scheduler to halt the system */
     if(processCount == 0){
         scheduler();
     }
