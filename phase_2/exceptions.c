@@ -217,6 +217,7 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
     pcb_PTR proc; /* temp proc pointer */
     int *temp; /* temp sema4 pointer */
 
+    /* recursively call terminate_process until the process has no more children */
     while(term_proc->p_child != NULL){
         terminate_process(removeChild(term_proc));
     }
@@ -235,6 +236,6 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
             }
         }
     }
-    processCount -= 1; /* since the process is being terminated, decrement the proc count */
     freePcb(term_proc); /* free up the terminated process's pcb */
+    processCount -= 1; /* since the process is being terminated and the pcb is freed up, decrement the proc count */
 }
