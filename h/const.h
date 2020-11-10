@@ -152,6 +152,7 @@
 #define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
 #define CLEARCAUSE 0xFFFFFF00
 
+
 /*                                  PHASE 3                                     */
 
 #define MAXPAGES 32
