@@ -50,9 +50,16 @@ void uTLB_RefillHandler(/*I think the ASID is given to us */){
     TLBWR();
     LDST(oldstate);
 
-    uVM_Hanlder();
+    uVM_Hanlder(); /* page handler ? */
 
     SYSCALL(8,0,0,0);
+    /* get cause */
+    /* get asid */
+    if (!pagefault){
+        SYSCALL(2,0,0,0);
+    }
+    /* get missing page num */
+    /* swap sema4 for mutex, sys 3 */
 
 	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
 		if(ASID == given_ASID){
