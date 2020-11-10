@@ -108,6 +108,7 @@ typedef struct support_t {
     int         sup_asid;           /* Process Id (asid)   */
     state_t     sup_exceptState[2]; /* stored excpt states */
     context_t   sup_exceptContext[2];/* pass up contexts    */
+    pteEntry_t  sup_PvtPgTable[32];
 } support_t;
 
 typedef struct pteEntry_t {
