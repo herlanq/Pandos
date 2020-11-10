@@ -151,6 +151,38 @@
 #define CAUSE	0x0000007C		/* Turn on the cause bits for exception handling */
 #define CLEARCAUSE 0xFFFFFF00
 
+/*                                  PHASE 3                                     */
+
+#define MAXPAGES 32
+#define USERPROCSTART 0x800000B0
+#define USERSTACK 0xC0000000
+#define KERNELSTACK 0x20001000
+#define UPGTBLSIZE MAXPAGES
+#define OSFRAMES 32
+#define UPROCMAX 8
+#define POOLSIZE 16
+#define BACKINGSTORE 0
+#define DISKBACK 1
+#define FLASHBACK 0 
+
+#define PRESENTFLAG 0x80000000
+
+/* Entry HI */
+#define GETPAGENUM 0x3FFFF000
+#define GETSHARE   0xC0000000
+#define VPNSHIFT   12
+#define ASIDSHIFT   6
+#define SEGFLAG    30
+
+/* Entry LO */
+#define DIRTYON    0x00000400
+#define VALIDON    0x00000200
+#define GLOBALON   0x00000100
+
+#define FLASHPOOL (RAMSTART + (OSFRAMES * PAGESIZE))
+#define DISKPOOL  (FLASHPOOL + (DEVPERINT * PAGESIZE))
+#define FRAMEPOOL (DISKPOOL + (DEVPERINT * PAGESIZE))
+
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
 
