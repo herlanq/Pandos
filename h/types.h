@@ -110,6 +110,17 @@ typedef struct support_t {
     context_t   sup_exceptContext[2];/* pass up contexts    */
 } support_t;
 
+typedef struct pteEntry_t {
+        unsigned int entryHI;
+        unsigned int entryLO;
+} pte_Entry_t;
+
+typedef struct swap_t {
+        int     sw_asid;
+        int     sw_pgNum;
+        pteEntry_t      *sw_pte;
+} swap_t;
+
 /* Exceptions related constants */
 #define PGFAULTEXCEPT 0
 #define GENERALEXCEPT 1
