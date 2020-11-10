@@ -34,6 +34,7 @@
 #define NULL 			  ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
 #define MAXINT            0xFFFFFFFF
+#define UPROCMAX		  8
 /* Sem number
  * 8 disks
  * 8 usb
