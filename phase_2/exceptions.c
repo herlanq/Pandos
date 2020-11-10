@@ -36,7 +36,11 @@ HIDDEN void PassUpOrDie(int Excepttrigger); /* function used to kill a pass up a
 HIDDEN void terminate_process(pcb_PTR term_proc); /* helper function used to recursively terminate a process an all of its children */
 
 
-/* */
+/* If the syscall request in not in kernel mode (in user mode) or the syscall is not syscalls 1-8, this invokes a
+ * pass up or die scenario. If the that is process making a SYSCALL request is in kernel mode and a0 contains a syscall
+ * value of 1-8 then the Nucleus should perform the proper syscall given the value that is in a0. The sysHanlder handles
+ * the request by determining the appropriate syscall based on the syscall number.
+*/
 void sysHandler(){
     state_PTR syscall_state; /* address of system state */
 	cpu_t current_time; /* current time */
@@ -241,6 +245,7 @@ HIDDEN void terminate_process(pcb_PTR term_proc){
     }
     freePcb(term_proc); /* free up the terminated process's pcb */
     processCount -= 1; /* since the process is being terminated and the pcb is freed up, decrement the proc count */
+
     /* if there are no more processes to be run, invoke the scheduler to halt the system */
     if(processCount == 0){
         scheduler();
