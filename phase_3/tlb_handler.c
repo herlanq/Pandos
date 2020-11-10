@@ -41,7 +41,7 @@ void uTLB_RefillHandler(/*I think the ASID is given to us */){
     int missing_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
     missing_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    missing_num = missing_num % MAXPAGES;
+    missing_num = missing_num % MAXPAGES; /* or % 31 ??? */
     setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[missing_num]).entryHI);
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[missing_num]).entryLO);
     TLBWR();

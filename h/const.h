@@ -154,7 +154,6 @@
 
 
 /*                                  PHASE 3                                     */
-
 #define MAXPAGES 32
 #define USERPROCSTART 0x800000B0
 #define USERSTACK 0xC0000000
