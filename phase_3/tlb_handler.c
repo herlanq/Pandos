@@ -20,7 +20,7 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 void initialStructs(){
 	/*Planning on using this function to initialize all the structures needed for each process,
-	possibly the swap pool as well */
+	possibly the swap pool and backing store as well */
 }
 
 void uTLB_exceptionHandler(){
@@ -28,7 +28,13 @@ void uTLB_exceptionHandler(){
 	it should check to make sure that the D-bit is on, and also check the valid bit. */
 }
 
-void uTLB_RefillHandler(){
+void uTLB_RefillHandler(/*I think the ASID is given to us */){
 	/*This function is used for when there is no TLB entry fould,
 	 this function goes and searches for it within the page table */
+	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
+		if(ASID == given_ASID){
+			/*might have to check the valid bit as well but yeah */
+			/*write it into the TLB and LDST on currentproc*/
+		} 
+	}
 }
