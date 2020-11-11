@@ -107,7 +107,7 @@ typedef struct context_t {
 typedef struct pteEntry_t {
     unsigned int entryHI;
     unsigned int entryLO;
-} pte_Entry_t;
+} pteEntry_t;
 
 typedef struct support_t {
     int         sup_asid;           /* Process Id (asid)   */
