@@ -19,13 +19,30 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
-int swap_sem = 1;
+HIDDEN semd_t swap_sem = 1;
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
-void initialStructs(){
-    for(int i=0; i < POOLSIZE; i++){
+void test(){
+    for(int i = 1; i <= 8; i++){
+        /* This is where we would initialize our device semaphores, which I think there is one per process. */
+    }
+    /*initializing the swap pool table and semaphore is initialized above as HIDDEN */
+    /*should be putting swap pool at like 0x2000.0000 plus some ambiguous number we decide */
+    for(int i = 0; i < POOLSIZE; i++){
         swap_pool[i].sw_asid = -1;
     }
+    /*now it is time to start initializing user processes */
+    for(int i = 1, i<= UPROCCNT; i++){
+        /*set EntryHi to ASID
+        set pc/T9 to 0x8000.00B0
+        set SP to 0xC000.0000
+        setStatus(Kernel off, INTEnabled, PLTenabled)
+        set supplemental data strucutre in case of pass up */
+        SYSCALL(CREATETHREAD,0,0,0);
+    }
+    /*now we wait until all the processes are finished */
+    /*then we SYS2 and call it a day */
+    SYSCALL(TERMINATETHREAD,0,0,0);
 }
 
 /*this function is used for TLB invalid and modification exceptions,
@@ -36,7 +53,7 @@ void uTLB_exceptionHandler(){
 
 /*This function is used for when there is no TLB entry fould,
 this function goes and searches for it within the page table */
-void uTLB_RefillHandler(/*I think the ASID is given to us */){
+void uTLB_RefillHandler(){
     state_PTR oldstate;
     int missing_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
@@ -46,16 +63,4 @@ void uTLB_RefillHandler(/*I think the ASID is given to us */){
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[missing_num]).entryLO);
     TLBWR();
     LDST(oldstate);
-
-    uVM_Hanlder();
-
-    SYSCALL(8,0,0,0);
-
-	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
-		if(ASID == given_ASID){
-			/*might have to check the valid bit as well but yeah */
-			/*write it into the TLB and LDST on currentproc*/
-		}
-	}
-
 }
