@@ -71,14 +71,15 @@ void uTLB_exceptionHandler(){
     }
 }
 
-/*This function is used for when there is no TLB entry fould,
+/*This function is used for when there is no TLB entry found,
 this function goes and searches for it within the page table */
+
 void uTLB_RefillHandler(){
     state_PTR oldstate;
     int pg_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
     pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    pg_num = pg_num % MAXPAGES; /* or % 31 ??? */
+    pg_num = pg_num % MAXPAGES;
     setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();
@@ -86,5 +87,6 @@ void uTLB_RefillHandler(){
 }
 /* This is the function called for TLB invalid issues (page faults) and will be handled in here */
 void Pager(){
+
 
 }
