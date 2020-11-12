@@ -22,12 +22,24 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
-int swap_sem = 1;
+HIDDEN semd_t swap_sem = 1;
+
+void pager();
+void uPgmTrapHandler();
+void uSysHanlder();
+
+pcb_t uProcs[UPROCMAX]; /* Array of user processes */
+
+HIDDEN void InitUserProc();
+
+
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
 void initialStructs(){
     for(int i=0; i < POOLSIZE; i++){
         swap_pool[i].sw_asid = -1;
+        swap_pool[i].sw_pgNum = 0;
+        swap_pool[i].sw_pte = NULL;
     }
 }
 
@@ -39,27 +51,17 @@ void uTLB_exceptionHandler(){
 
 /*This function is used for when there is no TLB entry fould,
 this function goes and searches for it within the page table */
-void uTLB_RefillHandler(/*I think the ASID is given to us */){
+void uTLB_RefillHandler() {
     state_PTR oldstate;
-    int missing_num;
+    int pg_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
-    missing_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    missing_num = missing_num % MAXPAGES; /* or % 31 ??? */
-    setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[missing_num]).entryHI);
-    setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[missing_num]).entryLO);
+    pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
+    pg_num = pg_num % MAXPAGES; /* or % 31 ??? */
+    setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
+    setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();
     LDST(oldstate);
-
-    uVM_Hanlder(); /* page handler ? */
-
-    SYSCALL(8,0,0,0);
-    /* get cause */
-    /* get asid */
-    if (!pagefault){
-        SYSCALL(2,0,0,0);
-    }
-    /* get missing page num */
-    /* swap sema4 for mutex, sys 3 */
+}
 
 	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
 		if(ASID == given_ASID){
