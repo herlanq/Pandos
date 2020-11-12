@@ -23,8 +23,6 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
 HIDDEN semd_t swap_sem = 1;
-<<<<<<< HEAD
-=======
 
 void pager();
 void uPgmTrapHandler();
@@ -35,7 +33,6 @@ pcb_t uProcs[UPROCMAX]; /* Array of user processes */
 HIDDEN void InitUserProc();
 
 
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
 void test(){
@@ -69,32 +66,16 @@ void uTLB_exceptionHandler(){
 
 }
 
-/*This function is used for when there is no TLB entry fould,
+/*This function is used for when there is no TLB entry found,
 this function goes and searches for it within the page table */
-<<<<<<< HEAD
-void uTLB_RefillHandler(){
-=======
 void uTLB_RefillHandler() {
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
     state_PTR oldstate;
     int pg_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
     pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    pg_num = pg_num % MAXPAGES; /* or % 31 ??? */
+    pg_num = pg_num % MAXPAGES;
     setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();
     LDST(oldstate);
-<<<<<<< HEAD
-=======
-}
-
-	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
-		if(ASID == given_ASID){
-			/*might have to check the valid bit as well but yeah */
-			/*write it into the TLB and LDST on currentproc*/
-		}
-	}
-
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
 }
