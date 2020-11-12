@@ -23,19 +23,15 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
 HIDDEN semd_t swap_sem = 1;
-<<<<<<< HEAD
-=======
 
-void pager();
+
+void Pager();
 void uPgmTrapHandler();
 void uSysHanlder();
 
 pcb_t uProcs[UPROCMAX]; /* Array of user processes */
 
 HIDDEN void InitUserProc();
-
-
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
 void test(){
@@ -66,16 +62,18 @@ void test(){
 /*this function is used for TLB invalid and modification exceptions,
 it should check to make sure that the D-bit is on, and also check the valid bit. */
 void uTLB_exceptionHandler(){
-
+    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 10) == 0)
+    {
+        PassUpOrDie(GENERALEXCEPT);
+    }
+    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 9) == 0){
+        Pager();
+    }
 }
 
 /*This function is used for when there is no TLB entry fould,
 this function goes and searches for it within the page table */
-<<<<<<< HEAD
 void uTLB_RefillHandler(){
-=======
-void uTLB_RefillHandler() {
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
     state_PTR oldstate;
     int pg_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
@@ -85,16 +83,8 @@ void uTLB_RefillHandler() {
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();
     LDST(oldstate);
-<<<<<<< HEAD
-=======
 }
+/* This is the function called for TLB invalid issues (page faults) and will be handled in here */
+void Pager(){
 
-	for(int i = 0, i<= (unsigned int) RAMTOP, i++){ /*go through the page table to see where the TLB entry is */
-		if(ASID == given_ASID){
-			/*might have to check the valid bit as well but yeah */
-			/*write it into the TLB and LDST on currentproc*/
-		}
-	}
-
->>>>>>> 936ffd21a99bce4310866050448f2ee4c05bae7f
 }
