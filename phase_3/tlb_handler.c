@@ -24,15 +24,14 @@ extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
 int swap_sem;
 
-void pager();
+
+void Pager();
 void uPgmTrapHandler();
 void uSysHanlder();
 
 pcb_t uProcs[UPROCMAX]; /* Array of user processes */
 
 HIDDEN void InitUserProc();
-
-
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
 void test(){
@@ -66,12 +65,19 @@ void test(){
 /*this function is used for TLB invalid and modification exceptions,
 it should check to make sure that the D-bit is on, and also check the valid bit. */
 void uTLB_exceptionHandler(){
-
+    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 10) == 0)
+    {
+        PassUpOrDie(GENERALEXCEPT);
+    }
+    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 9) == 0){
+        Pager();
+    }
 }
 
 /*This function is used for when there is no TLB entry found,
 this function goes and searches for it within the page table */
-void uTLB_RefillHandler() {
+
+void uTLB_RefillHandler(){
     state_PTR oldstate;
     int pg_num;
     oldstate = (state_PTR) BIOSDATAPAGE;
@@ -81,4 +87,9 @@ void uTLB_RefillHandler() {
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();
     LDST(oldstate);
+}
+/* This is the function called for TLB invalid issues (page faults) and will be handled in here */
+void Pager(){
+
+
 }
