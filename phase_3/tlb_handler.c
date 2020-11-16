@@ -22,7 +22,7 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 extern pcb_t *currentProc;
 swap_t swap_pool[POOLSIZE];
-HIDDEN semd_t swap_sem = 1;
+int swap_sem;
 
 void pager();
 void uPgmTrapHandler();
@@ -46,8 +46,11 @@ void test(){
         swap_pool[i].sw_pgNum = 0;
         swap_pool[i].sw_pte = NULL;
     }
+
+    swap_sem = 1;
+
     /*now it is time to start initializing user processes */
-    for(int i = 1, i<= UPROCCNT; i++){
+    for(int i = 1, i<= UPROCMAX; i++){
         /*set EntryHi to ASID
         set pc/T9 to 0x8000.00B0
         set SP to 0xC000.0000
