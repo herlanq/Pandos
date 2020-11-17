@@ -12,10 +12,11 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/libumps.h"
-#include "../h/support.h"
+#include "../h/VMsupport.h"
 
 extern pcb_t *currentProc;
 int devSem[DEVICECNT+DEVPERINT]; /* device sema4's */
+int control_sem;
 
 
 void Pager();
@@ -29,10 +30,6 @@ HIDDEN void InitUserProc();
 possibly the swap pool and backing store as well */
 
 void test(){
-    memaddr ramtop;
-    memaddr stacktop;
-    state_t start_state;
-    support_t support[UPROCMAX + 1];
     int devices = (DEVICECNT+DEVPERINT);
 
     InitTLB();
@@ -41,24 +38,19 @@ void test(){
         devSem[i] = 1;
         /* This is where we would initialize our device semaphores, which I think there is one per process. */
     }
-    RAMTOP(ramtop);
 
-    /*now it is time to start initializing user processes */
-    for(int i = 1, i <= UPROCMAX; i++){
-        stacktop = ramtop - (i * PAGESIZE * 2);
+    /* initialize user processes */
+    InitUserProc();
 
+    control_sem = 0;
 
-        /*set EntryHi to ASID
-        set pc/T9 to 0x8000.00B0
-        set SP to 0xC000.0000
-        setStatus(Kernel off, INTEnabled, PLTenabled)
-        set supplemental data strucutre in case of pass up */
-        SYSCALL(CREATETHREAD,0,0,0);
+    for(int i = 0; i < UPROCMAX; ++i){
+        SYSCALL(PASSERN, (int)&control_sem, 0, 0);
     }
-    /*now we wait until all the processes are finished */
-    /*then we SYS2 and call it a day */
-    SYSCALL(TERMINATETHREAD,0,0,0);
-}
+
+    SYSCALL(TERMINATETHREAD, 0, 0, 0);
+
+} /* end test() */
 
 /*this function is used for TLB invalid and modification exceptions,
 it should check to make sure that the D-bit is on, and also check the valid bit. */
@@ -89,6 +81,49 @@ void uTLB_RefillHandler(){
     TLBWR();
     LDST(oldstate);
 }
+
+void InitUserProc(){
+    int id;
+    int begin;
+    int devices = (DEVICECNT+DEVPERINT);
+    memaddr ramtop;
+    memaddr stacktop;
+    support_t support[UPROCMAX + 1];
+    state_t start_state;
+
+    RAMTOP(ramtop);
+    /*now it is time to start initializing user processes */
+    for(id = 1; id <= UPROCMAX; id++) {
+        stacktop = ramtop - (id * PAGESIZE * 2);
+        start_state.s_entryHI = id << ASIDSHIFT;
+        start_state.s_sp = (int) USERSTACK;
+        start_state.s_pc = start_state.s_t9;
+        start_state.s_pc = (memaddr) USERPROCSTART;
+        start_state.s_status = ALLOFF | IEPON | IMON | UMON | TEBITON;
+
+        support[id].sup_asid = id;
+        support[id].sup_exceptContext[GENERALEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
+        support[id].sup_exceptContext[GENERALEXCEPT].c_stackPtr = stacktop;
+        support[id].sup_exceptContext[GENERALEXCEPT].c_pc = (memaddr) uGeneralExcept;
+        support[id].sup_exceptContext[PGFAULTEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
+        support[id].sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = stacktop + PAGESIZE;
+        support[id].sup_exceptContext[GENERALEXCEPT].c_pc = (memaddr) uVM_Handler;
+
+        /* Init page table */
+        for (int i = 0; i < MAXPAGES; i++) {
+            support[i].sup_PvtPgTable->entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
+            support[i].sup_PvtPgTable->entryLO = ALLOFF | DIRTYON;
+        }
+
+        support[id].sup_PvtPgTable[MAXPAGES - 1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
+
+        begin = SYSCALL(CREATETHREAD, (int) &start_state, (int) &(support[id]), 0);
+        if (begin == 0) {
+            SYSCALL(TERMINATETHREAD, 0, 0, 0);
+        }
+    }
+} /* end inituserproc */
+
 /* This is the function called for TLB invalid issues (page faults) and will be handled in here */
 void Pager(){
 
