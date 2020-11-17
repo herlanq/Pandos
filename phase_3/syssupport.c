@@ -14,6 +14,7 @@ void SysSupport(){
 	int cause;
 	/*first things first, get the support struct */
 	supportStruct = SYSCALL(GETSPTPTR,0,0,0);
+	supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4;
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
 
 	if(cause == SYSEXCEPTION)
@@ -44,7 +45,7 @@ void uSysHandler(support_t *supportStruct){
 		int devSem; /*used to determine the device semapore */
 		int length; /*used to determine the length of output */
 
-		memaddr* charAddress;
+		char charAddress;
 		devregarea_t devReg; /*device register type */
 		id = supportStruct->sup_asid;
 		devReg = (devregarea_t *) RAMBASEADDR;
@@ -52,13 +53,23 @@ void uSysHandler(support_t *supportStruct){
 		charAddress = supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
-		int counter; /*used for the while loop */
+		int counter = 0; /*used for the while loop */
 		while((status == READY) && (counter < length)){
 			/*need to work on the output for this function */
+			devReg->devreg[devSem].d_data0 = charAddress;
+			devReg->devreg[devSem].d_command = 2;
+			status = SYSCALL(WAITIO, PRINTER, (id-1), 0);
+			if(status != READY){
+				supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = (status *-1);
+				status == status * -1;
+			}
+			charAddress++;
+			counter++;
+
 		}
 
 
-		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
+		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 
 	}
 	else if(sysReason == TERMINALW){
@@ -79,9 +90,18 @@ void uSysHandler(support_t *supportStruct){
 		int counter; /*used for the while loop */
 		while((status == READY) && (counter < length)){
 			/*need to work on the output for this function */
+			devReg->devreg[devSem].d_data0 = charAddress;
+			devReg->devreg[devSem].d_command = /*the transmat constant */ ;
+			status = SYSCALL(WAITIO, PRINTER, (id-1), 0);
+			if(status != READY){
+				supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = (status *-1);
+				status == status * -1;
+			}
+			charAddress++;
+			counter++;
 		}
 
-		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
+		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 
 	}
 	else if(sysReason == TERMINALR){
