@@ -15,8 +15,7 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 #include "../h/support.h"
 
 extern pcb_t *currentProc;
-swap_t swap_pool[POOLSIZE];
-int swap_sem;
+int devSem[DEVICECNT+DEVPERINT]; /* device sema4's */
 
 
 void Pager();
@@ -28,22 +27,27 @@ pcb_t uProcs[UPROCMAX]; /* Array of user processes */
 HIDDEN void InitUserProc();
 /*Planning on using this function to initialize all the structures needed for each process,
 possibly the swap pool and backing store as well */
+
 void test(){
-    for(int i = 1; i <= 8; i++){
+    memaddr ramtop;
+    memaddr stacktop;
+    state_t start_state;
+    support_t support[UPROCMAX + 1];
+    int devices = (DEVICECNT+DEVPERINT);
+
+    InitTLB();
+
+    for(int i=0; i < devices; i++){
+        devSem[i] = 1;
         /* This is where we would initialize our device semaphores, which I think there is one per process. */
     }
-    /*initializing the swap pool table and semaphore is initialized above as HIDDEN */
-    /*should be putting swap pool at like 0x2000.0000 plus some ambiguous number we decide */
-    for(int i = 0; i < POOLSIZE; i++){
-        swap_pool[i].sw_asid = -1;
-        swap_pool[i].sw_pgNum = 0;
-        swap_pool[i].sw_pte = NULL;
-    }
-
-    swap_sem = 1;
+    RAMTOP(ramtop);
 
     /*now it is time to start initializing user processes */
-    for(int i = 1, i<= UPROCMAX; i++){
+    for(int i = 1, i <= UPROCMAX; i++){
+        stacktop = ramtop - (i * PAGESIZE * 2);
+
+
         /*set EntryHi to ASID
         set pc/T9 to 0x8000.00B0
         set SP to 0xC000.0000
@@ -74,9 +78,12 @@ this function goes and searches for it within the page table */
 void uTLB_RefillHandler(){
     state_PTR oldstate;
     int pg_num;
+
     oldstate = (state_PTR) BIOSDATAPAGE;
+
     pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
     pg_num = pg_num % MAXPAGES;
+
     setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
     TLBWR();

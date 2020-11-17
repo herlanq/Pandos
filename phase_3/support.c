@@ -6,10 +6,20 @@
 
 #include "../h/const.h"
 #include "../h/types.h"
-#include "../h/pcb.h"
-#include "../h/asl.h"
-#include "../h/initial.h"
-#include "../h/interrupts.h"
-#include "../h/exceptions.h"
-#include "../h/scheduler.h"
+#include "../h/uInitial.h"
 #include "../h/libumps.h"
+
+HIDDEN swap_t swap_pool[POOLSIZE];
+HIDDEN int swap_sem;
+
+void InitTLB();
+
+void InitTLB(){
+    /*initializing the swap pool table and semaphore is initialized above as HIDDEN */
+    /*should be putting swap pool at like 0x2000.0000 plus some ambiguous number we decide */
+    swap_sem = 1;
+    for(int i = 0; i < POOLSIZE; i++){
+        swap_pool[i].sw_asid = -1;
+    }
+
+}
