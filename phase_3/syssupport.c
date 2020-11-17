@@ -40,10 +40,22 @@ void uSysHandler(support_t supportStruct){
 		int status; /*used for writing to printer and terminal */
 		int devSem; /*used to determine the device semapore */
 		int length; /*used to determine the length of output */
+
+		memaddr* charAddress;
 		devregarea_t devReg; /*device register type */
 		id = supportStruct->sup_asid;
 		devReg = (devregarea_t *) RAMBASEADDR;
 		devSem = ((PRINTERINT - DISKINT) * DEVPERINT) + (id -1);
+		charAddress = supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
+		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
+
+		int counter; /*used for the while loop */
+		while((status == READY) && (counter < length)){
+			/*need to work on the output for this function */
+		}
+
+
+		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
 
 	}
 	else if(sysReason == 12){
@@ -52,10 +64,22 @@ void uSysHandler(support_t supportStruct){
 		int status; /*used for writing to printer and terminal */
 		int devSem; /*used to determine the device semapore */
 		int length; /*used to determine the length of output */
+
+		memaddr* charAddress;
 		devregarea_t devReg; /*device register type */
 		id = supportStruct->sup_asid;
 		devReg = (devregarea_t *) RAMBASEADDR;
 		devSem = ((PRINTERINT - DISKINT) * DEVPERINT) + (id -1);
+		charAddress = supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
+		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
+
+		int counter; /*used for the while loop */
+		while((status == READY) && (counter < length)){
+			/*need to work on the output for this function */
+		}
+
+		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
+
 	}
 	else if(sysReason == 13){
 		/*this is the case where we read from terminal, havnt even started this yet */
