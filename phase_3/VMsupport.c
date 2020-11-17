@@ -14,6 +14,7 @@ HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 
 int flashOP(int flash, int sect, int buffer, int op);
+HIDDEN int get_frame();
 void intsON(int on_off);
 
 
@@ -24,8 +25,8 @@ void InitTLB(){
     }
 }
 
-/*This function is used for when there is no TLB entry found,
-this function goes and searches for it within the page table */
+/*This function is used for when there is no TLB entry found, thus calling a TLB exception.
+The contents of the PTE are then written into the TLB */
 void uTLB_RefillHandler(){
     state_PTR oldstate;
     int pg_num;
@@ -41,9 +42,9 @@ void uTLB_RefillHandler(){
     LDST(oldstate);
 }
 
-/*this function is used for TLB invalid and modification exceptions,
-it should check to make sure that the D-bit is on, and also check the valid bit. */
-void uTLB_ExceptionHandler(){
+/* This function handles only page fault TLB Management Exceptions. All other exceptions
+ * will result in a terminating process. */
+void uTLB_Pager(){
     int id, frame_num, pg_num, status;
     pteEntry_t *entry;
     unsigned int frame_addr;
@@ -55,41 +56,48 @@ void uTLB_ExceptionHandler(){
     cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE);
     id = supStruct->sup_asid;
 
-    if(cause == TLBINV || cause == TLBINVS){
-        pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
-        get_mutex();
+    if(cause != TLBINV && cause != TLBINVS) {
+        SYSCALL(TERMINATETHREAD, 0, 0, 0);
+    }
 
-        int swap;
-        swap = 0;
-        swap = (swap+1) % POOLSIZE;
-        frame_num = swap;
-        frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
-        if(swap_pool[frame_num].sw_asid != -1){
-            /* disable interrupts */
-            intsON(OFF);
-            swap_pool[frame_num].sw_pte->entryLO &= 0xFFFFFDFF;
-            TLBCLR();
+    pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
+    SYSCALL(PASSERN, swap_sem, 0, 0 );
+    frame_num = get_frame();
+    frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
 
-            block = swap_pool[frame_num].sw_pgNum;
-            block = block % MAXPAGES;
-            status = flashOP((swap_pool[frame_num].sw_asid)-1, block, frame_addr, FLASHR);
+    if(swap_pool[frame_num].sw_asid != -1){
+        /* disable interrupts */
+        intsON(OFF);
+        swap_pool[frame_num].sw_pte->entryLO = swap_pool[frame_num].sw_pte->entryLO & 0xFFFFFDFF;
+        TLBCLR();
+        intsON(ON);
 
-            if(status != READY){
-                termUproc(&swap_sem);
+        block = swap_pool[frame_num].sw_pgNum;
+        block = block % MAXPAGES;
+
+        status = flashOP(((swap_pool[frame_num].sw_asid)-1), block, frame_addr, FLASHW);
+
+        if(status != READY){
+                SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
             }
         }
-    }else{
-        termUproc();
-    }
 
     block = pg_num;
     block = block % MAXPAGES;
     status = flashOP((id-1), block, frame_addr, FLASHR);
     if(status != READY){
-        termUproc(&swap_sem);
+        SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
+
+    intsON(OFF);
+    swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
+    TLBCLR();
+    intsON(ON);
+    SYSCALL(VERHOGEN, swap_sem, 0, 0);
+    LDST(&supStruct->sup_exceptState[PGFAULTEXCEPT]);
 }
 
+/* Helper function to toggle interrupts on and off */
 void intsON(int on_off){
     unsigned int status;
     status = getSTATUS();
@@ -102,6 +110,12 @@ void intsON(int on_off){
     setSTATUS(status);
 }
 
+/* This function performs a Flash I/O operation within the page fault handler.
+ * This functions takes in 'flash' as the specific flash device number.
+ * sect is the I/O sector number
+ * buffer is the buffer address
+ * 'op' specifies the types of flash operation, read or write
+ * */
 int flashOP(int flash, int sect, int buffer, int op){
     int status;
     devregarea_t *devreg;
@@ -109,11 +123,20 @@ int flashOP(int flash, int sect, int buffer, int op){
     intsON(OFF);
     devreg->devreg[flash+DEVPERINT].d_data0 = buffer;
     devreg->devreg[flash+DEVPERINT].d_command = (sect << 8) | op;
-    status = SYSCALL(WAITIO, FLASH,flash, 0);
+    status = SYSCALL(WAITIO, FLASH, flash, 0);
     intsON(ON);
 
     if(status!=READY){
-        status = 0;
+        status = OFF;
     }
     return status;
+}
+
+/* this function is used to satisfy a page fault exception by finding which frame to use
+ * using a round robin algorithm */
+HIDDEN int get_frame(){
+    int swap;
+    swap = 0;
+    swap = (swap+1) % POOLSIZE;
+    return swap;
 }

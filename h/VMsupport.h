@@ -7,5 +7,7 @@ HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 
 extern void InitTLB();
+extern void uTLB_Pager();
 extern void intsON(int on_off);
 extern int flashOP(int flash, int sect, int buffer, int op);
+HIDDEN int get_frame();
