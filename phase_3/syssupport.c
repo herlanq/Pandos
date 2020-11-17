@@ -8,10 +8,6 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/VMsupport.h"
 #include "../h/syssupport.h"
 
-extern int control_sem;
-void uSysHandler(support_t *supportStruct);
-
-
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
 	support_t supportStruct;
@@ -69,13 +65,10 @@ void uSysHandler(support_t *supportStruct){
 			}
 			charAddress++;
 			counter++;
-
 		}
-
-
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
-
 	}
+
 	else if(sysReason == TERMINALW){
 		/*this is the case where we write to terminal */
 		int id; /*this is the asid of the process */
@@ -104,13 +97,13 @@ void uSysHandler(support_t *supportStruct){
 			charAddress++;
 			counter++;
 		}
-
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
-
 	}
+
 	else if(sysReason == TERMINALR){
 		/*this is the case where we read from terminal, havnt even started this yet */
 	}
+
 	else{
 		SYSCALL(TERMINATEPROCESS,0,0,0);
 	}

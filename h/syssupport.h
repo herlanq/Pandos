@@ -7,8 +7,8 @@
 
 
 extern int control_sem;
-void uSysHandler(support_t *supportStruct);
 void SysSupport();
+void uSysHandler(support_t *supportStruct);
 
 
 #endif
