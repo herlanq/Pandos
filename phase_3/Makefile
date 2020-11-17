@@ -24,7 +24,7 @@ DEFS = ../h/const.h ../h/types.h ../h/pcb.h ../h/asl.h \
 	$(INCDIR)/libumps.h Makefile
 
 OBJS = initial.o interrupts.o scheduler.o exceptions.o asl.o pcb.o \
-	initProc.o vmSupport.o sysSupport.o
+	uInitial.o VMsupport.o syssupport.o
 
 CFLAGS = -ffreestanding -ansi -Wall -c -mips1 -mabi=32 -mfp32 -mno-gpopt -G 0 -fno-pic -mno-abicalls
 
