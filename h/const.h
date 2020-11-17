@@ -197,6 +197,16 @@
 #define SYS17 17
 #define SYS18 18
 
+#define TERMINATE 9
+#define GETTOD 10
+#define PRINTERW 11
+#define TERMINALW 12
+#define TERMINALR 13
+#define DISKR 14
+#define DISKW 15
+#define FLASHR 16
+#define FLASHW 17
+
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
 
