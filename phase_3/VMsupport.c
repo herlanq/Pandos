@@ -12,6 +12,10 @@
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 
+int flashOP(int flash, int sect, int buffer, int op);
+void intsON(int on_off);
+
+
 void InitTLB(){
     swap_sem = 1;
     for(int i = 0; i < POOLSIZE; i++){
@@ -53,22 +57,54 @@ void uTLB_ExceptionHandler(){
     if(cause == TLBINV || cause == TLBINVS){
         pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
         mutex();
-        frame_num = getFrame();
+
+        int swap;
+        swap = 0;
+        swap = (swap+1) % POOLSIZE;
+        frame_num = swap;
         frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
         if(swap_pool[frame_num].sw_asid != -1){
-            
+            /* disable interrupts */
+            intsON(OFF);
+            swap_pool[frame_num].sw_pte->entryLO &= 0xFFFFFDFF;
+            TLBCLR();
+
+            block = swap_pool[frame_num].sw_pgNum;
+            block = block % MAXPAGES;
+            status = flashOP((swap_pool[frame_num].sw_asid)-1, block, frame_addr, FLASHR);
+
+            if(status != READY){
+                termUproc(&swap_sem);
+            }
         }
-
-
     }else{
         termUproc();
     }
 
-    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 10) == 0)
-    {
-        PassUpOrDie(GENERALEXCEPT);
+    block = pg_num;
+    block = block % MAXPAGES;
+    status = flashOP((id-1), block, frame_addr, FLASHR);
+    if(status != READY){
+        termUproc(&swap_sem);
     }
-    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 9) == 0){
-        Pager();
+}
+
+void intsON(int on_off){
+
+}
+
+int flashOP(int flash, int sect, int buffer, int op){
+    int status;
+    devregarea_t *devreg;
+    devreg = (devregarea_t *) RAMBASEADDR;
+    intsON(OFF);
+    devreg->devreg[flash+DEVPERINT].d_data0 = buffer;
+    devreg->devreg[flash+DEVPERINT].d_command = (sect << 8) | op;
+    status = SYSCALL(WAITIO, FLASH,flash, 0);
+    intsON(ON);
+
+    if(status!=READY){
+        status = 0;
     }
+    return status;
 }
