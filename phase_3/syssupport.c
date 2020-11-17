@@ -11,7 +11,7 @@ void SysSupport(){
 	support_t supportStruct;
 	int cause;
 	/*first things first, get the support struct */
-	supportStruct = SYSCALL(8,0,0,0);
+	supportStruct = SYSCALL(GETSPTPTR,0,0,0);
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
 
 	if(cause == SYSEXCEPTION)
@@ -42,7 +42,9 @@ void uSysHandler(support_t supportStruct){
 		int length; /*used to determine the length of output */
 		devregarea_t devReg; /*device register type */
 		id = supportStruct->sup_asid;
-		devReg = 
+		devReg = (devregarea_t *) RAMBASEADDR;
+		devSem = ((PRINTERINT - DISKINT) * DEVPERINT) + (id -1);
+
 	}
 	else if(sysReason == 12){
 		/*this is the case where we write to terminal */
@@ -52,9 +54,14 @@ void uSysHandler(support_t supportStruct){
 		int length; /*used to determine the length of output */
 		devregarea_t devReg; /*device register type */
 		id = supportStruct->sup_asid;
+		devReg = (devregarea_t *) RAMBASEADDR;
+		devSem = ((PRINTERINT - DISKINT) * DEVPERINT) + (id -1);
 	}
 	else if(sysReason == 13){
 		/*this is the case where we read from terminal, havnt even started this yet */
+	}
+	else{
+		SYSCALL(TERMINATEPROCESS,0,0,0);
 	}
 
 }
