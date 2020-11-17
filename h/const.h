@@ -166,6 +166,8 @@
 #define DISKBACK 1
 #define FLASHBACK 0 
 
+#define TLBINV 2
+#define TLBINVS 3
 #define PRESENTFLAG 0x80000000
 
 /* Entry HI */

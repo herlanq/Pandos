@@ -13,17 +13,11 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 #include "../h/types.h"
 #include "../h/libumps.h"
 #include "../h/VMsupport.h"
+#include "../h/syssupport.h"
 
-extern pcb_t *currentProc;
+
 int devSem[DEVICECNT+DEVPERINT]; /* device sema4's */
 int control_sem;
-
-
-void Pager();
-void uPgmTrapHandler();
-void uSysHanlder();
-
-pcb_t uProcs[UPROCMAX]; /* Array of user processes */
 
 HIDDEN void InitUserProc();
 /*Planning on using this function to initialize all the structures needed for each process,
@@ -33,7 +27,6 @@ void test(){
     int devices = (DEVICECNT+DEVPERINT);
 
     InitTLB();
-
     for(int i=0; i < devices; i++){
         devSem[i] = 1;
         /* This is where we would initialize our device semaphores, which I think there is one per process. */
@@ -52,36 +45,7 @@ void test(){
 
 } /* end test() */
 
-/*this function is used for TLB invalid and modification exceptions,
-it should check to make sure that the D-bit is on, and also check the valid bit. */
-void uTLB_exceptionHandler(){
-    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 10) == 0)
-    {
-        PassUpOrDie(GENERALEXCEPT);
-    }
-    if(((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO >> 9) == 0){
-        Pager();
-    }
-}
-
-/*This function is used for when there is no TLB entry found,
-this function goes and searches for it within the page table */
-
-void uTLB_RefillHandler(){
-    state_PTR oldstate;
-    int pg_num;
-
-    oldstate = (state_PTR) BIOSDATAPAGE;
-
-    pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    pg_num = pg_num % MAXPAGES;
-
-    setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
-    setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
-    TLBWR();
-    LDST(oldstate);
-}
-
+/* helper function to clean up the code, initializes the user processes */
 void InitUserProc(){
     int id;
     int begin;
@@ -123,9 +87,3 @@ void InitUserProc(){
         }
     }
 } /* end inituserproc */
-
-/* This is the function called for TLB invalid issues (page faults) and will be handled in here */
-void Pager(){
-
-
-}
