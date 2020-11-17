@@ -8,4 +8,4 @@ HIDDEN int swap_sem;
 
 extern void InitTLB();
 extern void intsON(int on_off);
-extern int flashOP(int flash, int sect, int buffer, int op)
+extern int flashOP(int flash, int sect, int buffer, int op);

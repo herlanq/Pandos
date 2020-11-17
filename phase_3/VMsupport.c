@@ -7,6 +7,7 @@
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/uInitial.h"
+#include "../h/VMsupport.h"
 #include "../h/libumps.h"
 
 HIDDEN swap_t swap_pool[POOLSIZE];
@@ -56,7 +57,7 @@ void uTLB_ExceptionHandler(){
 
     if(cause == TLBINV || cause == TLBINVS){
         pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
-        mutex();
+        get_mutex();
 
         int swap;
         swap = 0;
@@ -90,7 +91,15 @@ void uTLB_ExceptionHandler(){
 }
 
 void intsON(int on_off){
+    unsigned int status;
+    status = getSTATUS();
 
+    if(on_off == OFF){
+        status = status & ALLOFF;
+    }else{
+        status = status | 0x1
+    }
+    setSTATUS(status);
 }
 
 int flashOP(int flash, int sect, int buffer, int op){
