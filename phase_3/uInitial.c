@@ -12,6 +12,7 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/libumps.h"
+#include "../h/uInitial.h"
 #include "../h/VMsupport.h"
 #include "../h/syssupport.h"
 

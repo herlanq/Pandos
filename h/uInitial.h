@@ -9,3 +9,6 @@ extern int control_sem;
 
 HIDDEN void InitUserProc();
 extern void test();
+HIDDEN void InitUserProc();
+
+#endif

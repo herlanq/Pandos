@@ -6,6 +6,7 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/libumps.h"
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
+#include "../h/syssupport.h"
 
 extern int control_sem;
 void uSysHandler(support_t *supportStruct);

@@ -8,14 +8,8 @@
 #include "../h/types.h"
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
+#include "../h/syssupport.h"
 #include "../h/libumps.h"
-
-HIDDEN swap_t swap_pool[POOLSIZE];
-HIDDEN int swap_sem;
-
-int flashOP(int flash, int sect, int buffer, int op);
-HIDDEN int get_frame();
-void intsON(int on_off);
 
 
 void InitTLB(){
