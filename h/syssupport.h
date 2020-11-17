@@ -8,6 +8,7 @@
 
 extern int control_sem;
 void uSysHandler(support_t *supportStruct);
+void SysSupport();
 
 
 #endif

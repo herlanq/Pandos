@@ -12,12 +12,14 @@
 #include "../h/libumps.h"
 
 
+/* initializes the TLB data structure for support paging.
+ * Inits the global shared Page Table */
 void InitTLB(){
     swap_sem = 1;
     for(int i = 0; i < POOLSIZE; i++){
         swap_pool[i].sw_asid = -1;
     }
-}
+} /* end InitTLB */
 
 /*This function is used for when there is no TLB entry found, thus calling a TLB exception.
 The contents of the PTE are then written into the TLB */

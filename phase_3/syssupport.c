@@ -11,6 +11,7 @@ Written by Kaleb Berry and Quinn Herlan */
 extern int control_sem;
 void uSysHandler(support_t *supportStruct);
 
+
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
 	support_t supportStruct;
@@ -21,7 +22,7 @@ void SysSupport(){
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
 
 	if(cause == SYSEXCEPTION)
-		uSysHandler();
+		uSysHandler(supportStruct);
 
 	/*I think that we just terminate here? not sure what situation this puts us in */
 	SYSCALL(TERMINATEPROCESS,0,0,0);
