@@ -8,6 +8,8 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/VMsupport.h"
 
 extern int control_sem;
+void uSysHandler(support_t *supportStruct);
+
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
 	support_t supportStruct;
@@ -110,10 +112,5 @@ void uSysHandler(support_t *supportStruct){
 	else{
 		SYSCALL(TERMINATEPROCESS,0,0,0);
 	}
-
-}
-
-void uTermProc(int *semad){
-    if (semad )
 
 }
