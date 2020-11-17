@@ -4,8 +4,10 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/libumps.h"
-#include "../h/support.h"
+#include "../h/uInitial.h"
+#include "../h/VMsupport.h"
 
+extern int control_sem;
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
 	support_t supportStruct;
@@ -21,17 +23,19 @@ void SysSupport(){
 	SYSCALL(TERMINATEPROCESS,0,0,0);
 }
 
-void uSysHandler(support_t supportStruct){
-
+void uSysHandler(support_t *supportStruct){
+    cpu_t time;
 	int sysReason = supportStruct->sup_exceptState[GENERALEXCEPT].s_a0;
+
 	if(sysReason == TERMINATE){
 		/*this is the case where we terminate process */
 		SYSCALL(TERMINATEPROCESS,0,0,0);
+		break;
 	}
 	else if(sysReason == GETTOD){
-		cpu_t time;
 		STCK(time);
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = time;
+		break;
 	}
 	else if(sysReason == PRINTERW){
 		/*this is the case where we write to printer */
@@ -86,5 +90,10 @@ void uSysHandler(support_t supportStruct){
 	else{
 		SYSCALL(TERMINATEPROCESS,0,0,0);
 	}
+
+}
+
+void uTermProc(int *semad){
+    if (semad )
 
 }

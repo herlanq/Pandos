@@ -46,7 +46,7 @@ void test(){
 } /* end test() */
 
 /* helper function to clean up the code, initializes the user processes */
-void InitUserProc(){
+HIDDEN void InitUserProc(){
     int id;
     int begin;
     int devices = (DEVICECNT+DEVPERINT);
