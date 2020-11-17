@@ -109,7 +109,7 @@
 #define TRANCOMMAND 	3
 
 /* device common STATUS codes */
-#define UNINSTALLED		0
+#define UNINSTALLED			0
 #define READY			    1
 #define BUSY			    3
 
