@@ -22,19 +22,18 @@ void SysSupport(){
 }
 
 void uSysHandler(support_t supportStruct){
-	
-	
+    
 	int sysReason = supportStruct->sup_exceptState[GENERALEXCEPT].s_a0;
-	if(sysReason == 9){
+	if(sysReason == SYS9){
 		/*this is the case where we terminate process */
 		SYSCALL(TERMINATEPROCESS,0,0,0);
 	}
-	else if(sysReason == 10){
+	else if(sysReason == SYS10){
 		cpu_t time;
 		STCK(time);
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = time;
 	}
-	else if(sysReason == 11){
+	else if(sysReason == SYS11){
 		/*this is the case where we write to printer */
 		int id; /*this is the asid of the process */
 		int status; /*used for writing to printer and terminal */
@@ -58,7 +57,7 @@ void uSysHandler(support_t supportStruct){
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
 
 	}
-	else if(sysReason == 12){
+	else if(sysReason == SYS12){
 		/*this is the case where we write to terminal */
 		int id; /*this is the asid of the process */
 		int status; /*used for writing to printer and terminal */
@@ -81,7 +80,7 @@ void uSysHandler(support_t supportStruct){
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = length;
 
 	}
-	else if(sysReason == 13){
+	else if(sysReason == SYS13){
 		/*this is the case where we read from terminal, havnt even started this yet */
 	}
 	else{

@@ -186,16 +186,16 @@
 #define DISKPOOL  (FLASHPOOL + (DEVPERINT * PAGESIZE))
 #define FRAMEPOOL (DISKPOOL + (DEVPERINT * PAGESIZE))
 
-#define SYSCALL9 9
-#define SYSCALL10 10
-#define SYSCALL11 11
-#define SYSCALL12 12
-#define SYSCALL13 13
-#define SYSCALL14 14
-#define SYSCALL15 15
-#define SYSCALL16 16
-#define SYSCALL17 17
-#define SYSCALL18 18
+#define SYS9 9
+#define SYS10 10
+#define SYS11 11
+#define SYS12 12
+#define SYS13 13
+#define SYS14 14
+#define SYS15 15
+#define SYS16 16
+#define SYS17 17
+#define SYS18 18
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
