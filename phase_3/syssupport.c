@@ -4,9 +4,10 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/libumps.h"
+#include "../h/syssupport.h"
+
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
-#include "../h/syssupport.h"
 
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){

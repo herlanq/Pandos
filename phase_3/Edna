@@ -10,6 +10,10 @@
             "enabled": true,
             "file": "/home/schlampyy/Desktop/Pandos/testers/printerTest.umps"
         },
+        "flash1": {
+            "enabled": true,
+            "file": "/home/schlampyy/Desktop/Pandos/testers/timeOfDay.umps"
+        },
         "terminal0": {
             "enabled": true,
             "file": "term0.umps"
