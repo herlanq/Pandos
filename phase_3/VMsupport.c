@@ -11,12 +11,17 @@
 #include "../h/syssupport.h"
 #include "../h/libumps.h"
 
+HIDDEN swap_t swap_pool[POOLSIZE];
+HIDDEN int swap_sem;
+HIDDEN int get_frame();
+extern pcb_t *currentProc;
 
 /* initializes the TLB data structure for support paging.
  * Inits the global shared Page Table */
 void InitTLB(){
+    int i;
     swap_sem = 1;
-    for(int i = 0; i < POOLSIZE; i++){
+    for(i=0; i < POOLSIZE; i++){
         swap_pool[i].sw_asid = -1;
     }
 } /* end InitTLB */
@@ -42,7 +47,6 @@ void uTLB_RefillHandler(){
  * will result in a terminating process. */
 void uTLB_Pager(){
     int id, frame_num, pg_num, status;
-    pteEntry_t *entry;
     unsigned int frame_addr;
     int block;
     support_t *supStruct;
@@ -101,7 +105,7 @@ void intsON(int on_off){
     if(on_off == OFF){
         status = status & ALLOFF;
     }else{
-        status = status | 0x1
+        status = status | 0x1;
     }
     setSTATUS(status);
 }

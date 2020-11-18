@@ -26,14 +26,17 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 int devSem[DEVICECNT+DEVPERINT]; /* list of device sema4's */
 int control_sem; /* master process sema4 */
 
+HIDDEN void InitUserProc();
+
 /* master process that initializes all necessary data structures adn processes. Once this is complete, test() will
  * blocks itself until all of the processes have been terminated and then terminates itself. */
 void test(){
-    int devices = (DEVICECNT+DEVPERINT);
+    int i;
     /* initialize the TLB*/
     InitTLB();
+
     /* initializes the device reg semaphores */
-    for(int i=0; i < devices; i++){
+    for(i=0; i < (DEVICECNT+DEVPERINT); i++){
         devSem[i] = 1;
     }
     /* call helper function to initialize user processes */
@@ -43,7 +46,7 @@ void test(){
     control_sem = 0;
 
     /*block master proc */
-    for(int i = 0; i < UPROCMAX; ++i){
+    for(i=0; i < UPROCMAX; ++i){
         SYSCALL(PASSERN, (int)&control_sem, 0, 0);
     }
     /* Au revoir */
@@ -54,18 +57,13 @@ void test(){
 HIDDEN void InitUserProc(){
     int id;
     int begin;
-    int devices = (DEVICECNT+DEVPERINT);
-    memaddr ramtop;
     memaddr stacktop;
     support_t support[UPROCMAX + 1];
     state_t start_state; /* processor state */
 
-    /* get ramtop */
-    RAMTOP(ramtop);
-
     /*now it is time to start initializing user processes */
     for(id = 1; id <= UPROCMAX; id++) {
-        stacktop = ramtop - (id * PAGESIZE * 2);
+        stacktop = RAMTOP - (id * PAGESIZE * 2);
         start_state.s_entryHI = id << ASIDSHIFT;
         start_state.s_sp = (int) USERSTACK;
         start_state.s_pc = start_state.s_t9 = (memaddr) USERPROCSTART;
@@ -80,7 +78,8 @@ HIDDEN void InitUserProc(){
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_pc = (memaddr) uTLB_Pager;
 
         /* Init page table */
-        for (int i = 0; i < MAXPAGES; i++) {
+        int i;
+        for (i=0; i < MAXPAGES; i++) {
             support[i].sup_PvtPgTable->entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
             support[i].sup_PvtPgTable->entryLO = ALLOFF | DIRTYON;
         }
