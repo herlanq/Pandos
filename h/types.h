@@ -114,6 +114,8 @@ typedef struct support_t {
     state_t     sup_exceptState[2]; /* stored excpt states */
     context_t   sup_exceptContext[2];/* pass up contexts    */
     pteEntry_t  sup_PvtPgTable[32];
+    int         sup_privSem;
+    int         sup_stack[500];
 } support_t;
 
 typedef struct swap_t {
@@ -125,6 +127,7 @@ typedef struct swap_t {
 /* Exceptions related constants */
 #define PGFAULTEXCEPT 0
 #define GENERALEXCEPT 1
+
 #define	s_at	s_reg[0]
 #define	s_v0	s_reg[1]
 #define s_v1	s_reg[2]

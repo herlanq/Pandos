@@ -7,10 +7,6 @@
 extern int devSem[DEVICECNT+DEVPERINT]; /* device sema4's */
 extern int control_sem;
 
-HIDDEN swap_t swap_pool[POOLSIZE];
-HIDDEN int swap_sem;
-HIDDEN int get_frame();
-
 extern void InitTLB();
 extern void uTLB_Pager();
 extern void uTLB_RefillHandler();
