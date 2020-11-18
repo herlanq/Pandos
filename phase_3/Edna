@@ -8,7 +8,7 @@
     "devices": {
         "flash0": {
             "enabled": true,
-            "file": "/home/k98berry/Documents/testers/testers/printerTest.c"
+            "file": "/home/schlampyy/Desktop/Pandos/testers/printerTest.umps"
         },
         "terminal0": {
             "enabled": true,

@@ -71,7 +71,7 @@ HIDDEN void InitUserProc(){
 
         support[id].sup_asid = id;
         support[id].sup_exceptContext[GENERALEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
-        support[id].sup_exceptContext[GENERALEXCEPT].c_stackPtr = stacktop;
+        support[id].sup_exceptContext[GENERALEXCEPT].c_stackPtr = support->sup_stack[499];
         support[id].sup_exceptContext[GENERALEXCEPT].c_pc = (memaddr) SysSupport;
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = stacktop + PAGESIZE;
