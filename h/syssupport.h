@@ -7,6 +7,8 @@
 
 
 extern int control_sem;
+extern int devSem[DEVICECNT+DEVPERINT]; /* device sema4's */
+
 void SysSupport();
 void uSysHandler(support_t *supportStruct);
 
