@@ -115,7 +115,9 @@ typedef struct support_t {
     context_t   sup_exceptContext[2];/* pass up contexts    */
     pteEntry_t  sup_PvtPgTable[32];
     int         sup_privSem;
-    int         sup_stack[500];
+    int         sup_stackM[500];
+    int         sup_stackG[500];
+
 } support_t;
 
 typedef struct swap_t {
