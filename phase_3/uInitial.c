@@ -80,8 +80,8 @@ HIDDEN void InitUserProc(){
         int i;
         for (i=0; i < MAXPAGES; i++) {
             zdiditdo++;
-            support[id].sup_PvtPgTable->entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
-            support[id].sup_PvtPgTable->entryLO = ALLOFF | DIRTYON;
+            support[id].sup_PvtPgTable[i].entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
+            support[id].sup_PvtPgTable[i].entryLO = ALLOFF | DIRTYON;
         }
 
         support[id].sup_PvtPgTable[MAXPAGES - 1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
