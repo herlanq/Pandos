@@ -58,13 +58,11 @@ void test(){
 HIDDEN void InitUserProc(){
     int id;
     int begin;
-    memaddr stacktop;
     support_t support[UPROCMAX + 1];
     state_t start_state; /* processor state */
 
     /*now it is time to start initializing user processes */
     for(id = 1; id <= UPROCMAX; id++) {
-        stacktop = RAMTOP - (id * PAGESIZE * 2);
         start_state.s_entryHI = id << ASIDSHIFT;
         start_state.s_sp = (int) USERSTACK;
         start_state.s_pc = start_state.s_t9 = (memaddr) USERPROCSTART;
@@ -72,10 +70,10 @@ HIDDEN void InitUserProc(){
 
         support[id].sup_asid = id;
         support[id].sup_exceptContext[GENERALEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
-        support[id].sup_exceptContext[GENERALEXCEPT].c_stackPtr = (int) &(support[id]->sup_stackG[499]);
+        support[id].sup_exceptContext[GENERALEXCEPT].c_stackPtr = (int) &(support[id].sup_stackG[499]);
         support[id].sup_exceptContext[GENERALEXCEPT].c_pc = (memaddr) SysSupport;
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_status = ALLOFF | IEPON | IMON | TEBITON;
-        support[id].sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = (int) &(support[id]->sup_stackM[499]);
+        support[id].sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = (int) &(support[id].sup_stackM[499]);
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_pc = (memaddr) uTLB_Pager;
 
         /* Init page table */
