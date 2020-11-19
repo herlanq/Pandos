@@ -7,6 +7,7 @@
 #include "../h/const.h"
 #include "../h/types.h"
 
+#include "../h/initial.h"
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
 #include "../h/syssupport.h"
@@ -15,7 +16,6 @@
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 HIDDEN int get_frame();
-extern pcb_t *currentProc;
 
 /* initializes the TLB data structure for support paging.
  * Inits the global shared Page Table */
