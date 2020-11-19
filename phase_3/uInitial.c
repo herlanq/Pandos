@@ -25,6 +25,7 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 int devSem[DEVICECNT+DEVPERINT]; /* list of device sema4's */
 int control_sem; /* master process sema4 */
+int zdiditdo = 0;
 
 HIDDEN void InitUserProc();
 
@@ -80,12 +81,12 @@ HIDDEN void InitUserProc(){
         /* Init page table */
         int i;
         for (i=0; i < MAXPAGES; i++) {
-            support[i].sup_PvtPgTable->entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
-            support[i].sup_PvtPgTable->entryLO = ALLOFF | DIRTYON;
+            zdiditdo++;
+            support[id].sup_PvtPgTable->entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
+            support[id].sup_PvtPgTable->entryLO = ALLOFF | DIRTYON;
         }
 
         support[id].sup_PvtPgTable[MAXPAGES - 1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
-
         begin = SYSCALL(CREATETHREAD, (int) &start_state, (int) &(support[id]), 0);
         /* create the process, if it does not create, terminate B( */
         if (begin != READY) {
