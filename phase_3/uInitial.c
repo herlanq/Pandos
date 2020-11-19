@@ -47,7 +47,6 @@ void test(){
     for(i=0; i < UPROCMAX; ++i){
         SYSCALL(PASSERN, (int)&control_sem, 0, 0);
     }
-    
     /* Au revoir */
     SYSCALL(TERMINATETHREAD, 0, 0, 0);
 } /* end test(), master process */

@@ -47,42 +47,48 @@ void uTLB_RefillHandler(){
 /* This function handles only page fault TLB Management Exceptions. All other exceptions
  * will result in a terminating process. */
 void uTLB_Pager(){
-    int id, frame_num, pg_num, status;
+    int id, frame_num, pg_num, status; /* process id, victim frame number, requested pg number, return status */
     unsigned int frame_addr;
     int block;
     support_t *supStruct;
     int cause;
 
     supStruct = (support_t *) SYSCALL(GETSPTPTR,0,0,0);
-    cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE);
+    /* get exception cause and process id causing the exception */
+    cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE) >> SHIFT;
     id = supStruct->sup_asid;
 
-    if(cause != TLBINV && cause != TLBINVS) {
+    if((cause != TLBINV) && (cause != TLBINVS)) {
         SYSCALL(TERMINATETHREAD, 0, 0, 0);
     }
-
-    pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
+    /* get page number of the request */
+    pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM) >> VPNSHIFT;
+    /* P the sema4 to gain mutual exclusion */
     SYSCALL(PASSERN, swap_sem, 0, 0 );
+    /* call helper function to assign frame number and address */
     frame_num = get_frame();
     frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
 
+    /* if frame is being used */
     if(swap_pool[frame_num].sw_asid != -1){
         /* disable interrupts */
         intsON(OFF);
-        swap_pool[frame_num].sw_pte->entryLO = swap_pool[frame_num].sw_pte->entryLO & 0xFFFFFDFF;
+        swap_pool[frame_num].sw_pte->entryLO = ((swap_pool[frame_num].sw_pte->entryLO) & 0xFFFFFDFF);
         TLBCLR();
         intsON(ON);
 
+        /* update the backing store */
         block = swap_pool[frame_num].sw_pgNum;
         block = block % MAXPAGES;
-
+        /* write into the backing store */
         status = flashOP(((swap_pool[frame_num].sw_asid)-1), block, frame_addr, FLASHW);
 
         if(status != READY){
                 SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
             }
-        }
+    }
 
+    /* read from backing store */
     block = pg_num;
     block = block % MAXPAGES;
     status = flashOP((id-1), block, frame_addr, FLASHR);
@@ -99,7 +105,7 @@ void uTLB_Pager(){
     /* V the semaphore */
     SYSCALL(VERHOGEN, swap_sem, 0, 0);
     /* Load State */
-    LDST(&supStruct->sup_exceptState[PGFAULTEXCEPT]);
+    LDST(&(supStruct->sup_exceptState[PGFAULTEXCEPT]));
 
 } /* End uTLB_Pager */
 
