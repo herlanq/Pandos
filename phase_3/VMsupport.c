@@ -89,14 +89,19 @@ void uTLB_Pager(){
     if(status != READY){
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
-
+    /* Turn off interrupts */
     intsON(OFF);
     swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
+    /* Clear the TLB*/
     TLBCLR();
+    /* Turn on interrupts */
     intsON(ON);
+    /* V the semaphore */
     SYSCALL(VERHOGEN, swap_sem, 0, 0);
+    /* Load State */
     LDST(&supStruct->sup_exceptState[PGFAULTEXCEPT]);
-}
+
+} /* End uTLB_Pager */
 
 /* Helper function to toggle interrupts on and off */
 void intsON(int on_off){
