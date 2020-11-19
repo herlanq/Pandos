@@ -49,7 +49,8 @@
 #define DEVPERINT		  8		  /* devices per interrupt line */
 #define DEVICECNT         (DEVPERINT * DEVINTNUM)
 #define DEVREGLEN		  4		  /* device register field length in bytes, and regs per dev */	
-#define DEVREGSIZE	  16 		/* device register size in bytes */
+#define DEVREGSIZE	      16 		/* device register size in bytes */
+#define MAXSTRING         128
 
 /* system call codes */
 #define	CREATETHREAD	1	/* create thread */

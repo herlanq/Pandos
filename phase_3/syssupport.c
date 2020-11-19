@@ -63,7 +63,7 @@ void uSysHandler(support_t *supportStruct){
 		charAddress = (char*) supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
-		if(((int)charAddress < KUSEG) || (length < 1)){
+		if(((int)charAddress < KUSEG) || (length < 1) || (length > MAXSTRING)){
 		    SYSCALL(TERMINATETHREAD, 0, 0, 0);
 		}
 
