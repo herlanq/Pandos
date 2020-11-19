@@ -11,11 +11,11 @@ Written by Kaleb Berry and Quinn Herlan */
 
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
-	support_t* supportStruct;
+	support_t *supportStruct;
 	int cause;
 	/*first things first, get the support struct */
 	supportStruct = (support_t*) SYSCALL(GETSPTPTR,0,0,0);
-	supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4;
+	/*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4; */
 	/* get exception cause */
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
 
@@ -131,12 +131,11 @@ void uSysHandler(support_t *supportStruct){
 		}
 		/* V the semaphore to release mutual exclusion */
 		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
-
 		if(error){
 		    counter = 0 - (status&0xFF);
 		}
-
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
+
 	} /* End Terminal Write Case */
 
 	else if(sysReason == TERMINALR){
@@ -146,5 +145,6 @@ void uSysHandler(support_t *supportStruct){
 	else{
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
-
+    /*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc = supportStruct->sup_exceptState[]*/
+    LDST(&(supportStruct->sup_exceptState[GENERALEXCEPT]));
 }
