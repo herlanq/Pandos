@@ -103,16 +103,11 @@ void uTLB_Pager(){
     intsON(OFF);
     pteEntry_t* pEntry = &(supStruct->sup_PvtPgTable[block]);
     swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
-<<<<<<< HEAD
     swap_pool[frame_num].sw_pte = pEntry;
     swap_pool[frame_num].sw_asid = id;
     swap_pool[frame_num].sw_pgNum = pg_num;
     flaggerton = 4;
-
-
-=======
     /* Clear the TLB*/
->>>>>>> df088d3ee30c78b4ee4867820fccd9ced79ef4b1
     TLBCLR();
     /* Turn on interrupts */
     intsON(ON);
