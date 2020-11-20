@@ -16,6 +16,7 @@
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 HIDDEN int get_frame();
+int flaggerton = 0;
 
 /* initializes the TLB data structure for support paging.
  * Inits the global shared Page Table */
@@ -54,13 +55,13 @@ void uTLB_Pager(){
     int cause;
 
     supStruct = (support_t *) SYSCALL(GETSPTPTR,0,0,0);
-    cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE);
+    cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE) >> SHIFT;
     id = supStruct->sup_asid;
 
     if(cause != TLBINV && cause != TLBINVS) {
         SYSCALL(TERMINATETHREAD, 0, 0, 0);
     }
-
+    flaggerton = 1;
     pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM);
     SYSCALL(PASSERN, swap_sem, 0, 0 );
     frame_num = get_frame();
@@ -68,6 +69,7 @@ void uTLB_Pager(){
 
     if(swap_pool[frame_num].sw_asid != -1){
         /* disable interrupts */
+        flaggerton = 2;
         intsON(OFF);
         swap_pool[frame_num].sw_pte->entryLO = swap_pool[frame_num].sw_pte->entryLO & 0xFFFFFDFF;
         TLBCLR();
@@ -86,12 +88,20 @@ void uTLB_Pager(){
     block = pg_num;
     block = block % MAXPAGES;
     status = flashOP((id-1), block, frame_addr, FLASHR);
+    flaggerton = 3;
     if(status != READY){
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
 
     intsON(OFF);
+    pteEntry_t* pEntry = &(supStruct->sup_PvtPgTable[block]);
     swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
+    swap_pool[frame_num].sw_pte = pEntry;
+    swap_pool[frame_num].sw_asid = id;
+    swap_pool[frame_num].sw_pgNum = pg_num;
+    flaggerton = 4;
+
+
     TLBCLR();
     intsON(ON);
     SYSCALL(VERHOGEN, swap_sem, 0, 0);

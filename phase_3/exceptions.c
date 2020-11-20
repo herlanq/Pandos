@@ -30,6 +30,8 @@ extern pcb_t *readyQue;
 extern int semD[SEMNUM];
 extern cpu_t start_clock;
 
+int flagboi = 0;
+
 /* local function declaration */
 HIDDEN void blocker(int *blocking); /* helper function to block processes */
 HIDDEN void PassUpOrDie(int Excepttrigger); /* function used to kill a pass up a process or terminate it and all of its children */
@@ -48,7 +50,7 @@ void sysHandler(){
 
 	/* check for user mode
 	 * if syscall > 8, or in user mode, pass up or die */
-	if(syscall >= 1 && syscall <= 8 && usermode != 0){
+	if(syscall >= 1 && syscall <= 8 && usermode == 1){
 	    PassUpOrDie(GENERALEXCEPT);
 	}
 
@@ -94,6 +96,7 @@ void sysHandler(){
 	/*                  SYS 3                */
 	/* Passeren situation */
 	else if(syscall == 3){
+		flagboi = 4;
 		int *mutex;
 		mutex = (int*)currentProc->p_s.s_a1;
         (*mutex) -= 1;
@@ -164,6 +167,7 @@ void sysHandler(){
 	/*                  SYS 8                */
 	/* Get support data situation */
 	else if(syscall == 8){
+		flagboi++;
 		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		Context_Switch(currentProc);
 	} /* end support pointer case */

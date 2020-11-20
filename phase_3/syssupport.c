@@ -9,6 +9,8 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
 
+int zflag = 0;
+
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
 	support_t* supportStruct;
@@ -29,7 +31,6 @@ void SysSupport(){
 }
 
 void uSysHandler(support_t *supportStruct){
-    
 	int sysReason = supportStruct->sup_exceptState[GENERALEXCEPT].s_a0;
 
     /* Begin Terminate Case */
@@ -144,6 +145,7 @@ void uSysHandler(support_t *supportStruct){
 	}
 
 	else{
+		zflag = 4;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
 
