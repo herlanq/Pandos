@@ -89,6 +89,7 @@ void sysHandler(){
 	/*                  SYS 2                */
 	/* situation to terminate process */
 	else if(syscall == 2){
+		flagboi = 9;
 	    terminate_process(currentProc);
 		scheduler();
 	} /* end terminate process case */
@@ -96,7 +97,7 @@ void sysHandler(){
 	/*                  SYS 3                */
 	/* Passeren situation */
 	else if(syscall == 3){
-		flagboi = 4;
+		flagboi = 3;
 		int *mutex;
 		mutex = (int*)currentProc->p_s.s_a1;
         (*mutex) -= 1;
@@ -111,16 +112,19 @@ void sysHandler(){
 	/*                  SYS 4                */
 	/* Verhogen situation */
 	else if(syscall == 4){
+		flagboi = 4;
 		int *mutex;
 		mutex = (int *)currentProc->p_s.s_a1;
         pcb_PTR temp;
         (*mutex) += 1;
 		if((*mutex) <= 0){
+
 			temp = removeBlocked(mutex);
 			if(temp != NULL){
                 insertProcQ(&readyQue, temp);
             }
 		}
+
 		Context_Switch(currentProc);
 	} /* end Verhogen case */
 
@@ -167,7 +171,7 @@ void sysHandler(){
 	/*                  SYS 8                */
 	/* Get support data situation */
 	else if(syscall == 8){
-		flagboi++;
+		flagboi = 8;
 		currentProc->p_s.s_v0 = (int) currentProc->p_supportStruct;
 		Context_Switch(currentProc);
 	} /* end support pointer case */

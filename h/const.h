@@ -162,7 +162,7 @@
 #define KERNELSTACK 0x20001000
 #define UPGTBLSIZE MAXPAGES
 #define OSFRAMES 32
-#define POOLSIZE 16
+#define POOLSIZE UPROCMAX * 2
 #define BACKINGSTORE 0
 #define DISKBACK 1
 #define FLASHBACK 0 
@@ -205,8 +205,8 @@
 #define TERMINALR 13
 #define DISKR 14
 #define DISKW 15
-#define FLASHR 16
-#define FLASHW 17
+#define FLASHR 2
+#define FLASHW 3
 
 /* Macro to load the Interval Timer */
 #define LDIT(T)	((* ((cpu_t *) INTERVALTMR)) = (T) * (* ((cpu_t *) TIMESCALEADDR))) 
