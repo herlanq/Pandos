@@ -35,17 +35,14 @@ void test(){
     int i;
     /* initialize the TLB*/
     InitTLB();
-
     /* initializes the device reg semaphores */
     for(i=0; i < (DEVICECNT+DEVPERINT); i++){
         devSem[i] = 1;
     }
     /* call helper function to initialize user processes */
     InitUserProc();
-
     /* init master proc control sema4 */
     control_sem = 0;
-
     /*block master proc */
     for(i=0; i < UPROCMAX; ++i){
         SYSCALL(PASSERN, (int)&control_sem, 0, 0);
@@ -84,7 +81,7 @@ HIDDEN void InitUserProc(){
             support[id].sup_PvtPgTable[i].entryLO = ALLOFF | DIRTYON;
         }
 
-        support[id].sup_PvtPgTable[MAXPAGES - 1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
+        support[id].sup_PvtPgTable[MAXPAGES-1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
         begin = SYSCALL(CREATETHREAD, (int) &start_state, (int) &(support[id]), 0);
         /* create the process, if it does not create, terminate B( */
         if (begin != READY) {
