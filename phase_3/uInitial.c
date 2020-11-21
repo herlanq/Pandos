@@ -79,7 +79,6 @@ HIDDEN void InitUserProc(){
         /* Init page table */
         int i;
         for (i=0; i < MAXPAGES; i++) {
-            zdiditdo++;
             support[id].sup_PvtPgTable[i].entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
             support[id].sup_PvtPgTable[i].entryLO = ALLOFF | DIRTYON;
         }

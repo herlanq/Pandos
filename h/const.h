@@ -34,7 +34,7 @@
 #define NULL 			  ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
 #define MAXINT            0xFFFFFFFF
-#define UPROCMAX		  1
+#define UPROCMAX		  8
 /* Sem number
  * 8 disks
  * 8 usb
@@ -162,7 +162,7 @@
 #define KERNELSTACK 0x20001000
 #define UPGTBLSIZE MAXPAGES
 #define OSFRAMES 32
-#define POOLSIZE UPROCMAX * 2
+#define POOLSIZE (UPROCMAX * 2)
 #define BACKINGSTORE 0
 #define DISKBACK 1
 #define FLASHBACK 0 

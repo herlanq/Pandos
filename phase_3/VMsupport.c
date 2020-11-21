@@ -16,7 +16,9 @@
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 HIDDEN int get_frame();
+HIDDEN int swapper = 0;
 int flaggerton = 0;
+int pagethingy = -1;
 
 /* initializes the TLB data structure for support paging.
  * Inits the global shared Page Table */
@@ -49,6 +51,7 @@ void uTLB_RefillHandler(){
  * will result in a terminating process. */
 void uTLB_Pager(){
     int id, frame_num, pg_num, status; /* process id, victim frame number, requested pg number, return status */
+    
     unsigned int frame_addr;
     int block;
     support_t *supStruct;
@@ -65,6 +68,7 @@ void uTLB_Pager(){
     
     /* get page number of the request */
     pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM) >> VPNSHIFT;
+    pagethingy = pg_num;
     /* P the sema4 to gain mutual exclusion */
     SYSCALL(PASSERN, (int) &swap_sem, 0, 0 );
     /* call helper function to assign frame number and address */
@@ -74,7 +78,6 @@ void uTLB_Pager(){
     /* if frame is being used */
     if(swap_pool[frame_num].sw_asid != -1){
         /* disable interrupts */
-        flaggerton++;
         intsON(OFF);
         swap_pool[frame_num].sw_pte->entryLO = ((swap_pool[frame_num].sw_pte->entryLO) & 0xFFFFFDFF);
         TLBCLR();
@@ -100,11 +103,12 @@ void uTLB_Pager(){
     if(status != READY){
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
-    /* Turn off interrupts */
+    
     pteEntry_t* pEntry = &(supStruct->sup_PvtPgTable[block]);
     swap_pool[frame_num].sw_pte = pEntry;
     swap_pool[frame_num].sw_asid = id;
     swap_pool[frame_num].sw_pgNum = pg_num;
+    /* Turn off interrupts */
     intsON(OFF);
     
     swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
@@ -158,8 +162,8 @@ int flashOP(int flash, int sect, int buffer, int op){
 /* this function is used to satisfy a page fault exception by finding which frame to use
  * using a round robin algorithm */
 HIDDEN int get_frame(){
-    int swap;
-    swap = 0;
-    swap = (swap+1) % POOLSIZE;
-    return swap;
+    flaggerton = swapper;
+    swapper = (swapper+1) % POOLSIZE;
+    flaggerton = swapper;
+    return swapper;
 }

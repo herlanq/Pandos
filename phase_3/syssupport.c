@@ -39,7 +39,7 @@ void uSysHandler(support_t *supportStruct){
     /* Begin Terminate Case */
 	if(sysReason == TERMINATE){
 		/*this is the case where we terminate process */
-		zflag = 2;
+		zflag = 8;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	} /* End Terminate Case */
 
@@ -52,6 +52,7 @@ void uSysHandler(support_t *supportStruct){
 
 	/* Begin Write to Printer Case */
 	else if(sysReason == PRINTERW){
+		zflag = 1;
 		/*this is the case where we write to printer */
 		int id; /*this is the asid of the process */
 		int status; /*used for writing to printer and terminal */
@@ -69,13 +70,13 @@ void uSysHandler(support_t *supportStruct){
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
 		if(((int)charAddress < KUSEG) || (length < 1) || (length > MAXSTRING)){
-			zflag = 3;
+			zflag = 9;
 		    SYSCALL(TERMINATETHREAD, 0, 0, 0);
 		}
 
 		/* P the semaphore and get mutual exclusion */
 		SYSCALL(PASSERN, devSem[devSemNum], 0, 0);
-
+		zflag = 3;
 		int counter = 0; /*used for the while loop */
 		error = FALSE;
 		while((!error) && (counter < length)){
@@ -92,6 +93,7 @@ void uSysHandler(support_t *supportStruct){
             charAddress++;
 		}
 		/* V the semaphore and release mutual exclusion */
+		zflag = 4;
 		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
 
 		/* assign the number of characters to the process */
