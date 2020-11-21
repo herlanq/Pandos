@@ -20,14 +20,15 @@ void SysSupport(){
 	/*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4; */
 	/* get exception cause */
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
-
 	/* If Syscall */
 	if(cause == SYSEXCEPTION) {
         uSysHandler(supportStruct);
     }
-
-	/* Else, (for our purposes) Terminate the process */
-	SYSCALL(TERMINATETHREAD,0,0,0);
+	else{ /* Else, (for our purposes) Terminate the process */
+		zflag = 1;
+		SYSCALL(TERMINATETHREAD,0,0,0);
+	}
+	
 }
 
 void uSysHandler(support_t *supportStruct){
@@ -36,6 +37,7 @@ void uSysHandler(support_t *supportStruct){
     /* Begin Terminate Case */
 	if(sysReason == TERMINATE){
 		/*this is the case where we terminate process */
+		zflag = 2;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	} /* End Terminate Case */
 
@@ -65,6 +67,7 @@ void uSysHandler(support_t *supportStruct){
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
 		if(((int)charAddress < KUSEG) || (length < 1) || (length > MAXSTRING)){
+			zflag = 3;
 		    SYSCALL(TERMINATETHREAD, 0, 0, 0);
 		}
 

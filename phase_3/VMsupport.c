@@ -60,13 +60,14 @@ void uTLB_Pager(){
     id = supStruct->sup_asid;
 
     if((cause != TLBINV) && (cause != TLBINVS)) {
+        flaggerton = 1;
         SYSCALL(TERMINATETHREAD, 0, 0, 0);
     }
-    flaggerton = 1;
+    
     /* get page number of the request */
     pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM) >> VPNSHIFT;
     /* P the sema4 to gain mutual exclusion */
-    SYSCALL(PASSERN, swap_sem, 0, 0 );
+    SYSCALL(PASSERN, (int) &swap_sem, 0, 0 );
     /* call helper function to assign frame number and address */
     frame_num = get_frame();
     frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
@@ -87,8 +88,9 @@ void uTLB_Pager(){
         status = flashOP(((swap_pool[frame_num].sw_asid)-1), block, frame_addr, FLASHW);
 
         if(status != READY){
-                SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
-            }
+            
+            SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
+        }
     }
 
     /* read from backing store */
@@ -97,23 +99,27 @@ void uTLB_Pager(){
     status = flashOP((id-1), block, frame_addr, FLASHR);
     flaggerton = 3;
     if(status != READY){
+        flaggerton = 4;
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
     /* Turn off interrupts */
-    intsON(OFF);
     pteEntry_t* pEntry = &(supStruct->sup_PvtPgTable[block]);
-    swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
     swap_pool[frame_num].sw_pte = pEntry;
     swap_pool[frame_num].sw_asid = id;
     swap_pool[frame_num].sw_pgNum = pg_num;
-    flaggerton = 4;
+    intsON(OFF);
+    
+    swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
+    
+    flaggerton = 5;
     /* Clear the TLB*/
     TLBCLR();
     /* Turn on interrupts */
     intsON(ON);
     /* V the semaphore */
-    SYSCALL(VERHOGEN, swap_sem, 0, 0);
+    SYSCALL(VERHOGEN,(int) &swap_sem, 0, 0);
     /* Load State */
+    flaggerton = 9;
     LDST(&(supStruct->sup_exceptState[PGFAULTEXCEPT]));
 
 } /* End uTLB_Pager */
