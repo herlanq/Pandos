@@ -60,7 +60,6 @@ void uTLB_Pager(){
     id = supStruct->sup_asid;
 
     if((cause != TLBINV) && (cause != TLBINVS)) {
-        flaggerton = 1;
         SYSCALL(TERMINATETHREAD, 0, 0, 0);
     }
     
@@ -75,7 +74,7 @@ void uTLB_Pager(){
     /* if frame is being used */
     if(swap_pool[frame_num].sw_asid != -1){
         /* disable interrupts */
-        flaggerton = 2;
+        flaggerton++;
         intsON(OFF);
         swap_pool[frame_num].sw_pte->entryLO = ((swap_pool[frame_num].sw_pte->entryLO) & 0xFFFFFDFF);
         TLBCLR();
@@ -97,10 +96,8 @@ void uTLB_Pager(){
     block = pg_num;
     block = block % MAXPAGES;
     status = flashOP((id-1), block, frame_addr, FLASHR);
-    flaggerton = 3;
 
     if(status != READY){
-        flaggerton = 4;
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
     }
     /* Turn off interrupts */
@@ -112,7 +109,6 @@ void uTLB_Pager(){
     
     swap_pool[frame_num].sw_pte->entryLO = frame_addr | VALIDON | DIRTYON;
     
-    flaggerton = 5;
     /* Clear the TLB*/
     TLBCLR();
     /* Turn on interrupts */
@@ -120,7 +116,6 @@ void uTLB_Pager(){
     /* V the semaphore */
     SYSCALL(VERHOGEN,(int) &swap_sem, 0, 0);
     /* Load State */
-    flaggerton = 9;
     LDST(&(supStruct->sup_exceptState[PGFAULTEXCEPT]));
 
 } /* End uTLB_Pager */
