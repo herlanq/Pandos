@@ -18,8 +18,10 @@ void SysSupport(){
 	/*first things first, get the support struct */
 	supportStruct = (support_t*) SYSCALL(GETSPTPTR,0,0,0);
 	/*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4; */
+
 	/* get exception cause */
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
+
 	/* If Syscall */
 	if(cause == SYSEXCEPTION) {
         uSysHandler(supportStruct);
@@ -121,6 +123,7 @@ void uSysHandler(support_t *supportStruct){
 
         int counter = 0; /*used for the while loop */
         error = FALSE;
+
 		while((!error) && (counter < length)){
 		    devReg->devreg[devSemNum].t_transm_command = *charAddress;
 
@@ -135,11 +138,12 @@ void uSysHandler(support_t *supportStruct){
 		}
 		/* V the semaphore to release mutual exclusion */
 		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
+
 		if(error){
 		    counter = 0 - (status&0xFF);
 		}
-		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 
+		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Terminal Write Case */
 
 	else if(sysReason == TERMINALR){

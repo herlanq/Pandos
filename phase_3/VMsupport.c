@@ -98,6 +98,7 @@ void uTLB_Pager(){
     block = block % MAXPAGES;
     status = flashOP((id-1), block, frame_addr, FLASHR);
     flaggerton = 3;
+
     if(status != READY){
         flaggerton = 4;
         SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
