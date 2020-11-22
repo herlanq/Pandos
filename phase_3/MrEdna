@@ -8,11 +8,7 @@
     "devices": {
         "flash0": {
             "enabled": true,
-            "file": "/home/schlampyy/Desktop/Pandos/testers/printerTest.umps"
-        },
-        "flash1": {
-            "enabled": false,
-            "file": "/home/schlampyy/Desktop/Pandos/testers/timeOfDay.umps"
+            "file": "/home/schlampyy/Desktop/Pandos/testers/terminalTest1.umps"
         },
         "terminal0": {
             "enabled": true,
@@ -26,6 +22,6 @@
         "asid": 64,
         "file": "kernel.stab.umps"
     },
-    "tlb-floor-address": "0x80000000",
+    "tlb-floor-address": "0xffffffff",
     "tlb-size": 16
 }
