@@ -188,7 +188,7 @@ void uSysHandler(support_t *supportStruct){
                 *charAddress = status >> 8;
                 charAddress++;
                 if((status >> 8) == 0x0A){
-                    done = TRUE;
+                    complete = TRUE;
                 }
             }
         }
