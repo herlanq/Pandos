@@ -162,7 +162,6 @@ void uSysHandler(support_t *supportStruct){
         devReg = (devregarea_t*) RAMBASEADDR;
         devSemNum = ((TERMINAL - DISK) * DEVPERINT) + id;
         charAddress =(char*) supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
-        length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
         if((int)charAddress < KUSEG){
             SYSCALL(TERMINATETHREAD, 0, 0, 0);
