@@ -42,7 +42,6 @@ void test(){
 
     /* call helper function to initialize user processes */
     InitUserProc();
-
     /* init master proc control sema4 */
     control_sem = 0;
 

@@ -34,7 +34,6 @@
 #define NULL 			  ((void *)0xFFFFFFFF)
 #define MAXPROC	          20
 #define MAXINT            0xFFFFFFFF
-#define UPROCMAX		  8
 /* Sem number
  * 8 disks
  * 8 usb
@@ -156,6 +155,7 @@
 
 
 /*                                  PHASE 3                                     */
+#define UPROCMAX  1
 #define MAXPAGES 32
 #define USERPROCSTART 0x800000B0
 #define USERSTACK 0xC0000000
@@ -183,7 +183,7 @@
 #define VALIDON    0x00000200
 #define GLOBALON   0x00000100
 
-#define FLASHPOOL (RAMSTART + (OSFRAMES * PAGESIZE))
+#define FLASHPOOL (RAMSTART + (MAXPAGES * PAGESIZE))
 #define DISKPOOL  (FLASHPOOL + (DEVPERINT * PAGESIZE))
 #define FRAMEPOOL (DISKPOOL + (DEVPERINT * PAGESIZE))
 
