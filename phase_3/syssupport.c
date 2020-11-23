@@ -153,9 +153,8 @@ void uSysHandler(support_t *supportStruct){
         int id; /*this is the asid of the process */
         int status; /*used for writing to printer and terminal */
         int devSemNum; /*used to determine the device semapore */
-        int error;
+        int error; /* status variables */
         int complete;
-        int length; /*used to determine the length of output */
         char* charAddress;
         devregarea_t* devReg; /*device register type */
 
