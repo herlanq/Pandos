@@ -75,7 +75,7 @@ void uSysHandler(support_t *supportStruct){
 		}
 
 		/* P the semaphore and get mutual exclusion */
-		SYSCALL(PASSERN, devSem[devSemNum], 0, 0);
+		SYSCALL(PASSERN, (int) &devSem[devSemNum], 0, 0);
 		zflag = 3;
 		int counter = 0; /*used for the while loop */
 		error = FALSE;
@@ -94,7 +94,7 @@ void uSysHandler(support_t *supportStruct){
 		}
 		/* V the semaphore and release mutual exclusion */
 		zflag = 4;
-		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
+		SYSCALL(VERHOGEN, (int) &devSem[devSemNum], 0, 0);
 		/* assign the number of characters to the process */
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Write to Printer Case */
@@ -120,7 +120,7 @@ void uSysHandler(support_t *supportStruct){
             SYSCALL(TERMINATETHREAD, 0, 0, 0);
         }
         /* P the semaphore and get mutual exclusion */
-        SYSCALL(PASSERN, devSem[devSemNum], 0, 0);
+        SYSCALL(PASSERN, (int) &devSem[devSemNum], 0, 0);
 
         int counter = 0; /*used for the while loop */
         error = FALSE;
@@ -139,7 +139,7 @@ void uSysHandler(support_t *supportStruct){
             charAddress++;
 		}
 		/* V the semaphore to release mutual exclusion */
-		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
+		SYSCALL(VERHOGEN, (int) &devSem[devSemNum], 0, 0);
         supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 		if(error){
 		    counter = 0 - (status&0xFF);
