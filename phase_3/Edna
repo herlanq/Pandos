@@ -8,15 +8,47 @@
     "devices": {
         "flash0": {
             "enabled": true,
-            "file": "/home/schlampyy/Desktop/Pandos/testers/printerTest.umps"
+            "file": "/home/k98berry/Documents/Pandos/testers/fibEleven.umps"
         },
         "flash1": {
-            "enabled": false,
-            "file": "/home/schlampyy/Desktop/Pandos/testers/timeOfDay.umps"
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/fibEight.umps"
+        },
+        "printer0": {
+            "enabled": true,
+            "file": "P0.umps"
         },
         "terminal0": {
             "enabled": true,
             "file": "term0.umps"
+        },
+        "terminal1": {
+            "enabled": true,
+            "file": "term1.umps"
+        },
+        "terminal2": {
+            "enabled": false,
+            "file": "term2.umps"
+        },
+        "terminal3": {
+            "enabled": false,
+            "file": "term3.umps"
+        },
+        "terminal4": {
+            "enabled": false,
+            "file": "term4.umps"
+        },
+        "terminal5": {
+            "enabled": false,
+            "file": "term5.umps"
+        },
+        "terminal6": {
+            "enabled": false,
+            "file": "term6.umps"
+        },
+        "terminal7": {
+            "enabled": false,
+            "file": "term7.umps"
         }
     },
     "execution-rom": "/usr/local/share/umps3/exec.rom.umps",

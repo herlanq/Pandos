@@ -52,47 +52,47 @@ void uSysHandler(support_t *supportStruct){
 
 	/* Begin Write to Printer Case */
 	else if(sysReason == PRINTERW){
-		zflag = 1;
 		/*this is the case where we write to printer */
 		int id; /*this is the asid of the process */
-		int status; /*used for writing to printer and terminal */
+		int status = READY; /*used for writing to printer and terminal */
+		zflag = status;
 		int error;
 		int devSemNum; /*used to determine the device semapore */
 		int length; /*used to determine the length of output */
-		char *charAddress;
+		char* charAddress;
 		devregarea_t *devReg; /*device register type */
 
-		id = supportStruct->sup_asid-1;
+		id = (supportStruct->sup_asid) - 1;
 		devReg = (devregarea_t*) RAMBASEADDR;
         devSemNum = ((PRINTER - DISK) * DEVPERINT) + (id);
 
 		charAddress = (char*) supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
-		if(((int)charAddress < KUSEG) || (length < 1) || (length > MAXSTRING)){
-			zflag = 9;
+		if(((int)charAddress < KUSEG) || (length < 0) || (length > MAXSTRING)){
 		    SYSCALL(TERMINATETHREAD, 0, 0, 0);
 		}
 
 		/* P the semaphore and get mutual exclusion */
 		SYSCALL(PASSERN, (int) &devSem[devSemNum], 0, 0);
-		zflag = 3;
 		int counter = 0; /*used for the while loop */
 		error = FALSE;
 		while((error == FALSE) && (counter < length)){
 			/*need to work on the output for this function */
-			devReg->devreg[devSemNum].d_data0 = (*charAddress);
+			devReg->devreg[devSemNum].d_data0 = *charAddress;
 			devReg->devreg[devSemNum].d_command = 2;
 			status = SYSCALL(WAITIO, PRINTER, id, 0);
-			if(status != READY){
-			    error = TRUE;
-			}else{
-                counter++;
+			zflag = status;
+			if(status == READY){
+				zflag = 4;
+				counter++;
+			}
+			else{
+				error = TRUE;
 			}
             charAddress++;
 		}
 		/* V the semaphore and release mutual exclusion */
-		zflag = 4;
 		SYSCALL(VERHOGEN, (int) &devSem[devSemNum], 0, 0);
 		/* assign the number of characters to the process */
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
@@ -129,6 +129,7 @@ void uSysHandler(support_t *supportStruct){
 
 			/* Sys 8 the terminal write */
 			status = SYSCALL(WAITIO, TERMINAL, id, 0);
+			zflag = (status & 0xFF);
 
 			if((status & 0xFF) != C_TRANSOK){
 			    error = TRUE;
