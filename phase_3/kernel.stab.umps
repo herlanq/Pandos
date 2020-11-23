@@ -8,11 +8,11 @@ blocker                          :FUN:0x2000268C:0x000000CC:LOC
 semdTable.1061                   :OBJ:0x20006020:0x00000108:LOC
 pcbFree_h                        :OBJ:0x20006130:0x00000004:LOC
 pcbInit.1044                     :OBJ:0x20006134:0x00000DC0:LOC
-InitUserProc                     :FUN:0x20003E2C:0x00000498:LOC
 swap_pool                        :OBJ:0x20006F14:0x000000C0:LOC
 swap_sem                         :OBJ:0x20006FD4:0x00000004:LOC
 swapper                          :OBJ:0x20006FD8:0x00000004:LOC
 get_frame                        :FUN:0x20004A60:0x00000088:LOC
+flashOP                          :FUN:0x20004968:0x000000F8:LOC
 INITCPU                          :FUN:0x2000544C:0x00000040:GLB
 currentProc                      :OBJ:0x20006FF0:0x00000004:GLB
 InitTLB                          :FUN:0x200042D0:0x00000090:GLB
@@ -30,7 +30,7 @@ STST                             :FUN:0x2000534C:0x000000C0:GLB
 freeSemd                         :FUN:0x20002ED4:0x00000084:GLB
 getEPC                           :FUN:0x200051D4:0x00000014:GLB
 PANIC                            :FUN:0x20005420:0x00000014:GLB
-intsON                           :FUN:0x20004900:0x00000074:GLB
+intsON                           :FUN:0x200048E8:0x00000080:GLB
 TlbTrapHandler                   :FUN:0x200024C0:0x00000038:GLB
 insertBlocked                    :FUN:0x20002B30:0x0000014C:GLB
 TLBCLR                           :FUN:0x200052F4:0x00000014:GLB
@@ -61,7 +61,6 @@ zdiditdo                         :OBJ:0x20006F00:0x00000004:GLB
 CAS                              :FUN:0x2000531C:0x00000010:GLB
 Copy_Paste                       :FUN:0x20001B0C:0x000000F4:GLB
 getINDEX                         :FUN:0x20005134:0x00000014:GLB
-flashOP                          :FUN:0x20004974:0x000000EC:GLB
 SysSupport                       :FUN:0x20004AF0:0x000000AC:GLB
 insertProcQ                      :FUN:0x20003270:0x00000190:GLB
 readyQue                         :OBJ:0x20006FFC:0x00000004:GLB
@@ -86,13 +85,14 @@ TLBP                             :FUN:0x200052CC:0x00000014:GLB
 mkEmptyProcQ                     :FUN:0x20003214:0x00000024:GLB
 Ready_Timer                      :FUN:0x20001D58:0x00000090:GLB
 allocPcb                         :FUN:0x20003160:0x000000B4:GLB
+InitUserProc                     :FUN:0x20003E2C:0x00000498:GLB
 outProcQ                         :FUN:0x20003544:0x00000304:GLB
 outChild                         :FUN:0x20003ADC:0x00000254:GLB
 pagethingy                       :OBJ:0x20006000:0x00000004:GLB
 setINDEX                         :FUN:0x200051FC:0x0000001C:GLB
 getPRID                          :FUN:0x200051E8:0x00000014:GLB
 uTLB_RefillHandler               :FUN:0x20004360:0x00000110:GLB
-uTLB_Pager                       :FUN:0x20004470:0x00000490:GLB
+uTLB_Pager                       :FUN:0x20004470:0x00000478:GLB
 sysHandler                       :FUN:0x20001DF0:0x000006D0:GLB
 getTIMER                         :FUN:0x20005184:0x00000014:GLB
 zflag                            :OBJ:0x20006FE0:0x00000004:GLB

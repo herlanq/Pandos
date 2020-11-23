@@ -12,7 +12,6 @@ extern void uTLB_Pager();
 extern void uTLB_RefillHandler();
 
 extern void intsON(int on_off);
-extern int flashOP(int flash, int sect, int buffer, int op);
 
 
 #endif

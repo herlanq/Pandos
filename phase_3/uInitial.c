@@ -27,18 +27,19 @@ int devSem[DEVICECNT+DEVPERINT]; /* list of device sema4's */
 int control_sem; /* master process sema4 */
 int zdiditdo = 0;
 
-HIDDEN void InitUserProc();
+void InitUserProc();
 
 /* master process that initializes all necessary data structures adn processes. Once this is complete, test() will
  * blocks itself until all of the processes have been terminated and then terminates itself. */
 void test(){
     int i;
-    /* initialize the TLB*/
-    InitTLB();
     /* initializes the device reg semaphores */
     for(i=0; i < (DEVICECNT+DEVPERINT); i++){
         devSem[i] = 1;
     }
+    /* initialize the TLB*/
+    InitTLB();
+
     /* call helper function to initialize user processes */
     InitUserProc();
 
@@ -55,7 +56,7 @@ void test(){
 } /* end test(), master process */
 
 /* helper function to clean up the code, initializes the user processes */
-HIDDEN void InitUserProc(){
+void InitUserProc(){
     int id;
     int begin;
     support_t support[UPROCMAX + 1];

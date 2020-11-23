@@ -16,6 +16,7 @@
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
 HIDDEN int get_frame();
+HIDDEN int flashOP(int flash, int blockID, int buffer, int op);
 HIDDEN int swapper = 0;
 int flaggerton = 0;
 int pagethingy = -1;
@@ -38,8 +39,8 @@ void uTLB_RefillHandler(){
 
     oldstate = (state_PTR) BIOSDATAPAGE;
 
-    pg_num = (oldstate->s_entryHI & GETPAGENUM) >> VPNSHIFT;
-    pg_num = pg_num % MAXPAGES;
+    pg_num = (((oldstate->s_entryHI) & GETPAGENUM) >> VPNSHIFT);
+    pg_num = (pg_num % MAXPAGES);
 
     setENTRYHI((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryHI);
     setENTRYLO((currentProc->p_supportStruct->sup_PvtPgTable[pg_num]).entryLO);
@@ -51,7 +52,6 @@ void uTLB_RefillHandler(){
  * will result in a terminating process. */
 void uTLB_Pager(){
     int id, frame_num, pg_num, status; /* process id, victim frame number, requested pg number, return status */
-    
     unsigned int frame_addr;
     int block;
     support_t *supStruct;
@@ -62,7 +62,7 @@ void uTLB_Pager(){
     cause = (supStruct->sup_exceptState[PGFAULTEXCEPT].s_cause & CAUSE) >> SHIFT;
     id = supStruct->sup_asid;
 
-    if((cause != TLBINV) && (cause != TLBINVS)) {
+    if(cause != TLBINV && cause != TLBINVS) {
         SYSCALL(TERMINATETHREAD, 0, 0, 0);
     }
     
@@ -79,29 +79,28 @@ void uTLB_Pager(){
     if(swap_pool[frame_num].sw_asid != -1){
         /* disable interrupts */
         intsON(OFF);
-        swap_pool[frame_num].sw_pte->entryLO = ((swap_pool[frame_num].sw_pte->entryLO) & 0xFFFFFDFF);
+        /* Turn off V bit */
+        swap_pool[frame_num].sw_pte->entryLO &= 0xFFFFFDFF;
         TLBCLR();
         intsON(ON);
 
         /* update the backing store */
-        block = swap_pool[frame_num].sw_pgNum;
-        block = block % MAXPAGES;
+        block = ((swap_pool[frame_num].sw_pgNum) % MAXPAGES);
         /* write into the backing store */
+
         status = flashOP(((swap_pool[frame_num].sw_asid)-1), block, frame_addr, FLASHW);
 
         if(status != READY){
-            
-            SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
+            SYSCALL(TERMINATETHREAD, (int) &swap_sem, 0, 0);
         }
     }
 
     /* read from backing store */
-    block = pg_num;
-    block = block % MAXPAGES;
+    block = (pg_num % MAXPAGES);
     status = flashOP((id-1), block, frame_addr, FLASHR);
 
     if(status != READY){
-        SYSCALL(TERMINATETHREAD, swap_sem, 0, 0);
+        SYSCALL(TERMINATETHREAD, (int) &swap_sem, 0, 0);
     }
     
     pteEntry_t* pEntry = &(supStruct->sup_PvtPgTable[block]);
@@ -130,9 +129,9 @@ void intsON(int on_off){
     status = getSTATUS();
 
     if(on_off == OFF){
-        status = status & ALLOFF;
+        status = (status & IECON);
     }else{
-        status = status | 0x1;
+        status = (status | 0x1);
     }
     setSTATUS(status);
 }
@@ -143,18 +142,18 @@ void intsON(int on_off){
  * buffer is the buffer address
  * 'op' specifies the types of flash operation, read or write
  * */
-int flashOP(int flash, int sect, int buffer, int op){
+HIDDEN int flashOP(int flash, int blockID, int buffer, int op){
     int status;
     devregarea_t *devreg;
     devreg = (devregarea_t *) RAMBASEADDR;
     intsON(OFF);
     devreg->devreg[flash+DEVPERINT].d_data0 = buffer;
-    devreg->devreg[flash+DEVPERINT].d_command = (sect << 8) | op;
+    devreg->devreg[flash+DEVPERINT].d_command = (blockID << 8) | op;
     status = SYSCALL(WAITIO, FLASH, flash, 0);
     intsON(ON);
 
     if(status!=READY){
-        status = OFF;
+        status = OFF - status;
     }
     return status;
 }
