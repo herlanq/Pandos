@@ -17,7 +17,6 @@ void SysSupport(){
 	int cause;
 	/*first things first, get the support struct */
 	supportStruct = (support_t*) SYSCALL(GETSPTPTR,0,0,0);
-	/*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4; */
 
 	/* get exception cause */
 	cause = (supportStruct->sup_exceptState[GENERALEXCEPT].s_cause & CAUSE) >> SHIFT;
@@ -34,6 +33,7 @@ void SysSupport(){
 }
 
 void uSysHandler(support_t *supportStruct){
+    supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4;
 	int sysReason = supportStruct->sup_exceptState[GENERALEXCEPT].s_a0;
 
     /* Begin Terminate Case */
@@ -62,9 +62,9 @@ void uSysHandler(support_t *supportStruct){
 		char *charAddress;
 		devregarea_t *devReg; /*device register type */
 
-		id = supportStruct->sup_asid;
+		id = supportStruct->sup_asid-1;
 		devReg = (devregarea_t*) RAMBASEADDR;
-        devSemNum = ((PRINTER - DISK) * DEVPERINT) + (id-1);
+        devSemNum = ((PRINTER - DISK) * DEVPERINT) + (id);
 
 		charAddress = (char*) supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
@@ -79,11 +79,11 @@ void uSysHandler(support_t *supportStruct){
 		zflag = 3;
 		int counter = 0; /*used for the while loop */
 		error = FALSE;
-		while((!error) && (counter < length)){
+		while((error == FALSE) && (counter < length)){
 			/*need to work on the output for this function */
 			devReg->devreg[devSemNum].d_data0 = (*charAddress);
 			devReg->devreg[devSemNum].d_command = 2;
-			status = SYSCALL(WAITIO, PRINTER, (id-1), 0);
+			status = SYSCALL(WAITIO, PRINTER, id, 0);
 			if(status != READY){
 			    error = TRUE;
 				/*supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = (status *-1);*/
@@ -95,7 +95,6 @@ void uSysHandler(support_t *supportStruct){
 		/* V the semaphore and release mutual exclusion */
 		zflag = 4;
 		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
-
 		/* assign the number of characters to the process */
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Write to Printer Case */
@@ -111,9 +110,9 @@ void uSysHandler(support_t *supportStruct){
 		char* charAddress;
 		devregarea_t* devReg; /*device register type */
 
-		id = supportStruct->sup_asid;
+		id = supportStruct->sup_asid-1;
 		devReg = (devregarea_t*) RAMBASEADDR;
-        devSemNum = ((PRINTER - DISK) * DEVPERINT) + (id-1);
+        devSemNum = ((TERMINAL - DISK) * DEVPERINT) + id;
 		charAddress =(char*) supportStruct->sup_exceptState[GENERALEXCEPT].s_a1;
 		length = supportStruct->sup_exceptState[GENERALEXCEPT].s_a2;
 
@@ -126,26 +125,25 @@ void uSysHandler(support_t *supportStruct){
         int counter = 0; /*used for the while loop */
         error = FALSE;
 
-		while((!error) && (counter < length)){
-		    devReg->devreg[devSemNum].t_transm_command = *charAddress;
+		while((error == FALSE) && (counter < length)){
+		    devReg->devreg[devSemNum].t_transm_command = *charAddress << BYTE_LENGTH | C_TRANSMIT;
 
 			/* Sys 8 the terminal write */
-			status = SYSCALL(WAITIO, PRINTER, (id-1), 0);
+			status = SYSCALL(WAITIO, TERMINAL, id, 0);
 
-			if((status & 0xFF) != READY){
+			if((status & 0xFF) != C_TRANSOK){
 			    error = TRUE;
-			}
-			charAddress++;
-			counter++;
+			}else{
+                counter++;
+            }
+            charAddress++;
 		}
 		/* V the semaphore to release mutual exclusion */
 		SYSCALL(VERHOGEN, devSem[devSemNum], 0, 0);
-
+        supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 		if(error){
 		    counter = 0 - (status&0xFF);
 		}
-
-		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Terminal Write Case */
 
 	else if(sysReason == TERMINALR){

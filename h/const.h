@@ -165,7 +165,11 @@
 #define POOLSIZE (UPROCMAX * 2)
 #define BACKINGSTORE 0
 #define DISKBACK 1
-#define FLASHBACK 0 
+#define FLASHBACK 0
+
+#define C_TRANSMIT	2
+#define C_TRANSOK	5
+#define BYTE_LENGTH		8
 
 #define TLBINV 2
 #define TLBINVS 3
