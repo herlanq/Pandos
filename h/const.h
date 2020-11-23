@@ -167,6 +167,8 @@
 #define DISKBACK 1
 #define FLASHBACK 0
 
+#define MAXSTRING 128
+
 #define C_TRANSMIT	2
 #define C_TRANSOK	5
 #define BYTE_LENGTH		8
