@@ -5,7 +5,6 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/types.h"
 #include "../h/libumps.h"
 #include "../h/syssupport.h"
-
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
 
@@ -39,7 +38,7 @@ void uSysHandler(support_t *supportStruct){
     /* Begin Terminate Case */
 	if(sysReason == TERMINATE){
 		/*this is the case where we terminate process */
-		zflag = 8;
+		zflag = 9;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	} /* End Terminate Case */
 

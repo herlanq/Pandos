@@ -18,7 +18,7 @@ HIDDEN int swap_sem;
 HIDDEN int get_frame();
 HIDDEN int flashOP(int flash, int blockID, int buffer, int op);
 HIDDEN int swapper = 0;
-int flaggerton = 0;
+int flagDude = 0;
 int pagethingy = -1;
 
 /* initializes the TLB data structure for support paging.
@@ -161,8 +161,8 @@ HIDDEN int flashOP(int flash, int blockID, int buffer, int op){
 /* this function is used to satisfy a page fault exception by finding which frame to use
  * using a round robin algorithm */
 HIDDEN int get_frame(){
-    flaggerton = swapper;
+    flagDude = swapper;
     swapper = (swapper+1) % POOLSIZE;
-    flaggerton = swapper;
+    flagDude = swapper;
     return swapper;
 }
