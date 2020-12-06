@@ -2,7 +2,10 @@
  * CSCI 320-01 Operating Systems
  * Last modified 12/05
  *
- *
+ * The SysSupport module contains the portion of the OS that handles user system calls. The function SysSupport() is
+ * Phase 3's exception handler. It retrieves data from the support struct in order to determine the proper action to take.
+ * If the cause is a syscall exception, it calls the function uSysHandler, which is the user syscall handler, otherwise
+ * it terminates the process.
  */
 #include "../h/const.h"
 #include "../h/types.h"
@@ -125,7 +128,6 @@ void uSysHandler(support_t *supportStruct){
 
 			/* Sys 8 the terminal write */
 			status = SYSCALL(WAITIO, TERMINAL, id, 0);
-			zflag = (status & 0xFF);
 
 			if((status & 0xFF) != C_TRANSOK){
 			    error = TRUE;
