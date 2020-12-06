@@ -14,6 +14,30 @@
             "enabled": true,
             "file": "/home/k98berry/Documents/Pandos/testers/fibEight.umps"
         },
+        "flash2": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/terminalTest1.umps"
+        },
+        "flash3": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/terminalTest2.umps"
+        },
+        "flash4": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/terminalTest3.umps"
+        },
+        "flash5": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/terminalTest4.umps"
+        },
+        "flash6": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/terminalTest5.umps"
+        },
+        "flash7": {
+            "enabled": true,
+            "file": "/home/k98berry/Documents/Pandos/testers/printerTest.umps"
+        },
         "printer0": {
             "enabled": true,
             "file": "P0.umps"
@@ -27,33 +51,33 @@
             "file": "term1.umps"
         },
         "terminal2": {
-            "enabled": false,
+            "enabled": true,
             "file": "term2.umps"
         },
         "terminal3": {
-            "enabled": false,
+            "enabled": true,
             "file": "term3.umps"
         },
         "terminal4": {
-            "enabled": false,
+            "enabled": true,
             "file": "term4.umps"
         },
         "terminal5": {
-            "enabled": false,
+            "enabled": true,
             "file": "term5.umps"
         },
         "terminal6": {
-            "enabled": false,
+            "enabled": true,
             "file": "term6.umps"
         },
         "terminal7": {
-            "enabled": false,
+            "enabled": true,
             "file": "term7.umps"
         }
     },
     "execution-rom": "/usr/local/share/umps3/exec.rom.umps",
     "num-processors": 1,
-    "num-ram-frames": 64,
+    "num-ram-frames": 128,
     "symbol-table": {
         "asid": 64,
         "file": "kernel.stab.umps"
