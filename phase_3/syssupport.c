@@ -1,6 +1,9 @@
-/*SysSupport.c is the file that is referenced for SYS9 and above
-Written by Kaleb Berry and Quinn Herlan */
-
+/* Written by: Quinn Herlan, Kaleb Berry
+ * CSCI 320-01 Operating Systems
+ * Last modified 12/05
+ *
+ *
+ */
 #include "../h/const.h"
 #include "../h/types.h"
 #include "../h/libumps.h"
@@ -8,7 +11,6 @@ Written by Kaleb Berry and Quinn Herlan */
 #include "../h/uInitial.h"
 #include "../h/VMsupport.h"
 
-int zflag = 0;
 
 /*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
 void SysSupport(){
@@ -25,7 +27,6 @@ void SysSupport(){
         uSysHandler(supportStruct);
     }
 	else{ /* Else, (for our purposes) Terminate the process */
-		zflag = 1;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
 	
@@ -38,7 +39,6 @@ void uSysHandler(support_t *supportStruct){
     /* Begin Terminate Case */
 	if(sysReason == TERMINATE){
 		/*this is the case where we terminate process */
-		zflag = 9;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	} /* End Terminate Case */
 
@@ -54,7 +54,6 @@ void uSysHandler(support_t *supportStruct){
 		/*this is the case where we write to printer */
 		int id; /*this is the asid of the process */
 		int status = READY; /*used for writing to printer and terminal */
-		zflag = status;
 		int error;
 		int devSemNum; /*used to determine the device semapore */
 		int length; /*used to determine the length of output */
@@ -81,9 +80,7 @@ void uSysHandler(support_t *supportStruct){
 			devReg->devreg[devSemNum].d_data0 = *charAddress;
 			devReg->devreg[devSemNum].d_command = 2;
 			status = SYSCALL(WAITIO, PRINTER, id, 0);
-			zflag = status;
 			if(status == READY){
-				zflag = 4;
 				counter++;
 			}
 			else{
@@ -203,7 +200,6 @@ void uSysHandler(support_t *supportStruct){
 
 	/* Else, Terminate the Process */
 	else{
-		zflag = 4;
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
     /*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc = supportStruct->sup_exceptState[]*/

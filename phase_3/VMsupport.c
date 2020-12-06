@@ -1,7 +1,8 @@
-/* TLB Exception Handler for phase_3 */
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 11/11
+ * Last modified 12/05
+ *
+ *
  */
 
 #include "../h/const.h"
@@ -18,8 +19,6 @@ HIDDEN int swap_sem;
 HIDDEN int get_frame();
 HIDDEN int flashOP(int flash, int blockID, int buffer, int op);
 HIDDEN int swapper = 0;
-int flagDude = 0;
-int pagethingy = -1;
 
 /* initializes the TLB data structure for support paging.
  * Inits the global shared Page Table */
@@ -68,9 +67,10 @@ void uTLB_Pager(){
     
     /* get page number of the request */
     pg_num = ((supStruct->sup_exceptState[PGFAULTEXCEPT].s_entryHI) & GETPAGENUM) >> VPNSHIFT;
-    pagethingy = pg_num;
+
     /* P the sema4 to gain mutual exclusion */
     SYSCALL(PASSERN, (int) &swap_sem, 0, 0 );
+
     /* call helper function to assign frame number and address */
     frame_num = get_frame();
     frame_addr = FRAMEPOOL + (frame_num * PAGESIZE);
@@ -161,8 +161,6 @@ HIDDEN int flashOP(int flash, int blockID, int buffer, int op){
 /* this function is used to satisfy a page fault exception by finding which frame to use
  * using a round robin algorithm */
 HIDDEN int get_frame(){
-    flagDude = swapper;
     swapper = (swapper+1) % POOLSIZE;
-    flagDude = swapper;
     return swapper;
 }

@@ -1,18 +1,14 @@
 /* Written by: Quinn Herlan, Kaleb Berry
  * CSCI 320-01 Operating Systems
- * Last modified 11/11
+ * Last modified 12/05
  *
  * User Process Initialization module. This module initializes all of the user processes set up b
  * the test() function. All process information is being initialized such as page and segment table and backing store
  * locations. When all the processes have been created, test is blocked until all of the processes have been terminated.
  * Once all the processes have been terminated, test() will then also be terminated.
+ * One page table per user process. Pandos Page Table is an array of 32 Page Table entries.
+ * Each Page Table entry is a double-word consisting of an EntryHi and an EntryLo portion
  */
-
-/*REMINDERS:
-One page table per user process
-Pandos Page Table is an array of 32 Page Table entries. 
-Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo portion
-*/
 
 #include "../h/const.h"
 #include "../h/types.h"
@@ -25,7 +21,6 @@ Each Page Table entry is a doubleword consisting of an EntryHi and an EntryLo po
 
 int devSem[DEVICECNT+DEVPERINT]; /* list of device sema4's */
 int control_sem; /* master process sema4 */
-int zdiditdo = 0;
 
 void InitUserProc();
 
