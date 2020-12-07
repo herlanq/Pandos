@@ -36,11 +36,39 @@
         },
         "flash7": {
             "enabled": true,
-            "file": "/home/k98berry/Documents/Pandos/testers/printerTest.umps"
+            "file": "/home/k98berry/Documents/Pandos/testers/DadJokes.umps"
         },
         "printer0": {
             "enabled": true,
             "file": "P0.umps"
+        },
+        "printer1": {
+            "enabled": true,
+            "file": "p1.umps"
+        },
+        "printer2": {
+            "enabled": true,
+            "file": "p2.umps"
+        },
+        "printer3": {
+            "enabled": true,
+            "file": "p3.umps"
+        },
+        "printer4": {
+            "enabled": true,
+            "file": "p4.umps"
+        },
+        "printer5": {
+            "enabled": true,
+            "file": "p5.umps"
+        },
+        "printer6": {
+            "enabled": true,
+            "file": "p6.umps"
+        },
+        "printer7": {
+            "enabled": true,
+            "file": "p7.umps"
         },
         "terminal0": {
             "enabled": true,

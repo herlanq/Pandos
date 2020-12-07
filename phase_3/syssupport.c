@@ -69,6 +69,7 @@ void uSysHandler(support_t *supportStruct){
 
 
 	/* Begin Write to Printer Case */
+	/* Our Printer Write is broken, we are only able to print out one character from the beginning line in the test */
 	else if(sysReason == PRINTERW){
 		/*this is the case where we write to printer */
 		int id; /*this is the asid of the process */
@@ -165,6 +166,7 @@ void uSysHandler(support_t *supportStruct){
 
 
 	/* Begin Terminal Read Case */
+    /*We never were able to get this working */
 	else if(sysReason == TERMINALR){
         /*this is the case where we write to terminal */
         int id; /*this is the asid of the process */
