@@ -7,7 +7,8 @@
  * locations. When all the processes have been created, test is blocked until all of the processes have been terminated.
  * Once all the processes have been terminated, test() will then also be terminated.
  * One page table per user process. Pandos Page Table is an array of 32 Page Table entries.
- * Each Page Table entry is a double-word consisting of an EntryHi and an EntryLo portion
+ * Each Page Table entry is a double-word consisting of an EntryHi and an EntryLo portion.
+ *
  */
 
 #include "../h/const.h"
@@ -37,10 +38,11 @@ void test(){
 
     /* call helper function to initialize user processes */
     InitUserProc();
+
     /* init master proc control sema4 */
     control_sem = 0;
 
-    /*block master proc */
+    /* block master proc */
     for(i=0; i < UPROCMAX; ++i){
         SYSCALL(PASSERN, (int)&control_sem, 0, 0);
     }
@@ -56,7 +58,7 @@ void InitUserProc(){
     support_t support[UPROCMAX + 1];
     state_t start_state; /* processor state */
 
-    /*now it is time to start initializing user processes */
+    /* now it is time to start initializing user processes with a maximum of 8 user processes */
     for(id = 1; id <= UPROCMAX; id++) {
         start_state.s_entryHI = id << ASIDSHIFT;
         start_state.s_sp = (int) USERSTACK;
@@ -71,7 +73,7 @@ void InitUserProc(){
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_stackPtr = (int) &(support[id].sup_stackM[499]);
         support[id].sup_exceptContext[PGFAULTEXCEPT].c_pc = (memaddr) uTLB_Pager;
 
-        /* Init page table */
+        /* Init the process page table or 32 page table entries */
         int i;
         for (i=0; i < MAXPAGES; i++) {
             support[id].sup_PvtPgTable[i].entryHI = ((0x80000 + i) << VPNSHIFT) | (id << ASIDSHIFT);
@@ -79,6 +81,7 @@ void InitUserProc(){
         }
 
         support[id].sup_PvtPgTable[MAXPAGES-1].entryHI = (0xBFFFF << VPNSHIFT) | (id << ASIDSHIFT);
+        /* SYS 1, create the process */
         begin = SYSCALL(CREATETHREAD, (int) &start_state, (int) &(support[id]), 0);
         
         /* create the process, if it does not create, terminate B( */
@@ -86,4 +89,4 @@ void InitUserProc(){
             SYSCALL(TERMINATETHREAD, 0, 0, 0);
         }
     }
-} /* end inituserproc */
+} /* end InitUserProc */

@@ -6,6 +6,7 @@
  * Phase 3's exception handler. It retrieves data from the support struct in order to determine the proper action to take.
  * If the cause is a syscall exception, it calls the function uSysHandler, which is the user syscall handler, otherwise
  * it terminates the process.
+ *
  */
 #include "../h/const.h"
 #include "../h/types.h"
@@ -15,7 +16,10 @@
 #include "../h/VMsupport.h"
 
 
-/*this function is used to pull the support struct, check the exception, then determine what syscall to perform */
+/* This function is used to pull the support struct and the check the exception cause
+ * If the cause is a syscall exception, the function calls uSysHandler, otherwise the exception is treated as a
+ * program trap (for our purposes, this case simply terminates the process)
+ */
 void SysSupport(){
 	support_t *supportStruct;
 	int cause;
@@ -29,15 +33,25 @@ void SysSupport(){
 	if(cause == SYSEXCEPTION) {
         uSysHandler(supportStruct);
     }
-	else{ /* Else, (for our purposes) Terminate the process */
+	/* Else, (for our purposes) Terminate the process */
+	else{
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
 	
-}
+} /* End SysSupport */
 
+/* If a syscall > 9 is thrown, this function handles the proper user syscall that needs to be performed.
+ * SYS 9 - Terminate Process
+ * SYS 10 - GET TOD
+ * SYS 11 - Write the Printer
+ * SYS 12 - Write to Terminal
+ * SYS 13 - Read from Terminal
+ * Otherwise, a SYS 2 is performed and the process is terminated
+ */
 void uSysHandler(support_t *supportStruct){
     supportStruct->sup_exceptState[GENERALEXCEPT].s_pc += 4;
 	int sysReason = supportStruct->sup_exceptState[GENERALEXCEPT].s_a0;
+
 
     /* Begin Terminate Case */
 	if(sysReason == TERMINATE){
@@ -45,12 +59,14 @@ void uSysHandler(support_t *supportStruct){
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	} /* End Terminate Case */
 
+
 	/* Begin Get TOD Case */
 	else if(sysReason == GETTOD){
 		cpu_t time;
 		STCK(time);
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = time;
 	} /* End Get TOD Case */
+
 
 	/* Begin Write to Printer Case */
 	else if(sysReason == PRINTERW){
@@ -96,6 +112,7 @@ void uSysHandler(support_t *supportStruct){
 		/* assign the number of characters to the process */
 		supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Write to Printer Case */
+
 
 	/* Begin Terminal Write Case */
 	else if(sysReason == TERMINALW){
@@ -145,6 +162,7 @@ void uSysHandler(support_t *supportStruct){
 		}
         supportStruct->sup_exceptState[GENERALEXCEPT].s_v0 = counter;
 	} /* End Terminal Write Case */
+
 
 	/* Begin Terminal Read Case */
 	else if(sysReason == TERMINALR){
@@ -200,10 +218,12 @@ void uSysHandler(support_t *supportStruct){
 
 	} /* End Terminal Read Case */
 
+
 	/* Else, Terminate the Process */
 	else{
 		SYSCALL(TERMINATETHREAD,0,0,0);
 	}
-    /*supportStruct->sup_exceptState[GENERALEXCEPT].s_pc = supportStruct->sup_exceptState[]*/
+	
+    /* Perform a load state to return to the user process */
     LDST(&(supportStruct->sup_exceptState[GENERALEXCEPT]));
 }

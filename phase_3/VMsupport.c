@@ -2,6 +2,9 @@
  * CSCI 320-01 Operating Systems
  * Last modified 12/05
  *
+ * The VMsupport module contains a number of functions that provide support for managing the virtual memory of
+ * the Pandos operating system. The module contains functions to initialize the TLB, handle TLB refill events,
+ * and handle page fault errors.
  *
  */
 
@@ -14,17 +17,21 @@
 #include "../h/syssupport.h"
 #include "../h/libumps.h"
 
+/* Modular Variable Declaration */
 HIDDEN swap_t swap_pool[POOLSIZE];
 HIDDEN int swap_sem;
-HIDDEN int get_frame();
-HIDDEN int flashOP(int flash, int blockID, int buffer, int op);
 HIDDEN int swapper = 0;
 
-/* initializes the TLB data structure for support paging.
- * Inits the global shared Page Table */
+/* Modular Function Declaration */
+HIDDEN int get_frame();
+HIDDEN int flashOP(int flash, int blockID, int buffer, int op);
+
+/* Initializes the TLB data structure for support paging of size UPROCMAX * 2 (= 16) */
 void InitTLB(){
     int i;
+    /* Init the swap pool control sema4 */
     swap_sem = 1;
+    /* Init the swap pool data structure */
     for(i=0; i < POOLSIZE; i++){
         swap_pool[i].sw_asid = -1;
     }
@@ -48,7 +55,7 @@ void uTLB_RefillHandler(){
 }
 
 /* This function handles only page fault TLB Management Exceptions. All other exceptions
- * will result in a terminating process. */
+ * will result in a process termination. */
 void uTLB_Pager(){
     int id, frame_num, pg_num, status; /* process id, victim frame number, requested pg number, return status */
     unsigned int frame_addr;
@@ -146,11 +153,12 @@ HIDDEN int flashOP(int flash, int blockID, int buffer, int op){
     int status;
     devregarea_t *devreg;
     devreg = (devregarea_t *) RAMBASEADDR;
-    intsON(OFF);
+    /* Load I/O and perform sys 8 with interrupts disabled */
+    intsON(OFF); /* toggle interrupts off */
     devreg->devreg[flash+DEVPERINT].d_data0 = buffer;
     devreg->devreg[flash+DEVPERINT].d_command = (blockID << 8) | op;
     status = SYSCALL(WAITIO, FLASH, flash, 0);
-    intsON(ON);
+    intsON(ON); /* toggle interrupts back on */
 
     if(status!=READY){
         status = OFF - status;
